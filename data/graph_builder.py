@@ -1,6 +1,11 @@
 import json
 import os
+import re
 from collections import defaultdict
+
+
+def _norm(s):
+    return re.sub(r'[^\w]', '', s.lower())
 
 GENRE_OVERRIDES = {
     "HUGEL": "Electronic",
@@ -133,11 +138,11 @@ def normalize_listeners(nodes):
     return nodes
 
 
-def enrich_with_spotify(nodes, top_artists):
-    top_lookup = {a["name"].lower(): a["score"] for a in top_artists}
+def enrich_with_scores(nodes, top_artists):
+    top_lookup = {_norm(a["name"]): a["score"] for a in top_artists}
 
     for node in nodes:
-        key = node["name"].lower()
+        key = _norm(node["name"])
         if key in top_lookup:
             node["direct_score"] = top_lookup[key]
             node["score"] = top_lookup[key]
@@ -147,9 +152,9 @@ def enrich_with_spotify(nodes, top_artists):
             node.setdefault("derived_score", 0)
 
     for artist in top_artists:
-        artist_key = artist["name"].lower()
+        artist_key = _norm(artist["name"])
         directly_matched = any(
-            node["name"].lower() == artist_key for node in nodes
+            _norm(node["name"]) == artist_key for node in nodes
         )
         if directly_matched:
             continue
@@ -157,7 +162,7 @@ def enrich_with_spotify(nodes, top_artists):
             if node["direct_score"] > 0:
                 continue
             for similar in node.get("similar_artists", []):
-                if similar["name"].lower() == artist_key:
+                if _norm(similar["name"]) == artist_key:
                     derived = artist["score"] * similar["match"] * 0.6
                     node["derived_score"] = max(node.get("derived_score", 0), derived)
                     node["score"] = max(node.get("score", 0), node["derived_score"])

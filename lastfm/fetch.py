@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 from dotenv import load_dotenv
 
@@ -50,3 +51,87 @@ def get_artist_info(artist_name):
         "listeners": listeners,
         "tags": tags,
     }
+
+
+def get_artist_image_and_bio(artist_name):
+    """Returns (image_url, bio) — either may be None."""
+    params = {
+        "method": "artist.getInfo",
+        "artist": artist_name,
+        "api_key": API_KEY,
+        "format": "json",
+    }
+    response = requests.get(BASE_URL, params=params, timeout=10)
+    data = response.json()
+
+    if "error" in data:
+        return None, None
+
+    artist = data.get("artist", {})
+
+    # Largest image: Last.fm returns images ordered smallest → largest
+    image_url = None
+    for img in reversed(artist.get("image", [])):
+        url = img.get("#text", "").strip()
+        if url:
+            image_url = url
+            break
+
+    # Bio: strip the trailing <a href=...> read-more link, then all HTML, truncate
+    bio = None
+    summary = artist.get("bio", {}).get("summary", "").strip()
+    if summary:
+        cleaned = re.sub(r'\s*<a\s[^>]*>[^<]*</a>', '', summary)
+        cleaned = re.sub(r'<[^>]+>', '', cleaned).strip()
+        bio = cleaned[:300] if cleaned else None
+
+    return image_url, bio
+
+
+def get_top_artists(username, limit=50):
+    """
+    Fetch user's top artists from Last.fm.
+    Returns list of {name, score} dicts sorted by rank,
+    same format as spotify/fetch.py get_top_artists().
+    Score: rank 1 = 1.0, rank 50 = 0.0, linear interpolation.
+    """
+    params = {
+        "method": "user.getTopArtists",
+        "user": username,
+        "limit": limit,
+        "period": "overall",
+        "api_key": API_KEY,
+        "format": "json",
+    }
+    try:
+        response = requests.get(BASE_URL, params=params, timeout=10)
+        data = response.json()
+        if "error" in data:
+            return []
+        artists = data.get("topartists", {}).get("artist", [])
+        result = []
+        for i, a in enumerate(artists):
+            score = 1.0 - (i / max(limit - 1, 1))
+            result.append({"name": a["name"], "score": score})
+        return result
+    except Exception:
+        return []
+
+
+def get_top_tracks(artist_name, limit=10):
+    """Returns a list of track name strings (up to `limit`)."""
+    params = {
+        "method": "artist.getTopTracks",
+        "artist": artist_name,
+        "limit": limit,
+        "api_key": API_KEY,
+        "format": "json",
+    }
+    response = requests.get(BASE_URL, params=params, timeout=10)
+    data = response.json()
+
+    if "error" in data:
+        return []
+
+    tracks = data.get("toptracks", {}).get("track", [])
+    return [t["name"] for t in tracks]

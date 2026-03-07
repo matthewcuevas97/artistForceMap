@@ -58,8 +58,18 @@
       margin-bottom: 7px;
     }
 
-    /* ── Spotify button ─── */
-    #spotifyBtn {
+    /* ── Auth section ─── */
+    .auth-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .auth-col {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .auth-btn {
       width: 100%;
       background: none;
       border: 1px solid rgba(255, 255, 255, 0.18);
@@ -67,21 +77,94 @@
       font-family: 'IBM Plex Mono', monospace;
       font-size: 10px;
       letter-spacing: 0.12em;
-      padding: 7px 12px;
+      padding: 7px 6px;
       cursor: pointer;
       transition: background 0.12s, border-color 0.12s, color 0.12s;
     }
 
-    #spotifyBtn:hover:not(:disabled) {
+    .auth-btn:hover {
       background: rgba(255, 255, 255, 0.06);
       border-color: rgba(255, 255, 255, 0.38);
       color: rgba(255, 255, 255, 0.9);
     }
 
-    #spotifyBtn:disabled {
-      color: rgba(255, 255, 255, 0.28);
-      border-color: rgba(255, 255, 255, 0.07);
-      cursor: default;
+    .auth-user {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .auth-disconnect {
+      width: 100%;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: rgba(255, 255, 255, 0.35);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.10em;
+      padding: 5px 4px;
+      cursor: pointer;
+      transition: border-color 0.1s, color 0.1s;
+    }
+
+    .auth-disconnect:hover {
+      border-color: rgba(255, 255, 255, 0.28);
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .lastfm-row {
+      display: flex;
+      gap: 4px;
+    }
+
+    .lastfm-row input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.72);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      padding: 6px 6px;
+      outline: none;
+    }
+
+    .lastfm-row input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.22);
+    }
+
+    .lastfm-row input[type="text"]:focus {
+      border-color: rgba(255, 255, 255, 0.38);
+    }
+
+    .lastfm-go {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.72);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.10em;
+      padding: 6px 7px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+
+    .lastfm-go:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.38);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .auth-error {
+      font-size: 8px;
+      letter-spacing: 0.08em;
+      color: rgba(255, 100, 100, 0.75);
+      margin-top: 5px;
     }
 
     /* ── Day filter buttons ─── */
@@ -202,16 +285,91 @@
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       margin: 15px 0;
     }
+
+    /* ── Artist panel ─── */
+    .artist-panel {
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100vh;
+      width: 320px;
+      background: #1a1a1a;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      z-index: 100;
+      overflow-y: auto;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .artist-panel.open {
+      transform: translateX(0);
+    }
+
+    #panelClose {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-top-color: rgba(255,255,255,0.45);
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
   <svg id="graph"></svg>
 
+  <div id="artistPanel" class="artist-panel">
+    <button id="panelClose">✕</button>
+    <div id="panelContent"></div>
+  </div>
+
   <div id="controls">
-    <!-- Spotify auth -->
+    <!-- Auth section: Spotify + Last.fm -->
     <div class="ctrl-row">
-      <button id="spotifyBtn">LOGIN WITH SPOTIFY</button>
+      <div class="auth-row">
+        <!-- Spotify column -->
+        <div class="auth-col" id="spotifyCol">
+          <span class="ctrl-label">SPOTIFY</span>
+          <div id="spotifyConnected" style="display:none">
+            <div id="spotifyUserLabel" class="auth-user"></div>
+            <button id="spotifyDisconnect" class="auth-disconnect">DISCONNECT</button>
+          </div>
+          <button id="spotifyBtn" class="auth-btn">CONNECT ▶</button>
+        </div>
+        <!-- Last.fm column -->
+        <div class="auth-col" id="lastfmCol">
+          <span class="ctrl-label">LAST.FM</span>
+          <div id="lastfmConnected" style="display:none">
+            <div id="lastfmUserLabel" class="auth-user"></div>
+            <button id="lastfmDisconnect" class="auth-disconnect">DISCONNECT</button>
+          </div>
+          <div id="lastfmInput">
+            <div class="lastfm-row">
+              <input type="text" id="lastfmUsername" placeholder="username" />
+              <button id="lastfmGo" class="lastfm-go">GO</button>
+            </div>
+            <div id="lastfmError" class="auth-error" style="display:none">User not found</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <hr class="ctrl-sep" />
@@ -232,8 +390,9 @@
       <div class="slider-header">
         <span class="ctrl-label">EDGE THRESHOLD</span>
         <span class="slider-value" id="thresholdValue">0.20</span>
+
       </div>
-      <input type="range" id="thresholdSlider" min="0" max="1" step="0.01" value="0.2" />
+      <input type="range" id="thresholdSlider" min="0" max="4" step="1" value="2" />
     </div>
 
     <!-- Node size (live) -->
@@ -262,6 +421,8 @@
 
   <script>
     window.AUTHENTICATED = {{ 'true' if session.get('token') else 'false' }};
+    window.LASTFM_USER = {{ session.get('lastfm_user') | tojson }};
+    window.SPOTIFY_DISPLAY_NAME = {{ session.get('spotify_display_name') | tojson }};
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script type="module" src="/static/graph.js"></script>
