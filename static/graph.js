@@ -35,8 +35,11 @@ let dayFilter      = "ALL";
 
 let discoveryMode    = false;
 let discovered       = new Set(); // fully discovered artist names
-let revealed         = new Set(); // hollow/clickable but not yet discovered
-// locked = all nodes not in discovered or revealed (tiny dots, inert)
+let fringe           = new Set(); // undiscovered nodes one degree from lastDiscovered
+let subgraph         = new Set(); // lastDiscovered + ALL its direct neighbors (discovered + fringe)
+let ambassadors      = new Set(); // highest-score node from each undiscovered, disconnected subgraph
+let userSeeds        = new Set(); // artist names matched from Spotify/Last.fm data
+let lastDiscovered   = null;      // name of the most recently visited discovered node
 let allEdgesForFrontier = []; // populated once from /api/graph?threshold=0.05
 let frontierEdgesLoaded = false;
 
@@ -169,6 +172,16 @@ function closePanel() {
   if (currentAudio)   { currentAudio.pause(); currentAudio = null; }
   if (currentPlayBtn) { currentPlayBtn.textContent = "▶"; currentPlayBtn = null; }
   collapseSubmenu();
+  // Return to full discovered-node view when the panel is dismissed
+  if (discoveryMode && lastDiscovered !== null) {
+    window._pendingDiscovery = null;
+    lastDiscovered = null;
+    fringe.clear();
+    subgraph.clear();
+    updateAmbassadors();
+    updateDiscoveryVisuals();
+    expandMenu();
+  }
 }
 
 function collapseSubmenu() {
@@ -571,15 +584,22 @@ function ticked() {
 // ── Hover / interaction handlers ──────────────────────────────────────────────
 
 function onNodeEnter(event, d) {
-  // Dim all edges; highlight connected ones (respecting type filter)
+  // Dim all edges; highlight hovered + lastDiscovered 1-degree edges
   edgeEl.attr("opacity", e => {
     if (e.type === "similarity" && !showSimilarity) return 0;
     if (e.type === "genre"      && !showGenre)      return 0;
+    if (e.source === d || e.target === d) return edgeBaseOpacity(e);
+    // Preserve lastDiscovered 1-degree highlights in discovery mode
+    if (discoveryMode && lastDiscovered) {
+      const srcName = typeof e.source === "object" ? e.source.name : e.source;
+      const tgtName = typeof e.target === "object" ? e.target.name : e.target;
+      if (srcName === lastDiscovered || tgtName === lastDiscovered) {
+        const other = srcName === lastDiscovered ? tgtName : srcName;
+        if (discoveryVisible(other)) return 0.45;
+      }
+    }
     return 0.02;
   });
-  edgeEl
-    .filter(e => e.source === d || e.target === d)
-    .attr("opacity", e => edgeBaseOpacity(e));
 
   // Dim all labels; show hovered node's label
   labelEl.attr("opacity", l => (l === d ? 1.0 : (l.score >= 0.1 ? 0.05 : 0)));
@@ -620,8 +640,7 @@ function clearHover() {
   if (labelEl) {
     if (discoveryMode) {
       labelEl.attr("opacity", d => {
-        if (discovered.has(d.name)) return labelOpacity(d);
-        if (revealed.has(d.name))   return 0.4;
+        if (discoveryVisible(d.name)) return labelOpacity(d);
         return 0;
       });
     } else {
@@ -633,13 +652,30 @@ function clearHover() {
 
 // ── Filter functions (called on control changes) ──────────────────────────────
 
+// Returns true if the named node should be visible in the current discovery state.
+// When a node is selected: the full 1-degree subgraph (lastDiscovered + all direct
+// neighbors, both discovered and undiscovered fringe) is shown.
+// When no node is selected: all discovered nodes are shown.
+function discoveryVisible(name) {
+  if (lastDiscovered) return subgraph.has(name);
+  return discovered.has(name) || ambassadors.has(name);
+}
+
 function applyDayFilter() {
   if (!nodeEl) return;
   const target = dayFilter === "ALL" ? null : DAY_MAP[dayFilter];
   const visible = d => !target || d.day === target;
 
-  nodeEl .style("display", d => visible(d) ? null : "none");
-  labelEl.style("display", d => visible(d) ? null : "none");
+  nodeEl.style("display", d => {
+    if (!visible(d)) return "none";
+    if (discoveryMode && !discoveryVisible(d.name)) return "none";
+    return null;
+  });
+  labelEl.style("display", d => {
+    if (!visible(d)) return "none";
+    if (discoveryMode && !discoveryVisible(d.name)) return "none";
+    return null;
+  });
   edgeEl .style("display", e => {
     // After 300 ticks, e.source / e.target are node objects
     const src = e.source;
@@ -654,8 +690,14 @@ function applyEdgeFilter() {
     edgeEl.attr("opacity", e => {
       const srcName = typeof e.source === "object" ? e.source.name : e.source;
       const tgtName = typeof e.target === "object" ? e.target.name : e.target;
-      if (!discovered.has(srcName) || !discovered.has(tgtName)) return 0;
-      return edgeBaseOpacity(e);
+      // 1-degree subgraph of lastDiscovered: show edges to discovered AND fringe
+      if (lastDiscovered && (srcName === lastDiscovered || tgtName === lastDiscovered)) {
+        const other = srcName === lastDiscovered ? tgtName : srcName;
+        if (discoveryVisible(other)) return 0.45;
+      }
+      // No node selected: show discovered↔discovered edges normally
+      if (!lastDiscovered && discovered.has(srcName) && discovered.has(tgtName)) return edgeBaseOpacity(e);
+      return 0;
     });
   } else {
     edgeEl.attr("opacity", e => edgeBaseOpacity(e));
@@ -721,15 +763,24 @@ function buildGraph() {
       // D3 drag suppresses click after a real drag; dragMoved guard is belt-and-suspenders
       if (dragMoved) { dragMoved = false; return; }
 
-      // Discovery mode: revealed node → open panel, set pending discovery
-      if (discoveryMode && revealed.has(d.name) && !discovered.has(d.name)) {
-        openPanel(d.name);
+      // Discovery mode: fringe or ambassador node → open panel, set pending discovery
+      if (discoveryMode && (fringe.has(d.name) || ambassadors.has(d.name)) && !discovered.has(d.name)) {
         window._pendingDiscovery = d.name;
+        updateDiscoveryVisuals();
+        openPanel(d.name);
         return;
       }
-      // Discovery mode: locked node → inert (pointer-events:none should already block this)
-      if (discoveryMode && !discovered.has(d.name) && !revealed.has(d.name)) {
+      // Discovery mode: non-visible undiscovered node → inert
+      if (discoveryMode && !discovered.has(d.name) && !fringe.has(d.name) && !ambassadors.has(d.name)) {
         return;
+      }
+      // Discovery mode: clicking a discovered node shifts the fringe to its neighbors
+      if (discoveryMode && discovered.has(d.name)) {
+        lastDiscovered = d.name;
+        recalcFringe();
+        updateDiscoveryVisuals();
+        zoomToSubgraph();
+        minimizeMenu();
       }
 
       if (openArtistName === d.name && d.fx !== null && d.fx !== undefined) {
@@ -804,8 +855,9 @@ async function fetchAndBuild(threshold) {
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
     if (data.error) throw new Error(data.error);
-    rawNodes = data.nodes;
-    rawEdges = data.edges;
+    rawNodes  = data.nodes;
+    rawEdges  = data.edges;
+    userSeeds = new Set(data.user_seeds || []);
     buildGraph();
   } catch (err) {
     console.error("artistForceMap: failed to load graph —", err.message);
@@ -816,59 +868,119 @@ async function fetchAndBuild(threshold) {
 
 function seedDiscovery() {
   discovered.clear();
-  revealed.clear();
-  // Top 20 nodes by score
-  const top20 = [...simNodes]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 20);
-  top20.forEach(n => discovered.add(n.name));
-  expandFrontier();
+  fringe.clear();
+  subgraph.clear();
+  ambassadors.clear();
+  lastDiscovered = null;
+
+  let seeds;
+  if (userSeeds.size > 0) {
+    // User has Spotify/Last.fm data: prioritize those artists
+    const userNodes = simNodes
+      .filter(n => userSeeds.has(n.name))
+      .sort((a, b) => b.score - a.score);
+
+    if (userNodes.length >= 20) {
+      seeds = userNodes.slice(0, 20);
+    } else {
+      // Fill remaining slots from the rest of the graph sorted by score
+      const userNameSet = new Set(userNodes.map(n => n.name));
+      const rest = simNodes
+        .filter(n => !userNameSet.has(n.name))
+        .sort((a, b) => b.score - a.score);
+      seeds = [...userNodes, ...rest].slice(0, 20);
+    }
+  } else {
+    // No user data: top 20 by score
+    seeds = [...simNodes]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 20);
+  }
+
+  seeds.forEach(n => discovered.add(n.name));
+  // Fringe starts empty; it's computed when the user first clicks a discovered node
+  lastDiscovered = null;
+  updateAmbassadors();
   updateDiscoveryVisuals();
 }
 
-function expandFrontier() {
-  for (const name of discovered) {
-    for (const e of allEdgesForFrontier) {
+function recalcFringe() {
+  fringe.clear();
+  subgraph.clear();
+
+  if (lastDiscovered) {
+    subgraph.add(lastDiscovered);
+    // Use rawEdges (current display threshold) so every fringe node has a visible edge
+    for (const e of rawEdges) {
       const src = typeof e.source === "object" ? e.source.name : e.source;
       const tgt = typeof e.target === "object" ? e.target.name : e.target;
-      if (src === name && !discovered.has(tgt)) revealed.add(tgt);
-      if (tgt === name && !discovered.has(src)) revealed.add(src);
+      if (src === lastDiscovered) {
+        subgraph.add(tgt);
+        if (!discovered.has(tgt)) fringe.add(tgt);
+      }
+      if (tgt === lastDiscovered) {
+        subgraph.add(src);
+        if (!discovered.has(src)) fringe.add(src);
+      }
     }
   }
-  // If revealed is empty and locked nodes remain, guarantee reachability
-  const locked = simNodes.filter(n => !discovered.has(n.name) && !revealed.has(n.name));
-  if (revealed.size === 0 && locked.length > 0) {
-    bridgeUnlock();
-  }
+
 }
 
-function bridgeUnlock() {
-  const locked = simNodes.filter(n => !discovered.has(n.name) && !revealed.has(n.name));
-  if (locked.length === 0) return;
+function updateAmbassadors() {
+  ambassadors.clear();
 
-  const lockedNames = new Set(locked.map(n => n.name));
-  let bestNode   = null;
-  let bestWeight = -1;
+  // All undiscovered node names
+  const undiscovered = new Set(
+    simNodes.filter(n => !discovered.has(n.name)).map(n => n.name)
+  );
+  if (undiscovered.size === 0) return;
 
-  for (const e of allEdgesForFrontier) {
+  // Find undiscovered nodes that have at least one edge to a discovered node
+  const reachable = new Set();
+  for (const e of rawEdges) {
     const src = typeof e.source === "object" ? e.source.name : e.source;
     const tgt = typeof e.target === "object" ? e.target.name : e.target;
-    if (lockedNames.has(src) && discovered.has(tgt) && e.weight > bestWeight) {
-      bestWeight = e.weight;
-      bestNode   = src;
-    }
-    if (lockedNames.has(tgt) && discovered.has(src) && e.weight > bestWeight) {
-      bestWeight = e.weight;
-      bestNode   = tgt;
+    if (discovered.has(src) && undiscovered.has(tgt)) reachable.add(tgt);
+    if (discovered.has(tgt) && undiscovered.has(src)) reachable.add(src);
+  }
+
+  // Unreachable = undiscovered nodes with no edge to any discovered node
+  const unreachable = new Set([...undiscovered].filter(n => !reachable.has(n)));
+  if (unreachable.size === 0) return;
+
+  // Build adjacency among unreachable nodes only
+  const adj = new Map([...unreachable].map(n => [n, []]));
+  for (const e of rawEdges) {
+    const src = typeof e.source === "object" ? e.source.name : e.source;
+    const tgt = typeof e.target === "object" ? e.target.name : e.target;
+    if (unreachable.has(src) && unreachable.has(tgt)) {
+      adj.get(src).push(tgt);
+      adj.get(tgt).push(src);
     }
   }
 
-  // Fallback: highest-score locked node if no edges connect to discovered
-  if (bestNode === null) {
-    bestNode = locked.sort((a, b) => b.score - a.score)[0].name;
+  // BFS: find connected components, elect highest-score node as ambassador
+  const visited = new Set();
+  const nodeByName = new Map(simNodes.map(n => [n.name, n]));
+  for (const start of unreachable) {
+    if (visited.has(start)) continue;
+    const component = [];
+    const queue = [start];
+    visited.add(start);
+    while (queue.length > 0) {
+      const name = queue.shift();
+      component.push(name);
+      for (const neighbor of (adj.get(name) || [])) {
+        if (!visited.has(neighbor)) { visited.add(neighbor); queue.push(neighbor); }
+      }
+    }
+    const best = component
+      .map(name => nodeByName.get(name))
+      .filter(Boolean)
+      .sort((a, b) => b.score - a.score)[0];
+    if (best) ambassadors.add(best.name);
   }
-
-  revealed.add(bestNode);
 }
 
 function updateDiscoveryVisuals() {
@@ -876,71 +988,101 @@ function updateDiscoveryVisuals() {
 
   if (!discoveryMode) {
     // Restore all nodes to normal score-based appearance
-    nodeEl.transition().duration(600)
+    nodeEl
+      .style("display", null)
+      .transition().duration(600)
       .attr("r",            d => nodeRadius(d))
       .attr("fill",         d => nodeColor(d))
       .attr("fill-opacity", 1)
       .attr("stroke",       "none")
       .attr("stroke-width", 0)
       .style("pointer-events", "all");
-    labelEl.transition().duration(600)
+    labelEl
+      .style("display", null)
+      .transition().duration(600)
       .attr("opacity",   d => labelOpacity(d))
       .attr("font-size", "11px");
     applyEdgeFilter();
     return;
   }
 
-  // Discovery mode visual states
-  nodeEl.transition().duration(600)
-    .attr("r", d => {
-      if (discovered.has(d.name)) return nodeRadius(d);
-      if (revealed.has(d.name))   return 5;
-      return 2;
-    })
-    .attr("fill", d => {
-      if (discovered.has(d.name)) return nodeColor(d);
-      if (revealed.has(d.name))   return "none";
-      return "rgba(255,255,255,0.08)";
-    })
-    .attr("fill-opacity", d => {
-      if (revealed.has(d.name) && !discovered.has(d.name)) return 0;
-      return 1;
-    })
+  // Hide nodes outside the current subgraph
+  nodeEl.style("display",  d => discoveryVisible(d.name) ? null : "none");
+  labelEl.style("display", d => discoveryVisible(d.name) ? null : "none");
+
+  // Visual states — transition only visible nodes to avoid D3 touching hidden elements
+  nodeEl.filter(d => discoveryVisible(d.name))
+    .transition().duration(600)
+    .attr("r",    d => nodeRadius(d))
+    .attr("fill", d => discovered.has(d.name) ? nodeColor(d) : "none")
+    .attr("fill-opacity", 1)
     .attr("stroke", d => {
-      if (revealed.has(d.name) && !discovered.has(d.name)) return "rgba(255,255,255,0.35)";
+      if (d.name === lastDiscovered)              return "rgba(255,255,255,0.95)";
+      if (d.name === window._pendingDiscovery)    return "rgba(255,200,50,0.9)";
+      if (fringe.has(d.name) || ambassadors.has(d.name)) return "rgba(255,255,255,0.45)";
       return "none";
     })
     .attr("stroke-width", d => {
-      if (revealed.has(d.name) && !discovered.has(d.name)) return 1.5;
+      if (d.name === lastDiscovered)              return 3;
+      if (d.name === window._pendingDiscovery)    return 2;
+      if (fringe.has(d.name) || ambassadors.has(d.name)) return 1.5;
       return 0;
     })
-    .style("pointer-events", d => {
-      if (!discovered.has(d.name) && !revealed.has(d.name)) return "none";
-      return "all";
-    });
+    .style("pointer-events", "all");
 
-  labelEl.transition().duration(600)
-    .attr("opacity", d => {
-      if (discovered.has(d.name)) return labelOpacity(d);
-      if (revealed.has(d.name))   return 0.4;
-      return 0;
-    })
-    .attr("font-size", d => {
-      if (revealed.has(d.name) && !discovered.has(d.name)) return "8px";
-      return "11px";
-    });
+  // Discovered nodes keep labels forever; fringe labels show only while in fringe
+  // Pending discovery node gets full-brightness label
+  labelEl.filter(d => discoveryVisible(d.name))
+    .transition().duration(300)
+    .attr("opacity",   d => d.name === window._pendingDiscovery ? 1.0 : labelOpacity(d))
+    .attr("font-size", d => d.name === window._pendingDiscovery ? "13px" : "11px");
 
-  // Only draw edges where both endpoints are in discovered
+  // Only draw edges where both endpoints are discovered
   applyEdgeFilter();
 }
 
 function triggerDiscovery(artistName) {
   if (!discoveryMode) return;
   if (discovered.has(artistName)) return;
-  revealed.delete(artistName);
+  window._pendingDiscovery = null;
+  fringe.delete(artistName);
+  ambassadors.delete(artistName);
   discovered.add(artistName);
-  expandFrontier();
+  lastDiscovered = artistName;
+  updateAmbassadors();
+  recalcFringe();
   updateDiscoveryVisuals();
+  zoomToSubgraph();
+  minimizeMenu();
+}
+
+function zoomToSubgraph() {
+  if (!lastDiscovered) return;
+  const subNodes = simNodes.filter(n => subgraph.has(n.name));
+  if (subNodes.length === 0) return;
+
+  // Shrink the available viewport to avoid the open artist panel (320 px, right side)
+  const panelOpen  = document.getElementById("artistPanel").classList.contains("open");
+  const panelW     = panelOpen ? 320 : 0;
+  const availW     = W - panelW;
+  const availCentX = availW / 2; // centre of the usable area
+
+  const pad = 80;
+  const xs  = subNodes.map(n => n.x);
+  const ys  = subNodes.map(n => n.y);
+  const minX = Math.min(...xs) - pad;
+  const maxX = Math.max(...xs) + pad;
+  const minY = Math.min(...ys) - pad;
+  const maxY = Math.max(...ys) + pad;
+
+  const bw    = maxX - minX;
+  const bh    = maxY - minY;
+  const scale = Math.min(availW / bw, H / bh, 5);
+  const tx    = availCentX - scale * ((minX + maxX) / 2);
+  const ty    = H / 2      - scale * ((minY + maxY) / 2);
+
+  svg.transition().duration(700)
+    .call(zoomBehavior.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
 }
 
 // ── Wire up controls ──────────────────────────────────────────────────────────
@@ -976,7 +1118,32 @@ function updateAuthUI() {
   }
 }
 
+function minimizeMenu() {
+  const el = document.getElementById("controls");
+  if (el) {
+    el.classList.add("minimized");
+    const btn = document.getElementById("menuToggle");
+    if (btn) btn.textContent = "+";
+  }
+}
+
+function expandMenu() {
+  const el = document.getElementById("controls");
+  if (el) {
+    el.classList.remove("minimized");
+    const btn = document.getElementById("menuToggle");
+    if (btn) btn.textContent = "−";
+  }
+}
+
 function initControls() {
+  // Main menu minimize toggle
+  document.getElementById("menuToggle").addEventListener("click", () => {
+    const el = document.getElementById("controls");
+    if (el.classList.contains("minimized")) expandMenu();
+    else minimizeMenu();
+  });
+
   // Artist panel close button
   document.getElementById("panelClose").addEventListener("click", () => {
     if (pinnedDatum) {
@@ -1101,7 +1268,10 @@ function initControls() {
         seedDiscovery();
       } else {
         discovered.clear();
-        revealed.clear();
+        fringe.clear();
+        subgraph.clear();
+        ambassadors.clear();
+        lastDiscovered = null;
         updateDiscoveryVisuals();
       }
     });

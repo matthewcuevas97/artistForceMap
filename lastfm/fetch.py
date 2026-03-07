@@ -88,7 +88,7 @@ def get_artist_image_and_bio(artist_name):
     return image_url, bio
 
 
-def get_top_artists(username, limit=50):
+def get_top_artists(username, limit=100):
     """
     Fetch user's top artists from Last.fm.
     Returns list of {name, score} dicts sorted by rank,
@@ -99,7 +99,7 @@ def get_top_artists(username, limit=50):
         "method": "user.getTopArtists",
         "user": username,
         "limit": limit,
-        "period": "overall",
+        "period": "6month",
         "api_key": API_KEY,
         "format": "json",
     }

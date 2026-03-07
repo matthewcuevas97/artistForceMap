@@ -192,11 +192,17 @@ def api_graph():
             session.pop("token", None)
             session.pop("spotify_display_name", None)
 
+    # Collect user-data-matched nodes before stripping internal fields
+    user_seeds = [
+        node["name"] for node in nodes
+        if node.get("direct_score", 0) > 0 or node.get("derived_score", 0) > 0
+    ]
+
     for node in nodes:
         for field in _INTERNAL_FIELDS:
             node.pop(field, None)
 
-    return jsonify({"nodes": nodes, "edges": edges, "threshold": snapped})
+    return jsonify({"nodes": nodes, "edges": edges, "threshold": snapped, "user_seeds": user_seeds})
 
 
 @app.route("/api/artist/<name>")

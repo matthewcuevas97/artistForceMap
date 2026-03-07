@@ -40,6 +40,37 @@
       -webkit-backdrop-filter: blur(16px);
       user-select: none;
       z-index: 50;
+      transition: padding 0.25s ease, min-width 0.25s ease;
+    }
+
+    #menuHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    #menuToggle {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 0 0 12px;
+    }
+    #menuToggle:hover { color: rgba(255,255,255,0.7); }
+
+    #controls.minimized {
+      padding: 10px 14px;
+      min-width: 0;
+    }
+    #controls.minimized > *:not(#menuHeader) {
+      display: none !important;
+    }
+    #controls.minimized #menuHeader {
+      margin-bottom: 0;
     }
 
     .ctrl-row {
@@ -510,6 +541,10 @@
   </div>
 
   <div id="controls">
+    <div id="menuHeader">
+      <span style="font-size:9px;letter-spacing:0.12em;color:rgba(255,255,255,0.25)">CONTROLS</span>
+      <button id="menuToggle" title="Minimize">−</button>
+    </div>
     <!-- Auth section: Spotify + Last.fm -->
     <div class="ctrl-row">
       <div class="auth-row">
