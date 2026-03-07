@@ -4,6 +4,7 @@ import os
 import re
 import spotipy
 import requests
+from datetime import datetime
 from flask import Flask, jsonify, render_template, redirect, request, session
 from spotipy.exceptions import SpotifyException
 
@@ -216,6 +217,41 @@ def api_artist_tracks(name):
     artist_names = static_node.get("lastfm_artists") or [name]
     tracks = refresh_track_previews(node.get("top_tracks", []), artist_names)
     return jsonify({"tracks": tracks})
+
+
+@app.route("/api/spotify/create-playlist", methods=["POST"])
+def api_spotify_create_playlist():
+    token = session.get("token")
+    if not token:
+        return jsonify({"ok": False, "error": "Not authenticated"}), 401
+
+    data = request.get_json(force=True) or {}
+    tracks = data.get("tracks", [])
+
+    try:
+        sp = spotipy.Spotify(auth=token["access_token"])
+        name = f"Coachella 2026 · {datetime.now().strftime('%b %-d')}"
+        pl = sp.current_user_playlist_create(name, public=False)
+        playlist_id = pl["id"]
+
+        uris = []
+        for track in tracks:
+            artist = track.get("artist", "")
+            name = track.get("name", "")
+            results = sp.search(q=f"artist:{artist} track:{name}", type="track", limit=1)
+            items = results.get("tracks", {}).get("items", [])
+            if items:
+                uris.append(items[0]["uri"])
+
+        for i in range(0, len(uris), 100):
+            sp.playlist_add_items(playlist_id, uris[i:i + 100])
+
+        return jsonify({
+            "ok": True,
+            "playlist_url": f"https://open.spotify.com/playlist/{playlist_id}"
+        })
+    except SpotifyException as e:
+        return jsonify({"ok": False, "error": str(e)}), 400
 
 
 if __name__ == "__main__":

@@ -33,6 +33,13 @@ let showSimilarity = true;
 let showGenre      = true;
 let dayFilter      = "ALL";
 
+let discoveryMode    = false;
+let discovered       = new Set(); // fully discovered artist names
+let revealed         = new Set(); // hollow/clickable but not yet discovered
+// locked = all nodes not in discovered or revealed (tiny dots, inert)
+let allEdgesForFrontier = []; // populated once from /api/graph?threshold=0.05
+let frontierEdgesLoaded = false;
+
 let thresholdDebounce = null;
 let dragMoved = false;
 
@@ -41,6 +48,10 @@ let currentPlayBtn = null;
 let openArtistName = null;
 let pinnedDatum    = null;
 let panelRequestId = 0;
+
+let playlist           = [];   // { artist, name, album_art, deezer_url }
+let expandedTrackIndex = null;
+let currentTracks      = [];
 
 // ── Viewport ─────────────────────────────────────────────────────────────────
 
@@ -141,6 +152,14 @@ function buildTopEdgeSet(edges) {
   return topSet;
 }
 
+// ── Service link SVG icons ────────────────────────────────────────────────────
+
+const SPOTIFY_SVG = `<svg viewBox="0 0 24 24" style="width:18px;height:18px"><path fill="currentColor" d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>`;
+
+const YOUTUBE_SVG = `<svg viewBox="0 0 24 24" style="width:18px;height:18px"><path fill="currentColor" d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>`;
+
+const APPLE_SVG = `<svg viewBox="0 0 24 24" style="width:18px;height:18px"><path fill="currentColor" d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>`;
+
 // ── Artist panel ──────────────────────────────────────────────────────────────
 
 const PLACEHOLDER_HASH = "2a96cbd8b46e442fc41c2b86b821562f";
@@ -149,51 +168,298 @@ function closePanel() {
   document.getElementById("artistPanel").classList.remove("open");
   if (currentAudio)   { currentAudio.pause(); currentAudio = null; }
   if (currentPlayBtn) { currentPlayBtn.textContent = "▶"; currentPlayBtn = null; }
+  collapseSubmenu();
 }
 
-function wirePlayButtons() {
-  document.querySelectorAll(".play-btn").forEach(btn => {
-    btn.addEventListener("click", function(e) {
-      e.stopPropagation();
-      const previewUrl = this.dataset.preview;
-      if (!previewUrl) return;
+function collapseSubmenu() {
+  const existing = document.querySelector(".track-submenu");
+  if (existing) existing.remove();
+  expandedTrackIndex = null;
+}
 
-      if (currentAudio && currentPlayBtn === this) {
-        currentAudio.pause();
-        currentAudio   = null;
-        currentPlayBtn = null;
-        this.textContent = "▶";
-        return;
-      }
-      if (currentAudio) {
-        currentAudio.pause();
-        if (currentPlayBtn) { currentPlayBtn.textContent = "▶"; }
-      }
-      const audio = new Audio(previewUrl);
-      audio.play();
-      currentAudio   = audio;
-      currentPlayBtn = this;
-      this.textContent = "▐▐";
-      audio.addEventListener("ended", () => {
-        this.textContent = "▶";
-        currentAudio   = null;
-        currentPlayBtn = null;
-      });
-    });
+function buildServiceLinks(artist, trackName, btnClass, svgSize) {
+  const enc = encodeURIComponent;
+  const a   = enc(artist);
+  const n   = enc(trackName);
+  const sz  = svgSize || 18;
+  const spotifySvg = SPOTIFY_SVG.replace('width:18px;height:18px', `width:${sz}px;height:${sz}px`);
+  const youtubeSvg = YOUTUBE_SVG.replace('width:18px;height:18px', `width:${sz}px;height:${sz}px`);
+  const appleSvg   = APPLE_SVG.replace('width:18px;height:18px',   `width:${sz}px;height:${sz}px`);
+  return (
+    `<a href="https://open.spotify.com/search/${a}%20${n}" target="_blank" class="${btnClass}">${spotifySvg}</a>` +
+    `<a href="https://music.youtube.com/search?q=${a}+${n}" target="_blank" class="${btnClass}">${youtubeSvg}</a>` +
+    `<a href="https://music.apple.com/search?term=${a}+${n}" target="_blank" class="${btnClass}">${appleSvg}</a>`
+  );
+}
+
+function expandSubmenu(idx, rowEl) {
+  collapseSubmenu();
+  expandedTrackIndex = idx;
+  const track  = currentTracks[idx];
+  const artist = openArtistName || "";
+
+  const addBtnInner = window.AUTHENTICATED
+    ? `<span class="add-btn-icon"></span><span class="rainbow-text">＋ Queue</span>`
+    : `<span class="rainbow-text">＋ My Playlist</span>`;
+
+  const sub = document.createElement("div");
+  sub.className = "track-submenu";
+  sub.innerHTML =
+    buildServiceLinks(artist, track.name, "sub-svc-btn", 18) +
+    `<button class="add-playlist-btn">${addBtnInner}</button>`;
+
+  rowEl.insertAdjacentElement("afterend", sub);
+
+  requestAnimationFrame(() => {
+    sub.style.maxHeight = "60px";
+    sub.style.opacity   = "1";
+  });
+
+  sub.querySelector(".add-playlist-btn").addEventListener("click", () => {
+    addToPlaylist(track, sub);
   });
 }
 
+function wireTrackInteractions() {
+  document.querySelectorAll(".track-row").forEach(row => {
+    const idx = parseInt(row.dataset.trackIndex, 10);
+
+    // Row click (not on play button) → toggle submenu
+    row.addEventListener("click", function(e) {
+      if (e.target.closest(".play-btn")) return;
+      if (expandedTrackIndex === idx) {
+        collapseSubmenu();
+      } else {
+        expandSubmenu(idx, this);
+      }
+    });
+
+    // Play button → play/pause + expand submenu
+    const btn = row.querySelector(".play-btn");
+    if (btn) {
+      btn.addEventListener("click", function(e) {
+        e.stopPropagation();
+
+        if (expandedTrackIndex !== idx) {
+          expandSubmenu(idx, row);
+        }
+
+        const previewUrl = this.dataset.preview;
+        if (!previewUrl) return;
+
+        if (currentAudio && currentPlayBtn === this) {
+          currentAudio.pause();
+          currentAudio     = null;
+          currentPlayBtn   = null;
+          this.textContent = "▶";
+          return;
+        }
+        if (currentAudio) {
+          currentAudio.pause();
+          if (currentPlayBtn) { currentPlayBtn.textContent = "▶"; }
+        }
+        const audio = new Audio(previewUrl);
+        audio.play().then(() => {
+          if (window._pendingDiscovery) {
+            triggerDiscovery(window._pendingDiscovery);
+            window._pendingDiscovery = null;
+          }
+        }).catch(() => {});
+        currentAudio     = audio;
+        currentPlayBtn   = this;
+        this.textContent = "▐▐";
+        audio.addEventListener("ended", () => {
+          this.textContent = "▶";
+          currentAudio   = null;
+          currentPlayBtn = null;
+        });
+      });
+    }
+  });
+}
+
+function addToPlaylist(track, subEl) {
+  playlist.push({
+    artist:    openArtistName || "",
+    name:      track.name,
+    album_art: track.album_art || "",
+    deezer_url: track.preview_url || "",
+  });
+
+  if (window._pendingDiscovery) {
+    triggerDiscovery(window._pendingDiscovery);
+    window._pendingDiscovery = null;
+  }
+
+  const saved = subEl.innerHTML;
+  subEl.innerHTML = `<span style="color:rgba(255,255,255,0.6);font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:0.08em">✓ Added</span>`;
+  setTimeout(() => {
+    subEl.innerHTML = saved;
+    subEl.querySelector(".add-playlist-btn").addEventListener("click", () => {
+      addToPlaylist(track, subEl);
+    });
+  }, 1500);
+
+  updateExportButton();
+}
+
+function updateExportButton() {
+  const row = document.getElementById("exportRow");
+  const btn = document.getElementById("exportBtn");
+  if (!row || !btn) return;
+  if (playlist.length === 0) {
+    row.style.display = "none";
+    btn.classList.remove("active");
+  } else {
+    row.style.display = "block";
+    btn.classList.add("active");
+    btn.textContent = window.AUTHENTICATED
+      ? `SPOTIFY PLAYLIST (${playlist.length})`
+      : `MY PLAYLIST (${playlist.length})`;
+  }
+}
+
+function openExportPanel() {
+  renderExportPanel();
+  const panel = document.getElementById("exportPanel");
+  panel.style.display = "block";
+  requestAnimationFrame(() => panel.classList.add("open"));
+}
+
+function closeExportPanel() {
+  const panel = document.getElementById("exportPanel");
+  panel.classList.remove("open");
+  setTimeout(() => { panel.style.display = "none"; }, 260);
+}
+
+function renderExportPanel() {
+  const panel = document.getElementById("exportPanel");
+  const title = window.AUTHENTICATED ? "SPOTIFY PLAYLIST" : "MY PLAYLIST";
+
+  const tracksHTML = playlist.map((track, i) => {
+    const art = track.album_art || "/static/placeholder_artist.jpeg";
+    return (
+      `<div class="ep-track" data-ep-index="${i}" style="display:flex;align-items:center;padding:8px 12px;gap:8px;${!window.AUTHENTICATED ? "cursor:pointer;" : ""}">` +
+      `<img src="${art}" style="width:36px;height:36px;object-fit:cover;flex-shrink:0" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
+      `<div style="flex:1;min-width:0">` +
+      `<div style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${track.name}</div>` +
+      `<div style="font-size:9px;color:rgba(255,255,255,0.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${track.artist}</div>` +
+      `</div>` +
+      `<button class="ep-remove" data-ep-index="${i}" style="width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0">−</button>` +
+      `</div>` +
+      (!window.AUTHENTICATED ? `<div class="ep-service-links" data-ep-index="${i}" style="display:none;padding:4px 16px 8px;gap:8px;justify-content:center;align-items:center"></div>` : "")
+    );
+  }).join("");
+
+  const footerHTML = window.AUTHENTICATED
+    ? `<div style="padding:12px 16px;border-top:1px solid rgba(255,255,255,0.06)">` +
+      `<button id="createSpotifyBtn" style="width:100%;background:none;border:1px solid #1db954;color:#1db954;font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.12em;padding:10px;cursor:pointer;transition:background 0.15s">CREATE SPOTIFY PLAYLIST</button>` +
+      `<div id="spotifyCreateResult" style="margin-top:8px;font-size:9px;text-align:center;letter-spacing:0.08em"></div>` +
+      `</div>`
+    : `<div style="padding:8px 16px 12px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)">` +
+      `<span style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.08em">TAP A TRACK TO OPEN IN YOUR STREAMING SERVICE</span>` +
+      `</div>`;
+
+  panel.innerHTML =
+    `<div style="display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">` +
+    `<button id="exportPanelBack" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:16px;padding:0;font-family:'IBM Plex Mono',monospace;margin-right:8px">←</button>` +
+    `<span style="flex:1;text-align:center;font-size:10px;letter-spacing:0.14em;color:rgba(255,255,255,0.7)">${title} (${playlist.length})</span>` +
+    `<div style="width:24px"></div>` +
+    `</div>` +
+    `<div id="epTrackList">${tracksHTML}</div>` +
+    footerHTML;
+
+  document.getElementById("exportPanelBack").addEventListener("click", closeExportPanel);
+
+  panel.querySelectorAll(".ep-remove").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      playlist.splice(parseInt(btn.dataset.epIndex, 10), 1);
+      updateExportButton();
+      renderExportPanel();
+    });
+  });
+
+  if (!window.AUTHENTICATED) {
+    let expandedEpIdx = null;
+    panel.querySelectorAll(".ep-track").forEach(row => {
+      row.addEventListener("click", function() {
+        const idx   = parseInt(this.dataset.epIndex, 10);
+        const track = playlist[idx];
+
+        panel.querySelectorAll(".ep-track").forEach(r => r.style.boxShadow = "");
+        panel.querySelectorAll(".ep-service-links").forEach(sl => {
+          sl.style.display = "none";
+        });
+
+        if (expandedEpIdx === idx) {
+          expandedEpIdx = null;
+          return;
+        }
+        expandedEpIdx = idx;
+        this.style.boxShadow = "0 0 0 1px rgba(255,255,255,0.25)";
+
+        const serviceDiv = panel.querySelector(`.ep-service-links[data-ep-index="${idx}"]`);
+        if (serviceDiv) {
+          serviceDiv.style.display = "flex";
+          serviceDiv.innerHTML = buildServiceLinks(track.artist, track.name, "ep-svc-btn", 14);
+        }
+      });
+    });
+  }
+
+  const createBtn = document.getElementById("createSpotifyBtn");
+  if (createBtn) {
+    createBtn.addEventListener("click", createSpotifyPlaylist);
+  }
+}
+
+async function createSpotifyPlaylist() {
+  const btn    = document.getElementById("createSpotifyBtn");
+  const result = document.getElementById("spotifyCreateResult");
+  if (!btn || !result) return;
+
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner" style="display:inline-block;margin:0 auto;width:16px;height:16px;border-width:2px"></span>`;
+
+  try {
+    const resp = await fetch("/api/spotify/create-playlist", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ tracks: playlist.map(t => ({ artist: t.artist, name: t.name })) }),
+    });
+    const data = await resp.json();
+    if (data.ok) {
+      btn.style.display = "none";
+      result.innerHTML  =
+        `<span style="color:#1db954">✓ PLAYLIST CREATED</span><br>` +
+        `<a href="${data.playlist_url}" target="_blank" style="color:rgba(255,255,255,0.5);font-size:9px;letter-spacing:0.08em">OPEN IN SPOTIFY →</a>`;
+    } else {
+      btn.disabled = false;
+      btn.textContent = "CREATE SPOTIFY PLAYLIST";
+      result.style.color  = "rgba(255,100,100,0.8)";
+      result.textContent  = data.error || "Failed to create playlist";
+    }
+  } catch (_) {
+    btn.disabled = false;
+    btn.textContent = "CREATE SPOTIFY PLAYLIST";
+    result.style.color = "rgba(255,100,100,0.8)";
+    result.textContent = "Network error";
+  }
+}
+
 function renderTrackList(tracks) {
-  if (!tracks || !tracks.length) {
+  currentTracks = tracks || [];
+  if (!currentTracks.length) {
     return `<div style="font-size:9px;color:rgba(255,255,255,0.2);padding:16px;text-align:center">NO TRACKS AVAILABLE</div>`;
   }
   const header = `<div style="font-size:9px;letter-spacing:0.12em;color:rgba(255,255,255,0.3);margin:0 16px 8px">TOP TRACKS</div>`;
-  const rows = tracks.map(track => {
+  const rows = currentTracks.map((track, idx) => {
     const preview = track.preview_url || "";
     const art     = track.album_art   || "/static/placeholder_artist.jpeg";
     const disabledStyle = preview ? "" : ";opacity:0.25;pointer-events:none";
     return (
-      `<div class="track-row" style="display:flex;align-items:center;padding:8px 16px;gap:10px;cursor:pointer"` +
+      `<div class="track-row" data-track-index="${idx}" style="display:flex;align-items:center;padding:8px 16px;gap:10px;cursor:pointer"` +
       ` onmouseenter="this.style.background='rgba(255,255,255,0.04)'" onmouseleave="this.style.background=''">` +
       `<img src="${art}" style="width:40px;height:40px;object-fit:cover"` +
       ` onerror="this.src='/static/placeholder_artist.jpeg'" />` +
@@ -207,6 +473,7 @@ function renderTrackList(tracks) {
 }
 
 async function openPanel(artistName) {
+  collapseSubmenu();
   const myId = ++panelRequestId;
 
   // Phase 1: fetch static data, render immediately
@@ -253,7 +520,7 @@ async function openPanel(artistName) {
     if (tracksEl) {
       tracksEl.outerHTML = renderTrackList(tracksData.tracks || []);
     }
-    wirePlayButtons();
+    wireTrackInteractions();
   } catch (_) {
     if (myId !== panelRequestId) return;
     const tracksEl = document.getElementById("tracksLoading");
@@ -350,7 +617,17 @@ function moveTooltip(event) {
 
 function clearHover() {
   applyEdgeFilter();
-  if (labelEl) labelEl.attr("opacity", d => labelOpacity(d));
+  if (labelEl) {
+    if (discoveryMode) {
+      labelEl.attr("opacity", d => {
+        if (discovered.has(d.name)) return labelOpacity(d);
+        if (revealed.has(d.name))   return 0.4;
+        return 0;
+      });
+    } else {
+      labelEl.attr("opacity", d => labelOpacity(d));
+    }
+  }
   tooltip.style("display", "none");
 }
 
@@ -373,7 +650,16 @@ function applyDayFilter() {
 
 function applyEdgeFilter() {
   if (!edgeEl) return;
-  edgeEl.attr("opacity", e => edgeBaseOpacity(e));
+  if (discoveryMode) {
+    edgeEl.attr("opacity", e => {
+      const srcName = typeof e.source === "object" ? e.source.name : e.source;
+      const tgtName = typeof e.target === "object" ? e.target.name : e.target;
+      if (!discovered.has(srcName) || !discovered.has(tgtName)) return 0;
+      return edgeBaseOpacity(e);
+    });
+  } else {
+    edgeEl.attr("opacity", e => edgeBaseOpacity(e));
+  }
 }
 
 // ── Graph builder ─────────────────────────────────────────────────────────────
@@ -435,6 +721,17 @@ function buildGraph() {
       // D3 drag suppresses click after a real drag; dragMoved guard is belt-and-suspenders
       if (dragMoved) { dragMoved = false; return; }
 
+      // Discovery mode: revealed node → open panel, set pending discovery
+      if (discoveryMode && revealed.has(d.name) && !discovered.has(d.name)) {
+        openPanel(d.name);
+        window._pendingDiscovery = d.name;
+        return;
+      }
+      // Discovery mode: locked node → inert (pointer-events:none should already block this)
+      if (discoveryMode && !discovered.has(d.name) && !revealed.has(d.name)) {
+        return;
+      }
+
       if (openArtistName === d.name && d.fx !== null && d.fx !== undefined) {
         // Same pinned node → unpin, keep panel open
         d.fx = null;
@@ -481,6 +778,9 @@ function buildGraph() {
   applyDayFilter();
   applyEdgeFilter();
 
+  // If discovery mode is on, re-seed after graph rebuild
+  if (discoveryMode) seedDiscovery();
+
   // Resume with a gentle alpha so the graph softly continues to settle
   simulation
     .on("tick", ticked)
@@ -492,6 +792,14 @@ function buildGraph() {
 
 async function fetchAndBuild(threshold) {
   try {
+    // Fetch frontier edges once (0.05 threshold) for discovery mode connectivity
+    if (!frontierEdgesLoaded) {
+      frontierEdgesLoaded = true;
+      fetch("/api/graph?threshold=0.05")
+        .then(r => r.ok ? r.json() : null)
+        .then(data => { if (data && data.edges) allEdgesForFrontier = data.edges; })
+        .catch(() => {});
+    }
     const resp = await fetch(`/api/graph?threshold=${threshold.toFixed(2)}`);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
@@ -502,6 +810,137 @@ async function fetchAndBuild(threshold) {
   } catch (err) {
     console.error("artistForceMap: failed to load graph —", err.message);
   }
+}
+
+// ── Discovery mode ────────────────────────────────────────────────────────────
+
+function seedDiscovery() {
+  discovered.clear();
+  revealed.clear();
+  // Top 20 nodes by score
+  const top20 = [...simNodes]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 20);
+  top20.forEach(n => discovered.add(n.name));
+  expandFrontier();
+  updateDiscoveryVisuals();
+}
+
+function expandFrontier() {
+  for (const name of discovered) {
+    for (const e of allEdgesForFrontier) {
+      const src = typeof e.source === "object" ? e.source.name : e.source;
+      const tgt = typeof e.target === "object" ? e.target.name : e.target;
+      if (src === name && !discovered.has(tgt)) revealed.add(tgt);
+      if (tgt === name && !discovered.has(src)) revealed.add(src);
+    }
+  }
+  // If revealed is empty and locked nodes remain, guarantee reachability
+  const locked = simNodes.filter(n => !discovered.has(n.name) && !revealed.has(n.name));
+  if (revealed.size === 0 && locked.length > 0) {
+    bridgeUnlock();
+  }
+}
+
+function bridgeUnlock() {
+  const locked = simNodes.filter(n => !discovered.has(n.name) && !revealed.has(n.name));
+  if (locked.length === 0) return;
+
+  const lockedNames = new Set(locked.map(n => n.name));
+  let bestNode   = null;
+  let bestWeight = -1;
+
+  for (const e of allEdgesForFrontier) {
+    const src = typeof e.source === "object" ? e.source.name : e.source;
+    const tgt = typeof e.target === "object" ? e.target.name : e.target;
+    if (lockedNames.has(src) && discovered.has(tgt) && e.weight > bestWeight) {
+      bestWeight = e.weight;
+      bestNode   = src;
+    }
+    if (lockedNames.has(tgt) && discovered.has(src) && e.weight > bestWeight) {
+      bestWeight = e.weight;
+      bestNode   = tgt;
+    }
+  }
+
+  // Fallback: highest-score locked node if no edges connect to discovered
+  if (bestNode === null) {
+    bestNode = locked.sort((a, b) => b.score - a.score)[0].name;
+  }
+
+  revealed.add(bestNode);
+}
+
+function updateDiscoveryVisuals() {
+  if (!nodeEl || !labelEl || !edgeEl) return;
+
+  if (!discoveryMode) {
+    // Restore all nodes to normal score-based appearance
+    nodeEl.transition().duration(600)
+      .attr("r",            d => nodeRadius(d))
+      .attr("fill",         d => nodeColor(d))
+      .attr("fill-opacity", 1)
+      .attr("stroke",       "none")
+      .attr("stroke-width", 0)
+      .style("pointer-events", "all");
+    labelEl.transition().duration(600)
+      .attr("opacity",   d => labelOpacity(d))
+      .attr("font-size", "11px");
+    applyEdgeFilter();
+    return;
+  }
+
+  // Discovery mode visual states
+  nodeEl.transition().duration(600)
+    .attr("r", d => {
+      if (discovered.has(d.name)) return nodeRadius(d);
+      if (revealed.has(d.name))   return 5;
+      return 2;
+    })
+    .attr("fill", d => {
+      if (discovered.has(d.name)) return nodeColor(d);
+      if (revealed.has(d.name))   return "none";
+      return "rgba(255,255,255,0.08)";
+    })
+    .attr("fill-opacity", d => {
+      if (revealed.has(d.name) && !discovered.has(d.name)) return 0;
+      return 1;
+    })
+    .attr("stroke", d => {
+      if (revealed.has(d.name) && !discovered.has(d.name)) return "rgba(255,255,255,0.35)";
+      return "none";
+    })
+    .attr("stroke-width", d => {
+      if (revealed.has(d.name) && !discovered.has(d.name)) return 1.5;
+      return 0;
+    })
+    .style("pointer-events", d => {
+      if (!discovered.has(d.name) && !revealed.has(d.name)) return "none";
+      return "all";
+    });
+
+  labelEl.transition().duration(600)
+    .attr("opacity", d => {
+      if (discovered.has(d.name)) return labelOpacity(d);
+      if (revealed.has(d.name))   return 0.4;
+      return 0;
+    })
+    .attr("font-size", d => {
+      if (revealed.has(d.name) && !discovered.has(d.name)) return "8px";
+      return "11px";
+    });
+
+  // Only draw edges where both endpoints are in discovered
+  applyEdgeFilter();
+}
+
+function triggerDiscovery(artistName) {
+  if (!discoveryMode) return;
+  if (discovered.has(artistName)) return;
+  revealed.delete(artistName);
+  discovered.add(artistName);
+  expandFrontier();
+  updateDiscoveryVisuals();
 }
 
 // ── Wire up controls ──────────────────────────────────────────────────────────
@@ -601,6 +1040,10 @@ function initControls() {
   });
 
   updateAuthUI();
+  updateExportButton();
+
+  // Export panel button
+  document.getElementById("exportBtn").addEventListener("click", openExportPanel);
 
   // Day filter buttons
   document.querySelectorAll(".day-btn").forEach(btn => {
@@ -649,6 +1092,19 @@ function initControls() {
     showGenre = e.target.checked;
     applyEdgeFilter();
   });
+
+  // Discovery mode toggle
+  document.getElementById("discoveryToggle")
+    .addEventListener("change", function() {
+      discoveryMode = this.checked;
+      if (discoveryMode) {
+        seedDiscovery();
+      } else {
+        discovered.clear();
+        revealed.clear();
+        updateDiscoveryVisuals();
+      }
+    });
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────

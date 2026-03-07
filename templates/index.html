@@ -330,6 +330,174 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+
+    /* ── Export button ─── */
+    #exportBtn {
+      width: 100%;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.4);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      padding: 7px 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #exportBtn.active {
+      border-color: #4caf50;
+      color: #4caf50;
+    }
+
+    /* ── Track submenu ─── */
+    .track-submenu {
+      background: rgba(255, 255, 255, 0.03);
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 10px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.2s ease, opacity 0.2s ease;
+    }
+
+    .sub-svc-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.55);
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .sub-svc-btn:hover {
+      border-color: rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .add-playlist-btn {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: border-color 0.15s;
+    }
+
+    .add-playlist-btn:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .add-btn-icon {
+      width: 15px;
+      height: 15px;
+      background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+      -webkit-mask: url(/static/music-player-add-playlist-queue-square-black-icon.svg) center / contain no-repeat;
+      mask: url(/static/music-player-add-playlist-queue-square-black-icon.svg) center / contain no-repeat;
+      flex-shrink: 0;
+    }
+
+    .rainbow-text {
+      background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* ── Discovery toggle ─── */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 32px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.1);
+      border-radius: 18px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: "";
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      left: 3px;
+      top: 3px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .toggle-switch input:checked + .toggle-slider {
+      background: rgba(76,175,80,0.4);
+    }
+    .toggle-switch input:checked + .toggle-slider::before {
+      transform: translateX(14px);
+      background: #4caf50;
+    }
+
+    /* ── Export panel ─── */
+    #exportPanel {
+      position: fixed;
+      bottom: 0;
+      left: 24px;
+      min-width: 280px;
+      max-height: 80vh;
+      overflow-y: auto;
+      background: #1a1a1a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px 8px 0 0;
+      z-index: 200;
+      font-family: 'IBM Plex Mono', monospace;
+      transform: translateY(100%);
+      transition: transform 0.25s ease;
+    }
+
+    #exportPanel.open {
+      transform: translateY(0);
+    }
+
+    .ep-svc-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      color: rgba(255, 255, 255, 0.55);
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .ep-svc-btn:hover {
+      border-color: rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.9);
+    }
   </style>
 </head>
 <body>
@@ -370,6 +538,10 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="ctrl-row" id="exportRow" style="display:none">
+      <button id="exportBtn">MY PLAYLIST (0)</button>
     </div>
 
     <hr class="ctrl-sep" />
@@ -417,7 +589,19 @@
         GENRE EDGES
       </label>
     </div>
+
+    <hr class="ctrl-sep" />
+
+    <div class="ctrl-row">
+      <label class="ctrl-label">DISCOVERY MODE</label>
+      <label class="toggle-switch">
+        <input type="checkbox" id="discoveryToggle" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
   </div>
+
+  <div id="exportPanel" style="display:none"></div>
 
   <script>
     window.AUTHENTICATED = {{ 'true' if session.get('token') else 'false' }};

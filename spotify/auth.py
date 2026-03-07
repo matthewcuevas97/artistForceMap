@@ -6,7 +6,7 @@ from spotipy.oauth2 import SpotifyOAuth
 load_dotenv()
 
 # Scopes required to read the user's listening history
-SCOPES = "user-top-read user-read-recently-played"
+SCOPES = "user-top-read user-read-recently-played playlist-modify-private playlist-modify-public"
 
 
 def get_spotify_oauth():
