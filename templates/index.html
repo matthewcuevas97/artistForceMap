@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ARTIST FORCE MAP — COACHELLA 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #111111;
+      overflow: hidden;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #aaaaaa;
+    }
+
+    #graph {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* ── Controls panel ─────────────────────────────── */
+    #controls {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: rgba(14, 14, 14, 0.90);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 18px 20px;
+      min-width: 236px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      user-select: none;
+      z-index: 50;
+    }
+
+    .ctrl-row {
+      margin-bottom: 15px;
+    }
+
+    .ctrl-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .ctrl-label {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      color: rgba(255, 255, 255, 0.28);
+      margin-bottom: 7px;
+    }
+
+    /* ── Spotify button ─── */
+    #spotifyBtn {
+      width: 100%;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.72);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      padding: 7px 12px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+
+    #spotifyBtn:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.38);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    #spotifyBtn:disabled {
+      color: rgba(255, 255, 255, 0.28);
+      border-color: rgba(255, 255, 255, 0.07);
+      cursor: default;
+    }
+
+    /* ── Day filter buttons ─── */
+    .day-group {
+      display: flex;
+      gap: 4px;
+    }
+
+    .day-btn {
+      flex: 1;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.3);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      padding: 5px 0;
+      cursor: pointer;
+      transition: background 0.1s, border-color 0.1s, color 0.1s;
+    }
+
+    .day-btn:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .day-btn.active {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: rgba(255, 255, 255, 0.38);
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    /* ── Sliders ─── */
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 7px;
+    }
+
+    .slider-header .ctrl-label {
+      margin-bottom: 0;
+    }
+
+    .slider-value {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      border-radius: 1px;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      border: none;
+    }
+
+    /* ── Checkboxes ─── */
+    .check-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: rgba(255, 255, 255, 0.38);
+      cursor: pointer;
+      margin-bottom: 7px;
+      transition: color 0.1s;
+    }
+
+    .check-label:last-child {
+      margin-bottom: 0;
+    }
+
+    .check-label:hover {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .check-label input[type="checkbox"] {
+      accent-color: rgba(255, 255, 255, 0.75);
+      width: 11px;
+      height: 11px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ── Separator ─── */
+    .ctrl-sep {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin: 15px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <svg id="graph"></svg>
+
+  <div id="controls">
+    <!-- Spotify auth -->
+    <div class="ctrl-row">
+      <button id="spotifyBtn">LOGIN WITH SPOTIFY</button>
+    </div>
+
+    <hr class="ctrl-sep" />
+
+    <!-- Day filter -->
+    <div class="ctrl-row">
+      <span class="ctrl-label">DAY</span>
+      <div class="day-group">
+        <button class="day-btn active" data-day="ALL">ALL</button>
+        <button class="day-btn" data-day="FRI">FRI</button>
+        <button class="day-btn" data-day="SAT">SAT</button>
+        <button class="day-btn" data-day="SUN">SUN</button>
+      </div>
+    </div>
+
+    <!-- Edge threshold (re-fetches on change) -->
+    <div class="ctrl-row">
+      <div class="slider-header">
+        <span class="ctrl-label">EDGE THRESHOLD</span>
+        <span class="slider-value" id="thresholdValue">0.20</span>
+      </div>
+      <input type="range" id="thresholdSlider" min="0" max="1" step="0.01" value="0.2" />
+    </div>
+
+    <!-- Node size (live) -->
+    <div class="ctrl-row">
+      <div class="slider-header">
+        <span class="ctrl-label">NODE SIZE</span>
+        <span class="slider-value" id="nodeSizeValue">1.0</span>
+      </div>
+      <input type="range" id="nodeSizeSlider" min="0.5" max="3" step="0.05" value="1" />
+    </div>
+
+    <hr class="ctrl-sep" />
+
+    <!-- Edge type toggles (live) -->
+    <div class="ctrl-row">
+      <label class="check-label">
+        <input type="checkbox" id="similarityCheck" checked />
+        SIMILARITY EDGES
+      </label>
+      <label class="check-label">
+        <input type="checkbox" id="genreCheck" checked />
+        GENRE EDGES
+      </label>
+    </div>
+  </div>
+
+  <script>
+    window.AUTHENTICATED = {{ 'true' if session.get('token') else 'false' }};
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script type="module" src="/static/graph.js"></script>
+
+</body>
+</html>
