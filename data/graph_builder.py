@@ -131,41 +131,43 @@ def build_genre_edges(nodes):
     return edges
 
 
-def normalize_listeners(nodes):
+def normalize_listeners(nodes, scores):
     max_listeners = max((node.get("listeners", 0) for node in nodes), default=0)
     for node in nodes:
-        node["score"] = node.get("listeners", 0) / max_listeners if max_listeners else 0
-    return nodes
+        scores[node["name"]]["score"] = node.get("listeners", 0) / max_listeners if max_listeners else 0
+    return scores
 
 
-def enrich_with_scores(nodes, top_artists):
+def enrich_with_scores(nodes, top_artists, scores):
     top_lookup = {_norm(a["name"]): a["score"] for a in top_artists}
 
+    node_norm = {node["name"]: _norm(node["name"]) for node in nodes}
+    similar_lookup = {
+        node["name"]: {_norm(s["name"]): s["match"] for s in node.get("similar_artists", [])}
+        for node in nodes
+    }
+    normed_node_names = set(node_norm.values())
+
     for node in nodes:
-        key = _norm(node["name"])
-        if key in top_lookup:
-            node["direct_score"] = top_lookup[key]
-            node["score"] = top_lookup[key]
+        name = node["name"]
+        if node_norm[name] in top_lookup:
+            scores[name]["direct_score"] = top_lookup[node_norm[name]]
+            scores[name]["score"] = top_lookup[node_norm[name]]
         else:
-            node["direct_score"] = 0
-            node.setdefault("score", 0)
-            node.setdefault("derived_score", 0)
+            scores[name]["direct_score"] = 0
 
     for artist in top_artists:
         artist_key = _norm(artist["name"])
-        directly_matched = any(
-            _norm(node["name"]) == artist_key for node in nodes
-        )
-        if directly_matched:
+        if artist_key in normed_node_names:
             continue
         for node in nodes:
-            if node["direct_score"] > 0:
+            name = node["name"]
+            if scores[name]["direct_score"] > 0:
                 continue
-            for similar in node.get("similar_artists", []):
-                if _norm(similar["name"]) == artist_key:
-                    derived = artist["score"] * similar["match"] * 0.6
-                    node["derived_score"] = max(node.get("derived_score", 0), derived)
-                    node["score"] = max(node.get("score", 0), node["derived_score"])
-                    break
+            match = similar_lookup[name].get(artist_key)
+            if match is not None:
+                derived = artist["score"] * match * 0.6
+                scores[name]["derived_score"] = max(scores[name]["derived_score"], derived)
+                scores[name]["score"] = max(scores[name]["score"], scores[name]["derived_score"])
 
-    return nodes
+    return scores

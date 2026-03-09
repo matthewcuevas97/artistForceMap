@@ -1,4 +1,3 @@
-import copy
 import json
 import os
 import re
@@ -194,9 +193,9 @@ def api_graph():
     """
     Return pre-computed graph data enriched with the user's Spotify scores.
 
-    Nodes and edges are computed from data/graph_static.json. Edges are
-    cached after the first build. Nodes are deep-copied per request so
-    score enrichment doesn't persist across requests.
+    Nodes and edges are served from immutable module-level caches. Per-request
+    scores are tracked in a separate dict and merged into each node at
+    serialization time, leaving the cached node objects untouched.
 
     Returns JSON:
         nodes: list of artist dicts (name, genre, listeners, score, day, weekend, stage)
@@ -206,11 +205,12 @@ def api_graph():
         return jsonify({"error": "Graph data unavailable"}), 503
 
     threshold = request.args.get("threshold", 0.1, type=float)
-    nodes = copy.deepcopy(_slim_nodes)
     edges, snapped = _get_edges(threshold)
 
+    scores = {node["name"]: {"score": 0, "direct_score": 0, "derived_score": 0} for node in _slim_nodes}
+
     # Use listener count as baseline score for all nodes, then let auth source override
-    normalize_listeners(nodes)
+    normalize_listeners(_slim_nodes, scores)
 
     lastfm_user = session.get("lastfm_user")
     spotify_token = get_valid_spotify_token()
@@ -219,26 +219,27 @@ def api_graph():
         from lastfm.fetch import get_top_artists as lastfm_top
         top = lastfm_top(lastfm_user)
         if top:
-            enrich_with_scores(nodes, top)
+            enrich_with_scores(_slim_nodes, top, scores)
     elif spotify_token:
         try:
             sp = spotipy.Spotify(auth=spotify_token)
             top_artists = get_top_artists(sp)
-            enrich_with_scores(nodes, top_artists)
+            enrich_with_scores(_slim_nodes, top_artists, scores)
         except SpotifyException:
             pass
 
-    # Collect user-data-matched nodes before stripping internal fields
     user_seeds = [
-        node["name"] for node in nodes
-        if node.get("direct_score", 0) > 0 or node.get("derived_score", 0) > 0
+        name for name, s in scores.items()
+        if s["direct_score"] > 0 or s["derived_score"] > 0
     ]
 
-    for node in nodes:
-        for field in _INTERNAL_FIELDS:
-            node.pop(field, None)
+    nodes_out = [
+        {k: v for k, v in {**node, **scores.get(node["name"], {})}.items()
+         if k not in _INTERNAL_FIELDS}
+        for node in _slim_nodes
+    ]
 
-    return jsonify({"nodes": nodes, "edges": edges, "threshold": snapped, "user_seeds": user_seeds})
+    return jsonify({"nodes": nodes_out, "edges": edges, "threshold": snapped, "user_seeds": user_seeds})
 
 
 @app.route("/api/artist/<name>")
