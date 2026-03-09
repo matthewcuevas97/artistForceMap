@@ -13,7 +13,10 @@ from spotify.auth import get_spotify_oauth, get_token
 from spotify.fetch import get_top_artists
 
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret-change-me")
+secret_key = os.getenv("FLASK_SECRET_KEY")
+if not secret_key:
+    raise RuntimeError("FLASK_SECRET_KEY environment variable is not set")
+app.secret_key = secret_key
 
 THRESHOLDS = [0.05, 0.10, 0.20, 0.30, 0.50]
 

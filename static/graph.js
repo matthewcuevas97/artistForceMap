@@ -14,6 +14,17 @@ const GENRE_HUE = {
 
 const DAY_MAP = { FRI: "Friday", SAT: "Saturday", SUN: "Sunday" };
 
+// ── Utilities ─────────────────────────────────────────────────────────────────
+
+function escapeHtml(str) {
+  return String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // ── Module state ─────────────────────────────────────────────────────────────
 
 let rawNodes = [];   // original data from API (never mutated after fetch)
@@ -355,8 +366,8 @@ function renderExportPanel() {
       `<div class="ep-track" data-ep-index="${i}" style="display:flex;align-items:center;padding:8px 12px;gap:8px;${!window.AUTHENTICATED ? "cursor:pointer;" : ""}">` +
       `<img src="${art}" style="width:36px;height:36px;object-fit:cover;flex-shrink:0" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
       `<div style="flex:1;min-width:0">` +
-      `<div style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${track.name}</div>` +
-      `<div style="font-size:9px;color:rgba(255,255,255,0.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${track.artist}</div>` +
+      `<div style="font-size:10px;font-weight:500;color:rgba(255,255,255,0.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(track.name)}</div>` +
+      `<div style="font-size:9px;color:rgba(255,255,255,0.4);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escapeHtml(track.artist)}</div>` +
       `</div>` +
       `<button class="ep-remove" data-ep-index="${i}" style="width:20px;height:20px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:none;color:rgba(255,255,255,0.5);cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0">−</button>` +
       `</div>` +
@@ -446,7 +457,7 @@ async function createSpotifyPlaylist() {
       btn.style.display = "none";
       result.innerHTML  =
         `<span style="color:#1db954">✓ PLAYLIST CREATED</span><br>` +
-        `<a href="${data.playlist_url}" target="_blank" style="color:rgba(255,255,255,0.5);font-size:9px;letter-spacing:0.08em">OPEN IN SPOTIFY →</a>`;
+        `<a href="${escapeHtml(data.playlist_url)}" target="_blank" style="color:rgba(255,255,255,0.5);font-size:9px;letter-spacing:0.08em">OPEN IN SPOTIFY →</a>`;
     } else {
       btn.disabled = false;
       btn.textContent = "CREATE SPOTIFY PLAYLIST";
@@ -476,7 +487,7 @@ function renderTrackList(tracks) {
       ` onmouseenter="this.style.background='rgba(255,255,255,0.04)'" onmouseleave="this.style.background=''">` +
       `<img src="${art}" style="width:40px;height:40px;object-fit:cover"` +
       ` onerror="this.src='/static/placeholder_artist.jpeg'" />` +
-      `<span style="font-size:10px;flex:1;color:rgba(255,255,255,0.72)">${track.name}</span>` +
+      `<span style="font-size:10px;flex:1;color:rgba(255,255,255,0.72)">${escapeHtml(track.name)}</span>` +
       `<button class="play-btn" data-preview="${preview}"` +
       ` style="font-size:12px;color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer${disabledStyle}">▶</button>` +
       `</div>`
@@ -502,19 +513,19 @@ async function openPanel(artistName) {
 
   const tagsHtml = (d.tags || []).map(tag =>
     `<span style="display:inline-block;background:rgba(255,255,255,0.07);border-radius:3px;` +
-    `padding:2px 6px;font-size:9px;color:rgba(255,255,255,0.4);margin:0 4px 4px 0">${tag}</span>`
+    `padding:2px 6px;font-size:9px;color:rgba(255,255,255,0.4);margin:0 4px 4px 0">${escapeHtml(tag)}</span>`
   ).join("");
 
   const bioHtml = d.bio
     ? `<div style="font-size:10px;line-height:1.6;color:rgba(255,255,255,0.55);` +
-      `margin:0 16px 16px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px">${d.bio}</div>`
+      `margin:0 16px 16px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px">${escapeHtml(d.bio)}</div>`
     : "";
 
   document.getElementById("panelContent").innerHTML =
     `<img src="${imgSrc}" style="width:100%;object-fit:cover;max-height:280px;display:block"` +
     ` onerror="this.src='/static/placeholder_artist.jpeg'" />` +
-    `<div style="font-size:15px;font-weight:bold;color:white;margin:12px 16px 4px">${d.name}</div>` +
-    `<div style="font-size:10px;color:rgba(255,255,255,0.45);margin:0 16px 8px">${metaParts.join(" · ")}</div>` +
+    `<div style="font-size:15px;font-weight:bold;color:white;margin:12px 16px 4px">${escapeHtml(d.name)}</div>` +
+    `<div style="font-size:10px;color:rgba(255,255,255,0.45);margin:0 16px 8px">${metaParts.map(escapeHtml).join(" · ")}</div>` +
     `<div style="margin:0 16px 12px">${tagsHtml}</div>` +
     bioHtml +
     `<div id="tracksLoading" style="display:flex;justify-content:center;align-items:center;padding:24px 0">` +
@@ -610,9 +621,9 @@ function onNodeEnter(event, d) {
   tooltip
     .style("display", "block")
     .html(
-      `<div style="font-weight:500;margin-bottom:3px">${d.name}</div>` +
-      `<div style="color:#999">${d.genre}</div>` +
-      `<div style="color:#666">${stage}${d.day}${wk}</div>`
+      `<div style="font-weight:500;margin-bottom:3px">${escapeHtml(d.name)}</div>` +
+      `<div style="color:#999">${escapeHtml(d.genre)}</div>` +
+      `<div style="color:#666">${escapeHtml(stage)}${escapeHtml(d.day)}${escapeHtml(wk)}</div>`
     );
   moveTooltip(event);
 }
@@ -841,7 +852,48 @@ function buildGraph() {
 
 // ── Fetch + build ─────────────────────────────────────────────────────────────
 
+function _graphStatusEl() {
+  let el = document.getElementById("graphStatusOverlay");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "graphStatusOverlay";
+    Object.assign(el.style, {
+      position:   "fixed",
+      inset:      "0",
+      display:    "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      pointerEvents:  "none",
+      zIndex:     "5",
+    });
+    document.body.appendChild(el);
+  }
+  return el;
+}
+
+function _showGraphLoading() {
+  const el = _graphStatusEl();
+  el.style.display = "flex";
+  el.innerHTML =
+    `<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;` +
+    `letter-spacing:0.12em;color:rgba(255,255,255,0.3)">LOADING…</span>`;
+}
+
+function _showGraphError(msg) {
+  const el = _graphStatusEl();
+  el.style.display = "flex";
+  el.innerHTML =
+    `<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;` +
+    `letter-spacing:0.1em;color:rgba(255,100,100,0.6)">${escapeHtml(msg)}</span>`;
+}
+
+function _hideGraphStatus() {
+  const el = document.getElementById("graphStatusOverlay");
+  if (el) el.style.display = "none";
+}
+
 async function fetchAndBuild(threshold) {
+  _showGraphLoading();
   try {
     // Fetch frontier edges once (0.05 threshold) for discovery mode connectivity
     if (!frontierEdgesLoaded) {
@@ -859,8 +911,10 @@ async function fetchAndBuild(threshold) {
     rawEdges  = data.edges;
     userSeeds = new Set(data.user_seeds || []);
     buildGraph();
+    _hideGraphStatus();
   } catch (err) {
     console.error("artistForceMap: failed to load graph —", err.message);
+    _showGraphError("Failed to load graph. Please refresh the page.");
   }
 }
 
