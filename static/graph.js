@@ -875,8 +875,12 @@ function _showGraphLoading() {
   const el = _graphStatusEl();
   el.style.display = "flex";
   el.innerHTML =
+    `<div style="display:flex;flex-direction:column;align-items:center;gap:6px">` +
     `<span style="font-family:'IBM Plex Mono',monospace;font-size:11px;` +
-    `letter-spacing:0.12em;color:rgba(255,255,255,0.3)">LOADING…</span>`;
+    `letter-spacing:0.12em;color:rgba(255,255,255,0.3)">LOADING…</span>` +
+    `<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;` +
+    `letter-spacing:0.08em;color:rgba(255,255,255,0.3);opacity:0.4">first load may take ~30s</span>` +
+    `</div>`;
 }
 
 function _showGraphError(msg) {
