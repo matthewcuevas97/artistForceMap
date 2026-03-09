@@ -529,6 +529,44 @@
       border-color: rgba(255, 255, 255, 0.35);
       color: rgba(255, 255, 255, 0.9);
     }
+
+    /* ── Mobile bottom drawer ─── */
+    #artistDrawer {
+      display: none;
+    }
+
+    @media (max-width: 767px) {
+      #graph {
+        height: 55vh;
+      }
+
+      #artistDrawer {
+        display: block;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 10, 0.97);
+        z-index: 200;
+        overflow: hidden;
+        transition: transform 0.35s ease, height 0.35s ease;
+      }
+
+      #artistDrawer.drawer-hidden {
+        transform: translateY(100%);
+        height: 45vh;
+      }
+
+      #artistDrawer.drawer-collapsed {
+        transform: translateY(0);
+        height: 45vh;
+      }
+
+      #artistDrawer.drawer-expanded {
+        transform: translateY(0);
+        height: 85vh;
+      }
+    }
   </style>
 </head>
 <body>
@@ -637,6 +675,12 @@
   </div>
 
   <div id="exportPanel" style="display:none"></div>
+
+  <div id="artistDrawer" class="drawer-hidden">
+    <div id="drawerHero"></div>
+    <div id="drawerMeta"></div>
+    <div id="drawerTracks"></div>
+  </div>
 
   <script>
     window.AUTHENTICATED = {{ 'true' if session.get('token') else 'false' }};

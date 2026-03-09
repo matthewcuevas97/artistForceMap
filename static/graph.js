@@ -1,5 +1,7 @@
 // ── Constants ────────────────────────────────────────────────────────────────
 
+const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
+
 const GENRE_HUE = {
   "Electronic":             195,
   "Indie/Alt":              135,
@@ -70,7 +72,7 @@ let currentTracks      = [];
 // ── Viewport ─────────────────────────────────────────────────────────────────
 
 const W = window.innerWidth;
-const H = window.innerHeight;
+const H = isMobile ? Math.floor(window.innerHeight * 0.55) : window.innerHeight;
 
 // ── SVG scaffold ─────────────────────────────────────────────────────────────
 
@@ -494,6 +496,16 @@ function renderTrackList(tracks) {
     );
   }).join("");
   return header + rows;
+}
+
+function openDrawer(artistName) {
+  if (isMobile) {
+    const drawer = document.getElementById("artistDrawer");
+    drawer.classList.remove("drawer-hidden");
+    drawer.classList.add("drawer-collapsed");
+  } else {
+    openPanel(artistName);
+  }
 }
 
 async function openPanel(artistName) {
