@@ -813,8 +813,8 @@ function buildGraph() {
         pinnedDatum    = d;
         openArtistName = d.name;
         d3.select(event.currentTarget)
-          .attr("stroke",       "rgba(255,255,255,0.45)")
-          .attr("stroke-width", 1.5);
+          .attr("stroke",       "#FFD700")
+          .attr("stroke-width", 2.5);
         openPanel(d.name);
       }
       simulation.alpha(0.05).restart();
