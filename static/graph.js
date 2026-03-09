@@ -66,6 +66,10 @@ let pinnedDatum    = null;
 let panelRequestId = 0;
 let drawerState    = 'hidden';
 
+const DRAWER_PEEK_H = 140;
+const drawerCollapsedH = () => Math.round(window.innerHeight * 0.45);
+const drawerExpandedH  = () => Math.round(window.innerHeight * 0.85);
+
 let playlist           = [];   // { artist, name, album_art, deezer_url }
 let expandedTrackIndex = null;
 let currentTracks      = [];
@@ -73,7 +77,7 @@ let currentTracks      = [];
 // ── Viewport ─────────────────────────────────────────────────────────────────
 
 const W = window.innerWidth;
-const H = isMobile ? Math.floor(window.innerHeight * 0.55) : window.innerHeight;
+const H = window.innerHeight;
 
 // ── SVG scaffold ─────────────────────────────────────────────────────────────
 
@@ -527,14 +531,33 @@ function unpinCurrentNode() {
   pinnedDatum = null;
 }
 
+function updateDrawerParallax(heightPx) {
+  const hero = document.getElementById("drawerHero");
+  if (!hero) return;
+  const ratio = Math.max(0, Math.min(1,
+    (heightPx - DRAWER_PEEK_H) / (drawerExpandedH() - DRAWER_PEEK_H)
+  ));
+  hero.style.backgroundPositionY = (33 - ratio * 13) + "%";
+}
+
 function setDrawerState(state) {
+  // Item 10: can't fully hide while a node is pinned — drop to peek instead
+  if (state === 'hidden' && pinnedDatum) state = 'peek';
+
   drawerState = state;
   const drawer = document.getElementById("artistDrawer");
   if (!drawer) return;
+
   drawer.classList.remove("drawer-hidden", "drawer-collapsed", "drawer-expanded", "drawer-peek");
   drawer.classList.add("drawer-" + state);
-  // When hiding, stop any playing audio and exit discovery subgraph
+
+  const scrollEl = document.getElementById("drawerScroll");
+
   if (state === 'hidden') {
+    drawer.style.transform = 'translateY(100%)';
+    drawer.style.height    = DRAWER_PEEK_H + 'px';
+    if (scrollEl) scrollEl.style.overflowY = 'hidden';
+    // Stop audio, clear submenu, exit discovery subgraph
     if (currentAudio) { currentAudio.pause(); currentAudio = null; }
     if (currentPlayBtn) {
       currentPlayBtn.textContent = "▶";
@@ -551,6 +574,23 @@ function setDrawerState(state) {
       updateDiscoveryVisuals();
       expandMenu();
     }
+  } else if (state === 'peek') {
+    drawer.style.transform = 'translateY(0)';
+    drawer.style.height    = DRAWER_PEEK_H + 'px';
+    if (scrollEl) scrollEl.style.overflowY = 'hidden';
+    updateDrawerParallax(DRAWER_PEEK_H);
+  } else if (state === 'collapsed') {
+    const h = drawerCollapsedH();
+    drawer.style.transform = 'translateY(0)';
+    drawer.style.height    = h + 'px';
+    if (scrollEl) { scrollEl.style.overflowY = 'hidden'; scrollEl.scrollTop = 0; }
+    updateDrawerParallax(h);
+  } else if (state === 'expanded') {
+    const h = drawerExpandedH();
+    drawer.style.transform = 'translateY(0)';
+    drawer.style.height    = h + 'px';
+    if (scrollEl) scrollEl.style.overflowY = 'auto';
+    updateDrawerParallax(h);
   }
 }
 
@@ -710,6 +750,9 @@ function wireDrawerTrackInteractions() {
     if (playBtn) {
       playBtn.addEventListener("click", function(e) {
         e.stopPropagation();
+
+        // Expand drawer if collapsed (Fix #7)
+        if (drawerState === 'collapsed' || drawerState === 'peek') setDrawerState('expanded');
 
         // Also open submenu
         if (drawerExpandedIdx !== idx) {
@@ -1597,56 +1640,142 @@ function initControls() {
 function initDrawerGestures() {
   if (!isMobile) return;
 
-  const drawer = document.getElementById("artistDrawer");
-  let touchStartY        = 0;
-  let scrollAtTouchStart = 0;
+  const drawer   = document.getElementById("artistDrawer");
+  const scrollEl = document.getElementById("drawerScroll");
 
+  let startY             = 0;
+  let startHeight        = 0;
+  let isDraggingDrawer   = false;
+  let gestureCommitted   = null; // null | 'drawer' | 'scroll'
+  const moveSamples      = [];   // [{y, t}] for velocity
+
+  function applyDrag(currentY) {
+    const deltaY = startY - currentY;          // positive = finger moved up = taller
+    const minH   = pinnedDatum ? DRAWER_PEEK_H : 0;
+    const maxH   = drawerExpandedH();
+    let   newH   = Math.max(minH, Math.min(maxH, startHeight + deltaY));
+
+    if (!pinnedDatum && startHeight + deltaY < DRAWER_PEEK_H) {
+      // Rubber-band translate down when dragging below minimum
+      const excess = DRAWER_PEEK_H - (startHeight + deltaY);
+      drawer.style.transform = `translateY(${Math.max(0, excess)}px)`;
+      drawer.style.height    = DRAWER_PEEK_H + 'px';
+    } else {
+      drawer.style.transform = 'translateY(0)';
+      drawer.style.height    = newH + 'px';
+    }
+
+    updateDrawerParallax(newH);
+  }
+
+  function snapFromDrag(currentY) {
+    // Compute velocity (px/ms); positive = finger moving up = height increasing)
+    let velocity = 0;
+    if (moveSamples.length >= 2) {
+      const first = moveSamples[0];
+      const last  = moveSamples[moveSamples.length - 1];
+      const dt    = last.t - first.t;
+      if (dt > 0) velocity = (first.y - last.y) / dt;
+    }
+
+    const currentH  = drawer.offsetHeight;
+    const collH     = drawerCollapsedH();
+    const expH      = drawerExpandedH();
+
+    // Re-enable transition for the snap animation
+    drawer.style.transition = '';
+
+    let target;
+    if (Math.abs(velocity) >= 0.4) {
+      // Momentum snap
+      if (velocity > 0) {
+        // Moving up → next higher state
+        if      (currentH < DRAWER_PEEK_H + 30) target = 'collapsed';
+        else if (currentH < collH - 30)          target = 'collapsed';
+        else                                      target = 'expanded';
+      } else {
+        // Moving down → next lower state
+        if      (currentH > collH + 30)  target = 'collapsed';
+        else if (currentH > DRAWER_PEEK_H + 30) target = 'peek';
+        else                              target = 'hidden';
+      }
+    } else {
+      // Snap to closest state by height
+      const dPeek     = Math.abs(currentH - DRAWER_PEEK_H);
+      const dCollapsed = Math.abs(currentH - collH);
+      const dExpanded  = Math.abs(currentH - expH);
+      if (dPeek <= dCollapsed && dPeek <= dExpanded) target = 'peek';
+      else if (dCollapsed <= dExpanded)               target = 'collapsed';
+      else                                            target = 'expanded';
+    }
+
+    if (target === 'hidden' || (target === 'peek' && !pinnedDatum)) {
+      if (!pinnedDatum) {
+        unpinCurrentNode();
+        openArtistName = null;
+      }
+    }
+
+    setDrawerState(target);
+  }
+
+  // ── Touch listeners on the whole drawer ─────────────────────────────────────
   drawer.addEventListener("touchstart", e => {
-    touchStartY        = e.touches[0].clientY;
-    scrollAtTouchStart = drawer.scrollTop;
+    startY           = e.touches[0].clientY;
+    startHeight      = drawer.offsetHeight;
+    isDraggingDrawer = false;
+    gestureCommitted = null;
+    moveSamples.length = 0;
+    moveSamples.push({ y: startY, t: Date.now() });
   }, { passive: true });
+
+  drawer.addEventListener("touchmove", e => {
+    const fingerY    = e.touches[0].clientY;
+    const fingerDown = fingerY - startY;           // positive = finger moved down
+    const inScroll   = scrollEl && e.target.closest("#drawerScroll");
+
+    // Commit gesture type on first significant move
+    if (gestureCommitted === null) {
+      if (inScroll && drawerState === 'expanded') {
+        if (scrollEl.scrollTop > 4) {
+          gestureCommitted = 'scroll';
+        } else if (fingerDown < 0) {
+          // Finger moving up — scroll content
+          gestureCommitted = 'scroll';
+        } else {
+          // Finger moving down at top — drag drawer down
+          gestureCommitted = 'drawer';
+        }
+      } else {
+        gestureCommitted = 'drawer';
+      }
+    }
+
+    if (gestureCommitted === 'scroll') return; // let native scroll run
+
+    e.preventDefault();
+    isDraggingDrawer = true;
+    drawer.style.transition = 'none';
+
+    moveSamples.push({ y: fingerY, t: Date.now() });
+    if (moveSamples.length > 10) moveSamples.shift();
+
+    applyDrag(fingerY);
+  }, { passive: false });
 
   drawer.addEventListener("touchend", e => {
-    const deltaY = e.changedTouches[0].clientY - touchStartY;
-    const atTop  = scrollAtTouchStart <= 2;
-
-    if (drawerState === 'collapsed') {
-      if (deltaY < -40) {
-        // Swipe up → expand
-        setDrawerState('expanded');
-      } else if (atTop && deltaY > 40) {
-        // Fast swipe down at top → hidden
-        unpinCurrentNode();
-        openArtistName = null;
-        setDrawerState('hidden');
-      } else if (atTop && deltaY > 10) {
-        // Gentle push down at top → peek
-        setDrawerState('peek');
-      }
-    } else if (drawerState === 'expanded') {
-      if (atTop && deltaY > 40) {
-        // Swipe down from top → collapse
-        setDrawerState('collapsed');
-        drawer.scrollTop = 0;
-      }
-    } else if (drawerState === 'peek') {
-      if (deltaY < -20) {
-        // Swipe up from peek → collapsed
-        setDrawerState('collapsed');
-      } else if (deltaY > 10) {
-        // Any downward touch on peek → hidden
-        unpinCurrentNode();
-        openArtistName = null;
-        setDrawerState('hidden');
-      }
-    }
+    if (!isDraggingDrawer) return;
+    isDraggingDrawer = false;
+    gestureCommitted = null;
+    snapFromDrag(e.changedTouches[0].clientY);
   }, { passive: true });
 
-  // Scroll past top in collapsed state → peek
-  drawer.addEventListener("scroll", () => {
-    if (drawerState === 'collapsed' && drawer.scrollTop === 0) {
-      setDrawerState('peek');
-    }
+  drawer.addEventListener("touchcancel", () => {
+    if (!isDraggingDrawer) return;
+    isDraggingDrawer = false;
+    gestureCommitted = null;
+    drawer.style.transition = '';
+    setDrawerState(drawerState); // restore current state cleanly
   }, { passive: true });
 }
 

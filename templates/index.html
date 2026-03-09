@@ -536,12 +536,17 @@
     }
 
     @media (max-width: 767px) {
-      #graph {
-        height: 55vh;
+      /* ── Controls: move to top-left on mobile ── */
+      #controls {
+        bottom: auto;
+        top: 16px;
+        left: 16px;
       }
 
+      /* ── Drawer container ── */
       #artistDrawer {
-        display: block;
+        display: flex;
+        flex-direction: column;
         position: fixed;
         bottom: 0;
         left: 0;
@@ -552,28 +557,24 @@
         transition: transform 0.35s ease, height 0.35s ease;
       }
 
-      #artistDrawer.drawer-hidden {
-        transform: translateY(100%);
-        height: 45vh;
+      /* Soft fade at the very top of the drawer */
+      #artistDrawer::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 24px;
+        background: linear-gradient(to top, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
+        pointer-events: none;
+        z-index: 10;
       }
 
-      #artistDrawer.drawer-collapsed {
-        transform: translateY(0);
-        height: 45vh;
-        overflow-y: auto;
-      }
-
-      #artistDrawer.drawer-expanded {
-        transform: translateY(0);
-        height: 85vh;
-        overflow-y: auto;
-      }
-
-      #artistDrawer.drawer-peek {
-        transform: translateY(0);
-        height: 72px;
-        overflow: hidden;
-      }
+      /* State classes — JS controls transform+height inline; classes drive child styles */
+      #artistDrawer.drawer-hidden  { transform: translateY(100%); height: 140px; }
+      #artistDrawer.drawer-peek    { transform: translateY(0);    height: 140px; }
+      #artistDrawer.drawer-collapsed { transform: translateY(0);  height: 45vh;  }
+      #artistDrawer.drawer-expanded  { transform: translateY(0);  height: 85vh;  }
 
       /* ── Drawer hero ── */
       #drawerHero {
@@ -581,9 +582,15 @@
         width: 100%;
         height: 160px;
         background-size: cover;
-        background-position: center top;
+        background-position: center 33%;
         background-color: #1a1a1a;
         flex-shrink: 0;
+        transition: height 0.35s ease;
+      }
+
+      /* Hero collapses to 60px in peek state */
+      #artistDrawer.drawer-peek #drawerHero {
+        height: 60px;
       }
 
       #drawerHero::after {
@@ -602,6 +609,13 @@
         color: white;
         font-family: 'IBM Plex Mono', monospace;
         z-index: 1;
+      }
+
+      /* ── Drawer scrollable area ── */
+      #drawerScroll {
+        flex: 1;
+        min-height: 0;
+        overflow-y: hidden;
       }
 
       /* ── Drawer meta ── */
@@ -839,12 +853,14 @@
     <div id="drawerHero">
       <div id="drawerHeroName"></div>
     </div>
-    <div id="drawerMeta">
-      <div id="drawerMetaLine"></div>
-      <div id="drawerMetaTags"></div>
+    <div id="drawerScroll">
+      <div id="drawerMeta">
+        <div id="drawerMetaLine"></div>
+        <div id="drawerMetaTags"></div>
+      </div>
+      <div id="drawerTracks"></div>
+      <div id="drawerBio" style="display:none"></div>
     </div>
-    <div id="drawerTracks"></div>
-    <div id="drawerBio" style="display:none"></div>
   </div>
 
   <script>
