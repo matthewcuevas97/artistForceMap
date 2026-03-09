@@ -500,12 +500,202 @@ function renderTrackList(tracks) {
 
 function openDrawer(artistName) {
   if (isMobile) {
+    const datum = rawNodes.find(n => n.name === artistName) || { name: artistName };
     const drawer = document.getElementById("artistDrawer");
     drawer.classList.remove("drawer-hidden");
     drawer.classList.add("drawer-collapsed");
+    populateDrawer(datum);
   } else {
     openPanel(artistName);
   }
+}
+
+let drawerRequestId = 0;
+let drawerArtistName = null;
+let drawerTracks = [];
+let drawerExpandedIdx = null;
+
+function collapseDrawerSubmenu() {
+  const existing = document.querySelector(".drawer-track-submenu.open");
+  if (existing) existing.classList.remove("open");
+  drawerExpandedIdx = null;
+}
+
+async function populateDrawer(d) {
+  const myId = ++drawerRequestId;
+  drawerArtistName = d.name;
+  drawerTracks = [];
+  drawerExpandedIdx = null;
+
+  // ── Hero ──
+  const imgUrl = d.image_url || "";
+  const isPlaceholder = !imgUrl || imgUrl.includes(PLACEHOLDER_HASH);
+  const imgSrc = isPlaceholder ? "/static/placeholder_artist.jpeg" : imgUrl;
+  const hero = document.getElementById("drawerHero");
+  hero.style.backgroundImage = `url('${imgSrc}')`;
+  document.getElementById("drawerHeroName").textContent = d.name || "";
+
+  // ── Meta ──
+  const metaParts = [d.genre, d.stage, d.day].filter(Boolean);
+  document.getElementById("drawerMetaLine").textContent = metaParts.join(" · ");
+  document.getElementById("drawerMetaTags").innerHTML = (d.tags || [])
+    .map(tag => `<span class="drawer-tag">${escapeHtml(tag)}</span>`)
+    .join("");
+
+  // ── Tracks: loading state ──
+  const tracksEl = document.getElementById("drawerTracks");
+  tracksEl.innerHTML =
+    `<div style="display:flex;justify-content:center;align-items:center;padding:24px 0">` +
+    `<div class="spinner"></div></div>`;
+
+  const bioEl = document.getElementById("drawerBio");
+  bioEl.style.display = "none";
+  bioEl.textContent = "";
+
+  // ── Fetch tracks ──
+  try {
+    const tracksResp = await fetch("/api/artist/" + encodeURIComponent(d.name) + "/tracks");
+    if (myId !== drawerRequestId) return;
+    const tracksData = tracksResp.ok ? await tracksResp.json() : { tracks: [] };
+    if (myId !== drawerRequestId) return;
+
+    drawerTracks = tracksData.tracks || [];
+
+    if (!drawerTracks.length) {
+      tracksEl.innerHTML =
+        `<div style="font-size:9px;color:rgba(255,255,255,0.2);padding:16px;text-align:center;` +
+        `font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em">NO TRACKS AVAILABLE</div>`;
+    } else {
+      const header =
+        `<div style="font-size:9px;letter-spacing:0.12em;color:rgba(255,255,255,0.3);` +
+        `padding:8px 16px 4px;font-family:'IBM Plex Mono',monospace">TOP TRACKS</div>`;
+
+      const rows = drawerTracks.map((track, idx) => {
+        const art     = track.album_art || "/static/placeholder_artist.jpeg";
+        const preview = track.preview_url || "";
+        const disabledStyle = preview ? "" : "opacity:0.25;pointer-events:none;";
+        return (
+          `<div class="drawer-track-row" data-drawer-track-index="${idx}">` +
+          `<img class="drawer-track-art" src="${escapeHtml(art)}"` +
+          ` onerror="this.src='/static/placeholder_artist.jpeg'" />` +
+          `<div class="drawer-track-info">` +
+          `<div class="drawer-track-name">${escapeHtml(track.name)}</div>` +
+          `<div class="drawer-track-artist">${escapeHtml(d.name)}</div>` +
+          `</div>` +
+          `<button class="drawer-play-btn" data-preview="${escapeHtml(preview)}"` +
+          ` style="${disabledStyle}">▶</button>` +
+          `</div>` +
+          `<div class="drawer-track-submenu" data-drawer-submenu-index="${idx}">` +
+          buildServiceLinks(d.name, track.name, "sub-svc-btn", 18) +
+          `<button class="add-playlist-btn" data-drawer-add-index="${idx}">` +
+          (window.AUTHENTICATED
+            ? `<span class="add-btn-icon"></span><span class="rainbow-text">＋ Queue</span>`
+            : `<span class="rainbow-text">＋ My Playlist</span>`) +
+          `</button>` +
+          `</div>`
+        );
+      }).join("");
+
+      tracksEl.innerHTML = header + rows;
+      wireDrawerTrackInteractions();
+    }
+  } catch (_) {
+    if (myId !== drawerRequestId) return;
+    tracksEl.innerHTML =
+      `<div style="font-size:9px;color:rgba(255,255,255,0.2);padding:16px;text-align:center;` +
+      `font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em">NO TRACKS AVAILABLE</div>`;
+  }
+
+  // ── Fetch bio (may already be on datum, else fetch artist endpoint) ──
+  try {
+    const bio = d.bio || await (async () => {
+      const r = await fetch("/api/artist/" + encodeURIComponent(d.name));
+      if (!r.ok) return null;
+      const data = await r.json();
+      return data.bio || null;
+    })();
+    if (myId !== drawerRequestId) return;
+    if (bio) {
+      bioEl.textContent = bio;
+      bioEl.style.display = "block";
+    }
+  } catch (_) { /* bio is optional */ }
+}
+
+function wireDrawerTrackInteractions() {
+  const tracksEl = document.getElementById("drawerTracks");
+
+  tracksEl.querySelectorAll(".drawer-track-row").forEach(row => {
+    const idx = parseInt(row.dataset.drawerTrackIndex, 10);
+    const submenu = tracksEl.querySelector(`.drawer-track-submenu[data-drawer-submenu-index="${idx}"]`);
+
+    // Row tap (not on play btn) → toggle submenu
+    row.addEventListener("click", function(e) {
+      if (e.target.closest(".drawer-play-btn")) return;
+      if (drawerExpandedIdx === idx) {
+        collapseDrawerSubmenu();
+      } else {
+        collapseDrawerSubmenu();
+        drawerExpandedIdx = idx;
+        if (submenu) submenu.classList.add("open");
+      }
+    });
+
+    // Add-to-playlist button
+    if (submenu) {
+      submenu.querySelector(".add-playlist-btn").addEventListener("click", e => {
+        e.stopPropagation();
+        const track = drawerTracks[idx];
+        addToPlaylist(track, submenu);
+      });
+    }
+
+    // Play button
+    const playBtn = row.querySelector(".drawer-play-btn");
+    if (playBtn) {
+      playBtn.addEventListener("click", function(e) {
+        e.stopPropagation();
+
+        // Also open submenu
+        if (drawerExpandedIdx !== idx) {
+          collapseDrawerSubmenu();
+          drawerExpandedIdx = idx;
+          if (submenu) submenu.classList.add("open");
+        }
+
+        const previewUrl = this.dataset.preview;
+        if (!previewUrl) return;
+
+        if (currentAudio && currentPlayBtn === this) {
+          currentAudio.pause();
+          currentAudio = null;
+          currentPlayBtn = null;
+          this.textContent = "▶";
+          this.classList.remove("playing");
+          return;
+        }
+        if (currentAudio) {
+          currentAudio.pause();
+          if (currentPlayBtn) {
+            currentPlayBtn.textContent = "▶";
+            currentPlayBtn.classList.remove("playing");
+          }
+        }
+        const audio = new Audio(previewUrl);
+        audio.play().catch(() => {});
+        currentAudio = audio;
+        currentPlayBtn = this;
+        this.textContent = "▐▐";
+        this.classList.add("playing");
+        audio.addEventListener("ended", () => {
+          this.textContent = "▶";
+          this.classList.remove("playing");
+          currentAudio = null;
+          currentPlayBtn = null;
+        });
+      });
+    }
+  });
 }
 
 async function openPanel(artistName) {
