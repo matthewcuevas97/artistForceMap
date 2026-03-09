@@ -2,6 +2,7 @@ import copy
 import json
 import os
 import re
+import time
 import spotipy
 import requests
 from datetime import datetime
@@ -18,6 +19,8 @@ if not secret_key:
     raise RuntimeError("FLASK_SECRET_KEY environment variable is not set")
 app.secret_key = secret_key
 
+sp_oauth = get_spotify_oauth()
+
 THRESHOLDS = [0.05, 0.10, 0.20, 0.30, 0.50]
 
 DEEZER_SEARCH = "https://api.deezer.com/search"
@@ -25,6 +28,32 @@ DEEZER_SEARCH = "https://api.deezer.com/search"
 
 def _norm_simple(s):
     return re.sub(r'[^\w]', '', s.lower())
+
+
+def get_valid_spotify_token():
+    """Return a valid Spotify access token from the session, refreshing if needed.
+
+    Returns the access token string, or None if the session has no token or
+    the refresh attempt fails.
+    """
+    token = session.get("spotify_token")
+    if not token:
+        return None
+    expires_at = session.get("spotify_token_expires_at", 0)
+    if time.time() > expires_at - 60:
+        refresh_token = session.get("spotify_refresh_token")
+        if not refresh_token:
+            return None
+        try:
+            new_token = sp_oauth.refresh_access_token(refresh_token)
+            session["spotify_token"] = new_token["access_token"]
+            session["spotify_token_expires_at"] = new_token["expires_at"]
+            if new_token.get("refresh_token"):
+                session["spotify_refresh_token"] = new_token["refresh_token"]
+            return new_token["access_token"]
+        except Exception:
+            return None
+    return token
 
 
 def refresh_track_previews(tracks, artist_names):
@@ -114,7 +143,9 @@ def callback():
     if not code:
         return "Missing authorization code", 400
     token = get_token(code)
-    session["token"] = token
+    session["spotify_token"] = token["access_token"]
+    session["spotify_refresh_token"] = token.get("refresh_token")
+    session["spotify_token_expires_at"] = token["expires_at"]
     session.pop("lastfm_user", None)
     try:
         sp = spotipy.Spotify(auth=token["access_token"])
@@ -127,7 +158,9 @@ def callback():
 
 @app.route("/api/spotify/logout", methods=["POST"])
 def spotify_logout():
-    session.pop("token", None)
+    session.pop("spotify_token", None)
+    session.pop("spotify_refresh_token", None)
+    session.pop("spotify_token_expires_at", None)
     session.pop("spotify_display_name", None)
     return jsonify({"ok": True})
 
@@ -143,7 +176,9 @@ def lastfm_login():
     if not top:
         return jsonify({"ok": False, "error": "User not found"}), 400
     session["lastfm_user"] = username
-    session.pop("token", None)
+    session.pop("spotify_token", None)
+    session.pop("spotify_refresh_token", None)
+    session.pop("spotify_token_expires_at", None)
     session.pop("spotify_display_name", None)
     return jsonify({"ok": True})
 
@@ -178,7 +213,7 @@ def api_graph():
     normalize_listeners(nodes)
 
     lastfm_user = session.get("lastfm_user")
-    spotify_token = session.get("token")
+    spotify_token = get_valid_spotify_token()
 
     if lastfm_user:
         from lastfm.fetch import get_top_artists as lastfm_top
@@ -187,13 +222,11 @@ def api_graph():
             enrich_with_scores(nodes, top)
     elif spotify_token:
         try:
-            sp = spotipy.Spotify(auth=spotify_token["access_token"])
+            sp = spotipy.Spotify(auth=spotify_token)
             top_artists = get_top_artists(sp)
             enrich_with_scores(nodes, top_artists)
         except SpotifyException:
-            # Token likely expired; clear session and serve listener-normalized scores
-            session.pop("token", None)
-            session.pop("spotify_display_name", None)
+            pass
 
     # Collect user-data-matched nodes before stripping internal fields
     user_seeds = [
@@ -230,15 +263,15 @@ def api_artist_tracks(name):
 
 @app.route("/api/spotify/create-playlist", methods=["POST"])
 def api_spotify_create_playlist():
-    token = session.get("token")
+    token = get_valid_spotify_token()
     if not token:
-        return jsonify({"ok": False, "error": "Not authenticated"}), 401
+        return jsonify({"error": "spotify_auth_required"}), 401
 
     data = request.get_json(force=True) or {}
     tracks = data.get("tracks", [])
 
     try:
-        sp = spotipy.Spotify(auth=token["access_token"])
+        sp = spotipy.Spotify(auth=token)
         name = f"Coachella 2026 · {datetime.now().strftime('%b %-d')}"
         pl = sp.current_user_playlist_create(name, public=False)
         playlist_id = pl["id"]
