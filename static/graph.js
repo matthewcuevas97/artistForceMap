@@ -64,6 +64,7 @@ let currentPlayBtn = null;
 let openArtistName = null;
 let pinnedDatum    = null;
 let panelRequestId = 0;
+let drawerState    = 'hidden';
 
 let playlist           = [];   // { artist, name, album_art, deezer_url }
 let expandedTrackIndex = null;
@@ -87,6 +88,19 @@ svg.append("rect")
   .attr("fill", "#111111")
   .on("click", () => {
     clearHover();
+    if (isMobile) {
+      if (drawerState === 'expanded') {
+        setDrawerState('collapsed');
+        return;
+      } else if (drawerState === 'collapsed' || drawerState === 'peek') {
+        unpinCurrentNode();
+        openArtistName = null;
+        setDrawerState('hidden');
+        closePanel();
+        return;
+      }
+      return;
+    }
     if (pinnedDatum) {
       pinnedDatum.fx = null;
       pinnedDatum.fy = null;
@@ -329,6 +343,12 @@ function addToPlaylist(track, subEl) {
   updateExportButton();
 }
 
+function syncHamburgerColor() {
+  const btn = document.getElementById("menuToggle");
+  if (!btn) return;
+  btn.style.color = playlist.length > 0 ? "#1db954" : "";
+}
+
 function updateExportButton() {
   const row = document.getElementById("exportRow");
   const btn = document.getElementById("exportBtn");
@@ -343,6 +363,7 @@ function updateExportButton() {
       ? `SPOTIFY PLAYLIST (${playlist.length})`
       : `MY PLAYLIST (${playlist.length})`;
   }
+  syncHamburgerColor();
 }
 
 function openExportPanel() {
@@ -498,12 +519,45 @@ function renderTrackList(tracks) {
   return header + rows;
 }
 
+function unpinCurrentNode() {
+  if (!pinnedDatum) return;
+  pinnedDatum.fx = null;
+  pinnedDatum.fy = null;
+  if (nodeEl) nodeEl.filter(n => n === pinnedDatum).attr("stroke", "none").attr("stroke-width", 0);
+  pinnedDatum = null;
+}
+
+function setDrawerState(state) {
+  drawerState = state;
+  const drawer = document.getElementById("artistDrawer");
+  if (!drawer) return;
+  drawer.classList.remove("drawer-hidden", "drawer-collapsed", "drawer-expanded", "drawer-peek");
+  drawer.classList.add("drawer-" + state);
+  // When hiding, stop any playing audio and exit discovery subgraph
+  if (state === 'hidden') {
+    if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+    if (currentPlayBtn) {
+      currentPlayBtn.textContent = "▶";
+      currentPlayBtn.classList.remove("playing");
+      currentPlayBtn = null;
+    }
+    collapseDrawerSubmenu();
+    if (discoveryMode && lastDiscovered !== null) {
+      window._pendingDiscovery = null;
+      lastDiscovered = null;
+      fringe.clear();
+      subgraph.clear();
+      updateAmbassadors();
+      updateDiscoveryVisuals();
+      expandMenu();
+    }
+  }
+}
+
 function openDrawer(artistName) {
   if (isMobile) {
     const datum = rawNodes.find(n => n.name === artistName) || { name: artistName };
-    const drawer = document.getElementById("artistDrawer");
-    drawer.classList.remove("drawer-hidden");
-    drawer.classList.add("drawer-collapsed");
+    setDrawerState('collapsed');
     populateDrawer(datum);
   } else {
     openPanel(artistName);
@@ -629,9 +683,10 @@ function wireDrawerTrackInteractions() {
     const idx = parseInt(row.dataset.drawerTrackIndex, 10);
     const submenu = tracksEl.querySelector(`.drawer-track-submenu[data-drawer-submenu-index="${idx}"]`);
 
-    // Row tap (not on play btn) → toggle submenu
+    // Row tap (not on play btn) → expand drawer if collapsed, then toggle submenu
     row.addEventListener("click", function(e) {
       if (e.target.closest(".drawer-play-btn")) return;
+      if (drawerState === 'collapsed') setDrawerState('expanded');
       if (drawerExpandedIdx === idx) {
         collapseDrawerSubmenu();
       } else {
@@ -980,7 +1035,7 @@ function buildGraph() {
       if (discoveryMode && (fringe.has(d.name) || ambassadors.has(d.name)) && !discovered.has(d.name)) {
         window._pendingDiscovery = d.name;
         updateDiscoveryVisuals();
-        openPanel(d.name);
+        openDrawer(d.name);
         return;
       }
       // Discovery mode: non-visible undiscovered node → inert
@@ -1017,7 +1072,7 @@ function buildGraph() {
         d3.select(event.currentTarget)
           .attr("stroke",       "#FFD700")
           .attr("stroke-width", 2.5);
-        openPanel(d.name);
+        openDrawer(d.name);
       }
       simulation.alpha(0.05).restart();
     });
@@ -1537,7 +1592,66 @@ function initControls() {
     });
 }
 
+// ── Drawer gestures (mobile only) ─────────────────────────────────────────────
+
+function initDrawerGestures() {
+  if (!isMobile) return;
+
+  const drawer = document.getElementById("artistDrawer");
+  let touchStartY        = 0;
+  let scrollAtTouchStart = 0;
+
+  drawer.addEventListener("touchstart", e => {
+    touchStartY        = e.touches[0].clientY;
+    scrollAtTouchStart = drawer.scrollTop;
+  }, { passive: true });
+
+  drawer.addEventListener("touchend", e => {
+    const deltaY = e.changedTouches[0].clientY - touchStartY;
+    const atTop  = scrollAtTouchStart <= 2;
+
+    if (drawerState === 'collapsed') {
+      if (deltaY < -40) {
+        // Swipe up → expand
+        setDrawerState('expanded');
+      } else if (atTop && deltaY > 40) {
+        // Fast swipe down at top → hidden
+        unpinCurrentNode();
+        openArtistName = null;
+        setDrawerState('hidden');
+      } else if (atTop && deltaY > 10) {
+        // Gentle push down at top → peek
+        setDrawerState('peek');
+      }
+    } else if (drawerState === 'expanded') {
+      if (atTop && deltaY > 40) {
+        // Swipe down from top → collapse
+        setDrawerState('collapsed');
+        drawer.scrollTop = 0;
+      }
+    } else if (drawerState === 'peek') {
+      if (deltaY < -20) {
+        // Swipe up from peek → collapsed
+        setDrawerState('collapsed');
+      } else if (deltaY > 10) {
+        // Any downward touch on peek → hidden
+        unpinCurrentNode();
+        openArtistName = null;
+        setDrawerState('hidden');
+      }
+    }
+  }, { passive: true });
+
+  // Scroll past top in collapsed state → peek
+  drawer.addEventListener("scroll", () => {
+    if (drawerState === 'collapsed' && drawer.scrollTop === 0) {
+      setDrawerState('peek');
+    }
+  }, { passive: true });
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 initControls();
+initDrawerGestures();
 fetchAndBuild(edgeThreshold);
