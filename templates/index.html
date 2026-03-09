@@ -536,6 +536,9 @@
     }
 
     @media (max-width: 767px) {
+      /* ── No tooltips on mobile ── */
+      #tooltip { display: none !important; }
+
       /* ── Controls: move to top-left on mobile ── */
       #controls {
         bottom: auto;
@@ -571,8 +574,8 @@
       }
 
       /* State classes — JS controls transform+height inline; classes drive child styles */
-      #artistDrawer.drawer-hidden  { transform: translateY(100%); height: 140px; }
-      #artistDrawer.drawer-peek    { transform: translateY(0);    height: 140px; }
+      #artistDrawer.drawer-hidden  { transform: translateY(100%); height: 64px; }
+      #artistDrawer.drawer-peek    { transform: translateY(0);    height: 64px; }
       #artistDrawer.drawer-collapsed { transform: translateY(0);  height: 45vh;  }
       #artistDrawer.drawer-expanded  { transform: translateY(0);  height: 85vh;  }
 
@@ -588,28 +591,51 @@
         transition: height 0.35s ease;
       }
 
-      /* Hero collapses to 60px in peek state */
-      #artistDrawer.drawer-peek #drawerHero {
-        height: 60px;
-      }
-
       #drawerHero::after {
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(to bottom, rgba(10,10,10,0) 0%, rgba(10,10,10,0.7) 60%, rgba(10,10,10,0.97) 100%);
+        background: linear-gradient(to bottom, rgba(10,10,10,0) 0%, rgba(10,10,10,0.75) 70%, rgba(10,10,10,0.92) 100%);
+        pointer-events: none;
+      }
+
+      /* Bottom bar inside hero — holds name + peek meta */
+      #drawerHeroBottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        padding: 10px 16px;
+        z-index: 1;
       }
 
       #drawerHeroName {
-        position: absolute;
-        bottom: 10px;
-        left: 16px;
         font-size: 18px;
         font-weight: bold;
         color: white;
         font-family: 'IBM Plex Mono', monospace;
-        z-index: 1;
       }
+
+      /* Peek meta (Genre · Stage · Day) — hidden except in peek state */
+      #drawerHeroPeekMeta {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.5);
+        font-family: 'IBM Plex Mono', monospace;
+        display: none;
+        text-align: right;
+      }
+
+      /* ── Peek state overrides ── */
+      #artistDrawer.drawer-peek #drawerHero       { height: 64px; }
+      #artistDrawer.drawer-peek #drawerHeroBottom { top: 0; align-items: center; padding: 0 16px; }
+      #artistDrawer.drawer-peek #drawerHeroName   { font-size: 13px; font-weight: 500; }
+      #artistDrawer.drawer-peek #drawerHeroPeekMeta { display: block; }
+      #artistDrawer.drawer-peek #drawerMeta        { display: none; }
+      #artistDrawer.drawer-peek #drawerScroll      { display: none; }
+      #artistDrawer.drawer-peek::before            { display: none; }
 
       /* ── Drawer scrollable area ── */
       #drawerScroll {
@@ -851,7 +877,10 @@
 
   <div id="artistDrawer" class="drawer-hidden">
     <div id="drawerHero">
-      <div id="drawerHeroName"></div>
+      <div id="drawerHeroBottom">
+        <div id="drawerHeroName"></div>
+        <div id="drawerHeroPeekMeta"></div>
+      </div>
     </div>
     <div id="drawerScroll">
       <div id="drawerMeta">

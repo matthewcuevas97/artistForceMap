@@ -66,13 +66,16 @@ let pinnedDatum    = null;
 let panelRequestId = 0;
 let drawerState    = 'hidden';
 
-const DRAWER_PEEK_H = 140;
+const DRAWER_PEEK_H = 64;
 const drawerCollapsedH = () => Math.round(window.innerHeight * 0.45);
 const drawerExpandedH  = () => Math.round(window.innerHeight * 0.85);
 
 let playlist           = [];   // { artist, name, album_art, deezer_url }
 let expandedTrackIndex = null;
 let currentTracks      = [];
+
+let isSubgraphHighlight   = false;
+let highlightNeighborhood = null;  // Set<name> of selected node + its direct neighbors
 
 // ── Viewport ─────────────────────────────────────────────────────────────────
 
@@ -105,6 +108,7 @@ svg.append("rect")
       }
       return;
     }
+    exitSubgraphHighlight();
     if (pinnedDatum) {
       pinnedDatum.fx = null;
       pinnedDatum.fy = null;
@@ -131,6 +135,7 @@ svg.call(zoomBehavior).on("dblclick.zoom", null);
 // ── Tooltip ──────────────────────────────────────────────────────────────────
 
 const tooltip = d3.select("body").append("div")
+  .attr("id", "tooltip")
   .style("position",       "fixed")
   .style("background",     "rgba(12, 12, 12, 0.93)")
   .style("border",         "1px solid rgba(255,255,255,0.12)")
@@ -198,6 +203,9 @@ const APPLE_SVG = `<svg viewBox="0 0 24 24" style="width:18px;height:18px"><path
 
 const PLACEHOLDER_HASH = "2a96cbd8b46e442fc41c2b86b821562f";
 
+const DRAWER_PLAY_SVG  = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><polygon points="4,2 14,8 4,14"/></svg>`;
+const DRAWER_PAUSE_SVG = `<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>`;
+
 function closePanel() {
   document.getElementById("artistPanel").classList.remove("open");
   if (currentAudio)   { currentAudio.pause(); currentAudio = null; }
@@ -211,7 +219,7 @@ function closePanel() {
     subgraph.clear();
     updateAmbassadors();
     updateDiscoveryVisuals();
-    expandMenu();
+    if (!isMobile) expandMenu();
   }
 }
 
@@ -550,6 +558,7 @@ function setDrawerState(state) {
 
   drawer.classList.remove("drawer-hidden", "drawer-collapsed", "drawer-expanded", "drawer-peek");
   drawer.classList.add("drawer-" + state);
+  drawer.style.pointerEvents = (state === 'hidden') ? 'none' : 'auto';
 
   const scrollEl = document.getElementById("drawerScroll");
 
@@ -557,14 +566,15 @@ function setDrawerState(state) {
     drawer.style.transform = 'translateY(100%)';
     drawer.style.height    = DRAWER_PEEK_H + 'px';
     if (scrollEl) scrollEl.style.overflowY = 'hidden';
-    // Stop audio, clear submenu, exit discovery subgraph
+    // Stop audio, clear submenu, exit subgraph highlight, exit discovery subgraph
     if (currentAudio) { currentAudio.pause(); currentAudio = null; }
     if (currentPlayBtn) {
-      currentPlayBtn.textContent = "▶";
+      currentPlayBtn.innerHTML = DRAWER_PLAY_SVG;
       currentPlayBtn.classList.remove("playing");
       currentPlayBtn = null;
     }
     collapseDrawerSubmenu();
+    exitSubgraphHighlight();
     if (discoveryMode && lastDiscovered !== null) {
       window._pendingDiscovery = null;
       lastDiscovered = null;
@@ -572,7 +582,7 @@ function setDrawerState(state) {
       subgraph.clear();
       updateAmbassadors();
       updateDiscoveryVisuals();
-      expandMenu();
+      if (!isMobile) expandMenu();
     }
   } else if (state === 'peek') {
     drawer.style.transform = 'translateY(0)';
@@ -631,7 +641,9 @@ async function populateDrawer(d) {
 
   // ── Meta ──
   const metaParts = [d.genre, d.stage, d.day].filter(Boolean);
-  document.getElementById("drawerMetaLine").textContent = metaParts.join(" · ");
+  const metaStr = metaParts.join(" · ");
+  document.getElementById("drawerMetaLine").textContent = metaStr;
+  document.getElementById("drawerHeroPeekMeta").textContent = metaStr;
   document.getElementById("drawerMetaTags").innerHTML = (d.tags || [])
     .map(tag => `<span class="drawer-tag">${escapeHtml(tag)}</span>`)
     .join("");
@@ -677,7 +689,7 @@ async function populateDrawer(d) {
           `<div class="drawer-track-artist">${escapeHtml(d.name)}</div>` +
           `</div>` +
           `<button class="drawer-play-btn" data-preview="${escapeHtml(preview)}"` +
-          ` style="${disabledStyle}">▶</button>` +
+          ` style="${disabledStyle}">${DRAWER_PLAY_SVG}</button>` +
           `</div>` +
           `<div class="drawer-track-submenu" data-drawer-submenu-index="${idx}">` +
           buildServiceLinks(d.name, track.name, "sub-svc-btn", 18) +
@@ -768,14 +780,14 @@ function wireDrawerTrackInteractions() {
           currentAudio.pause();
           currentAudio = null;
           currentPlayBtn = null;
-          this.textContent = "▶";
+          this.innerHTML = DRAWER_PLAY_SVG;
           this.classList.remove("playing");
           return;
         }
         if (currentAudio) {
           currentAudio.pause();
           if (currentPlayBtn) {
-            currentPlayBtn.textContent = "▶";
+            currentPlayBtn.innerHTML = DRAWER_PLAY_SVG;
             currentPlayBtn.classList.remove("playing");
           }
         }
@@ -783,10 +795,10 @@ function wireDrawerTrackInteractions() {
         audio.play().catch(() => {});
         currentAudio = audio;
         currentPlayBtn = this;
-        this.textContent = "▐▐";
+        this.innerHTML = DRAWER_PAUSE_SVG;
         this.classList.add("playing");
         audio.addEventListener("ended", () => {
-          this.textContent = "▶";
+          this.innerHTML = DRAWER_PLAY_SVG;
           this.classList.remove("playing");
           currentAudio = null;
           currentPlayBtn = null;
@@ -954,9 +966,14 @@ function clearHover() {
         if (discoveryVisible(d.name)) return labelOpacity(d);
         return 0;
       });
+    } else if (isSubgraphHighlight && highlightNeighborhood) {
+      labelEl.attr("opacity", d => highlightNeighborhood.has(d.name) ? labelOpacity(d) : 0);
     } else {
       labelEl.attr("opacity", d => labelOpacity(d));
     }
+  }
+  if (nodeEl && isSubgraphHighlight && highlightNeighborhood) {
+    nodeEl.attr("opacity", d => highlightNeighborhood.has(d.name) ? 1.0 : 0.15);
   }
   tooltip.style("display", "none");
 }
@@ -1009,6 +1026,13 @@ function applyEdgeFilter() {
       // No node selected: show discovered↔discovered edges normally
       if (!lastDiscovered && discovered.has(srcName) && discovered.has(tgtName)) return edgeBaseOpacity(e);
       return 0;
+    });
+  } else if (isSubgraphHighlight && highlightNeighborhood) {
+    edgeEl.attr("opacity", e => {
+      const sn = typeof e.source === "object" ? e.source.name : e.source;
+      const tn = typeof e.target === "object" ? e.target.name : e.target;
+      return (highlightNeighborhood.has(sn) && highlightNeighborhood.has(tn))
+        ? edgeBaseOpacity(e) : 0;
     });
   } else {
     edgeEl.attr("opacity", e => edgeBaseOpacity(e));
@@ -1066,13 +1090,15 @@ function buildGraph() {
     .attr("stroke", "none")
     .style("cursor", "pointer")
     .call(drag)
-    .on("mouseenter", onNodeEnter)
-    .on("mousemove",  onNodeMove)
-    .on("mouseleave", onNodeLeave)
+    .on("mouseenter", isMobile ? null : onNodeEnter)
+    .on("mousemove",  isMobile ? null : onNodeMove)
+    .on("mouseleave", isMobile ? null : onNodeLeave)
     .on("click", (event, d) => {
       event.stopPropagation();
       // D3 drag suppresses click after a real drag; dragMoved guard is belt-and-suspenders
       if (dragMoved) { dragMoved = false; return; }
+      // Capture before any state changes — used to decide whether to delay zoom on mobile
+      const wasNodeSelected = pinnedDatum !== null;
 
       // Discovery mode: fringe or ambassador node → open panel, set pending discovery
       if (discoveryMode && (fringe.has(d.name) || ambassadors.has(d.name)) && !discovered.has(d.name)) {
@@ -1090,23 +1116,30 @@ function buildGraph() {
         lastDiscovered = d.name;
         recalcFringe();
         updateDiscoveryVisuals();
-        zoomToSubgraph();
+        // On mobile, delay zoom until after the drawer finishes animating open (350ms)
+        if (isMobile && !wasNodeSelected) {
+          setTimeout(zoomToSubgraph, 360);
+        } else {
+          zoomToSubgraph();
+        }
         minimizeMenu();
       }
 
       if (openArtistName === d.name && d.fx !== null && d.fx !== undefined) {
-        // Same pinned node → unpin, keep panel open
+        // Same pinned node → unpin, keep panel open, exit subgraph highlight
         d.fx = null;
         d.fy = null;
         pinnedDatum = null;
         d3.select(event.currentTarget).attr("stroke", "none").attr("stroke-width", 0);
+        if (!discoveryMode) exitSubgraphHighlight();
       } else {
-        // Unpin previous node if different
+        // Unpin previous node if different, exit any active subgraph highlight
         if (pinnedDatum && pinnedDatum !== d) {
           pinnedDatum.fx = null;
           pinnedDatum.fy = null;
           nodeEl.filter(n => n === pinnedDatum).attr("stroke", "none").attr("stroke-width", 0);
         }
+        if (!discoveryMode) exitSubgraphHighlight();
         // Pin this node and open panel
         d.fx = d.x;
         d.fy = d.y;
@@ -1116,6 +1149,7 @@ function buildGraph() {
           .attr("stroke",       "#FFD700")
           .attr("stroke-width", 2.5);
         openDrawer(d.name);
+        if (!discoveryMode) enterSubgraphHighlight(d, !wasNodeSelected);
       }
       simulation.alpha(0.05).restart();
     });
@@ -1419,11 +1453,17 @@ function zoomToSubgraph() {
   const subNodes = simNodes.filter(n => subgraph.has(n.name));
   if (subNodes.length === 0) return;
 
-  // Shrink the available viewport to avoid the open artist panel (320 px, right side)
-  const panelOpen  = document.getElementById("artistPanel").classList.contains("open");
+  // Shrink the available viewport to avoid the open artist panel (desktop right side)
+  // and the bottom drawer (mobile)
+  const panelOpen  = !isMobile && document.getElementById("artistPanel").classList.contains("open");
   const panelW     = panelOpen ? 320 : 0;
+  const drawerH    = isMobile && drawerState !== 'hidden'
+    ? (document.getElementById("artistDrawer")?.offsetHeight || 0)
+    : 0;
   const availW     = W - panelW;
-  const availCentX = availW / 2; // centre of the usable area
+  const availH     = H - drawerH;
+  const availCentX = availW / 2;
+  const availCentY = availH / 2;
 
   const pad = 80;
   const xs  = subNodes.map(n => n.x);
@@ -1435,9 +1475,85 @@ function zoomToSubgraph() {
 
   const bw    = maxX - minX;
   const bh    = maxY - minY;
-  const scale = Math.min(availW / bw, H / bh, 5);
+  const scale = Math.min(availW / bw, availH / bh, 5);
   const tx    = availCentX - scale * ((minX + maxX) / 2);
-  const ty    = H / 2      - scale * ((minY + maxY) / 2);
+  const ty    = availCentY - scale * ((minY + maxY) / 2);
+
+  svg.transition().duration(700)
+    .call(zoomBehavior.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+}
+
+// ── Subgraph highlight (non-discovery mode) ───────────────────────────────────
+
+function enterSubgraphHighlight(datum, delayZoom = false) {
+  if (!nodeEl || !edgeEl || !labelEl) return;
+
+  // Build 1-hop neighborhood: selected node + all directly connected nodes
+  const neighborhood = new Set([datum.name]);
+  simEdges.forEach(e => {
+    const sn = typeof e.source === "object" ? e.source.name : e.source;
+    const tn = typeof e.target === "object" ? e.target.name : e.target;
+    if (sn === datum.name) neighborhood.add(tn);
+    if (tn === datum.name) neighborhood.add(sn);
+  });
+
+  isSubgraphHighlight   = true;
+  highlightNeighborhood = neighborhood;
+
+  nodeEl .attr("opacity", d => neighborhood.has(d.name) ? 1.0 : 0.15);
+  labelEl.attr("opacity", d => neighborhood.has(d.name) ? labelOpacity(d) : 0);
+  applyEdgeFilter();
+
+  // On mobile, delay zoom until after the drawer finishes animating open (350ms)
+  if (isMobile && delayZoom) {
+    setTimeout(() => zoomToNeighborhood(neighborhood), 360);
+  } else {
+    zoomToNeighborhood(neighborhood);
+  }
+}
+
+function exitSubgraphHighlight() {
+  if (!isSubgraphHighlight) return;
+  isSubgraphHighlight   = false;
+  highlightNeighborhood = null;
+
+  if (nodeEl)  nodeEl .attr("opacity", 1.0);
+  if (labelEl) labelEl.attr("opacity", d => labelOpacity(d));
+  applyEdgeFilter();
+
+  svg.transition().duration(500)
+    .call(zoomBehavior.scaleBy, 1 / 1.25);
+}
+
+function zoomToNeighborhood(neighborhood) {
+  const subNodes = simNodes.filter(n => neighborhood.has(n.name));
+  if (subNodes.length === 0) return;
+
+  // Available viewport: shrink for desktop right panel and mobile bottom drawer
+  const panelOpen = !isMobile && document.getElementById("artistPanel").classList.contains("open");
+  const panelW    = panelOpen ? 320 : 0;
+  const drawerH   = isMobile && drawerState !== 'hidden'
+    ? (document.getElementById("artistDrawer")?.offsetHeight || 0)
+    : 0;
+
+  const availW     = W - panelW;
+  const availH     = H - drawerH;
+  const availCentX = availW / 2;
+  const availCentY = availH / 2;
+
+  const pad = 80;
+  const xs  = subNodes.map(n => n.x);
+  const ys  = subNodes.map(n => n.y);
+  const minX = Math.min(...xs) - pad;
+  const maxX = Math.max(...xs) + pad;
+  const minY = Math.min(...ys) - pad;
+  const maxY = Math.max(...ys) + pad;
+
+  const bw    = maxX - minX;
+  const bh    = maxY - minY;
+  const scale = Math.min(availW / bw, availH / bh, 5);
+  const tx    = availCentX - scale * ((minX + maxX) / 2);
+  const ty    = availCentY - scale * ((minY + maxY) / 2);
 
   svg.transition().duration(700)
     .call(zoomBehavior.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
@@ -1633,6 +1749,15 @@ function initControls() {
         updateDiscoveryVisuals();
       }
     });
+
+  // On mobile, tapping outside #controls closes it
+  if (isMobile) {
+    document.addEventListener("touchstart", e => {
+      const controls = document.getElementById("controls");
+      if (!controls || controls.classList.contains("minimized")) return;
+      if (!controls.contains(e.target)) minimizeMenu();
+    }, { passive: true });
+  }
 }
 
 // ── Drawer gestures (mobile only) ─────────────────────────────────────────────
