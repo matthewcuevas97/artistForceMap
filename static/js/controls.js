@@ -6,10 +6,14 @@ import { THRESHOLD_LEVELS } from './constants.js';
 import * as S from './state.js';
 import { applyEdgeFilter, applyDayFilter, rebuildNodeSizes } from './simulation.js';
 import { seedDiscovery, updateAmbassadors, updateDiscoveryVisuals } from './discovery.js';
-import { updateExportButton, openExportPanel } from './playlist.js';
+import { updateExportButton, openExportPanel, closeExportPanel, setOnBackClose } from './playlist.js';
 import { minimizeMenu, expandMenu } from './ui.js';
 
 export { minimizeMenu, expandMenu };
+
+// Callback registered by main.js — unpin node + close artist bio panel
+let _closeArtist = null;
+export function registerCloseArtistCallback(fn) { _closeArtist = fn; }
 
 export function updateAuthUI() {
   const spotifyCol       = document.getElementById("spotifyCol");
@@ -43,11 +47,20 @@ export function updateAuthUI() {
 }
 
 export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
+  // When playlist back-button is pressed: close playlist, reopen controls
+  setOnBackClose(() => expandMenu());
+
   // Minimize toggle
   document.getElementById("menuToggle").addEventListener("click", () => {
     const el = document.getElementById("controls");
-    if (el.classList.contains("minimized")) expandMenu();
-    else minimizeMenu();
+    if (el.classList.contains("minimized")) {
+      // Opening controls: close artist bio (mutually exclusive) + close playlist
+      _closeArtist?.();
+      closeExportPanel();
+      expandMenu();
+    } else {
+      minimizeMenu();
+    }
   });
 
   // Panel close button
@@ -104,8 +117,11 @@ export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
   updateAuthUI();
   updateExportButton();
 
-  // Export button
-  document.getElementById("exportBtn").addEventListener("click", openExportPanel);
+  // Export button: minimize controls first (playlist replaces controls), then open
+  document.getElementById("exportBtn").addEventListener("click", () => {
+    minimizeMenu();
+    openExportPanel();
+  });
 
   // Day filter buttons
   document.querySelectorAll(".day-btn").forEach(btn => {

@@ -6,6 +6,11 @@
 import { escapeHtml, buildServiceLinks } from './utils.js';
 import * as S from './state.js';
 
+// Callback called when the user presses the ← back button inside the playlist panel.
+// Used by controls.js to re-expand the controls panel (back-navigation pattern).
+let _onBackClose = null;
+export function setOnBackClose(fn) { _onBackClose = fn; }
+
 export function addToPlaylist(track, subEl, onAdded) {
   S.playlist.push({
     artist:     S.openArtistName || "",
@@ -107,7 +112,10 @@ export function renderExportPanel() {
     `<div id="epTrackList">${tracksHTML}</div>` +
     footerHTML;
 
-  document.getElementById("exportPanelBack").addEventListener("click", closeExportPanel);
+  document.getElementById("exportPanelBack").addEventListener("click", () => {
+    closeExportPanel();
+    _onBackClose?.();
+  });
 
   panel.querySelectorAll(".ep-remove").forEach(btn => {
     btn.addEventListener("click", e => {

@@ -18,8 +18,8 @@ import {
   setDrawerState, openDrawer, initDrawerGestures,
   closeAllPanels, registerUnpinCallback,
 } from './drawer.js';
-import { initControls, updateAuthUI }           from './controls.js';
-import { updateExportButton }                   from './playlist.js';
+import { initControls, updateAuthUI, registerCloseArtistCallback } from './controls.js';
+import { updateExportButton, closeExportPanel }  from './playlist.js';
 import { minimizeMenu }                         from './ui.js';
 import { escapeHtml }                           from './utils.js';
 
@@ -36,6 +36,22 @@ function unpinCurrentNode() {
 
 registerUnpinCallback(unpinCurrentNode);
 
+// Register with controls.js: opening the controls hamburger closes artist bio
+registerCloseArtistCallback(() => {
+  unpinCurrentNode();
+  S.setOpenArtistName(null);
+  closePanel();
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+// Close controls + playlist without triggering "reopen controls" back-nav logic.
+// Used before opening artist bio (they're mutually exclusive).
+function closeSidePanels() {
+  minimizeMenu();
+  closeExportPanel();
+}
+
 // ── Node click ────────────────────────────────────────────────────────────────
 
 function onNodeClick(event, d) {
@@ -44,6 +60,7 @@ function onNodeClick(event, d) {
   // Discovery mode — fringe / ambassador → pending discovery + open detail
   if (S.discoveryMode && (S.fringe.has(d.name) || S.ambassadors.has(d.name)) && !S.discovered.has(d.name)) {
     window._pendingDiscovery = d.name;
+    closeSidePanels();
     updateDiscoveryVisuals();
     S.isMobile ? openDrawer(d.name) : openPanel(d.name);
     return;
@@ -81,6 +98,7 @@ function onNodeClick(event, d) {
     S.setOpenArtistName(d.name);
     if (nodeEl) nodeEl.filter(n => n === d).attr("stroke", "#FFD700").attr("stroke-width", 2.5);
 
+    closeSidePanels();
     S.isMobile ? openDrawer(d.name) : openPanel(d.name);
     if (!S.discoveryMode) enterSubgraphHighlight(d);
   }
@@ -100,9 +118,12 @@ function onBgClick() {
       S.setOpenArtistName(null);
       setDrawerState('hidden');
       closePanel();
+    } else {
+      closeSidePanels();
     }
     return;
   }
+  closeSidePanels();
   exitSubgraphHighlight();
   unpinCurrentNode();
   S.setOpenArtistName(null);
