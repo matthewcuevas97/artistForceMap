@@ -15,6 +15,10 @@ export { minimizeMenu, expandMenu };
 let _closeArtist = null;
 export function registerCloseArtistCallback(fn) { _closeArtist = fn; }
 
+// Callback registered by main.js — reduce bio to peek (mobile) or no-op (desktop)
+let _peekArtist = null;
+export function registerPeekArtistCallback(fn) { _peekArtist = fn; }
+
 export function updateAuthUI() {
   const spotifyCol       = document.getElementById("spotifyCol");
   const spotifyBtn       = document.getElementById("spotifyBtn");
@@ -54,8 +58,8 @@ export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
   document.getElementById("menuToggle").addEventListener("click", () => {
     const el = document.getElementById("controls");
     if (el.classList.contains("minimized")) {
-      // Opening controls: close artist bio (mutually exclusive) + close playlist
-      _closeArtist?.();
+      // Opening controls: peek bio (mobile) or leave as-is (desktop) + close playlist
+      _peekArtist?.();
       closeExportPanel();
       expandMenu();
     } else {
@@ -117,8 +121,9 @@ export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
   updateAuthUI();
   updateExportButton();
 
-  // Export button: minimize controls first (playlist replaces controls), then open
+  // Export button: close bio entirely, minimize controls, then open playlist
   document.getElementById("exportBtn").addEventListener("click", () => {
+    _closeArtist?.();
     minimizeMenu();
     openExportPanel();
   });

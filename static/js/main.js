@@ -18,7 +18,7 @@ import {
   setDrawerState, openDrawer, initDrawerGestures,
   closeAllPanels, registerUnpinCallback,
 } from './drawer.js';
-import { initControls, updateAuthUI, registerCloseArtistCallback } from './controls.js';
+import { initControls, updateAuthUI, registerCloseArtistCallback, registerPeekArtistCallback } from './controls.js';
 import { updateExportButton, closeExportPanel }  from './playlist.js';
 import { minimizeMenu }                         from './ui.js';
 import { escapeHtml }                           from './utils.js';
@@ -36,11 +36,17 @@ function unpinCurrentNode() {
 
 registerUnpinCallback(unpinCurrentNode);
 
-// Register with controls.js: opening the controls hamburger closes artist bio
+// Register with controls.js: opening the controls hamburger peeks bio (mobile) or no-ops (desktop)
+registerPeekArtistCallback(() => {
+  if (S.isMobile && S.drawerState !== 'hidden') setDrawerState('peek');
+});
+
+// Register with controls.js: opening the playlist closes bio entirely + unpins
 registerCloseArtistCallback(() => {
   unpinCurrentNode();
   S.setOpenArtistName(null);
   closePanel();
+  if (S.isMobile) setDrawerState('hidden');
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
