@@ -893,7 +893,7 @@
   </div>
 
   <script>
-    window.AUTHENTICATED = {{ 'true' if session.get('token') else 'false' }};
+    window.AUTHENTICATED = {{ 'true' if session.get('spotify_token') else 'false' }};
     window.LASTFM_USER = {{ session.get('lastfm_user') | tojson }};
     window.SPOTIFY_DISPLAY_NAME = {{ session.get('spotify_display_name') | tojson }};
   </script>
