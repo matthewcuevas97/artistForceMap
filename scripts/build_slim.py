@@ -13,7 +13,7 @@ import sys
 # Allow imports from project root when run as a script
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from data.graph_builder import build_edges, build_genre_edges, load_static_graph
+from data.graph_builder import build_edges, load_static_graph
 
 THRESHOLDS = [0.05, 0.10, 0.20, 0.30, 0.50]
 
@@ -31,7 +31,7 @@ def slim_node(node):
 
 
 def build_deduped_edges(full_nodes, threshold):
-    raw = build_edges(full_nodes, threshold) + build_genre_edges(full_nodes)
+    raw = build_edges(full_nodes, threshold)
     seen = set()
     deduped = []
     for e in raw:

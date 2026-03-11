@@ -17,8 +17,11 @@ def get_similar_artists(artist_name, limit=50, threshold=0.1):
         "api_key": API_KEY,
         "format": "json",
     }
-    response = requests.get(BASE_URL, params=params)
-    data = response.json()
+    try:
+        response = requests.get(BASE_URL, params=params, timeout=10)
+        data = response.json()
+    except Exception:
+        return []
 
     if "error" in data:
         return []

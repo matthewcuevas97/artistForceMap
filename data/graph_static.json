@@ -27,7 +27,7 @@
           "match": 0.889412
         },
         {
-          "name": "AM\u00c9M\u00c9",
+          "name": "AMÉMÉ",
           "match": 0.72047
         },
         {
@@ -59,7 +59,7 @@
           "match": 0.159102
         },
         {
-          "name": "Am\u00e9s",
+          "name": "Amés",
           "match": 0.146214
         },
         {
@@ -135,7 +135,7 @@
           "match": 0.071917
         },
         {
-          "name": "Av\u00f6",
+          "name": "Avö",
           "match": 0.071438
         },
         {
@@ -143,7 +143,7 @@
           "match": 0.066258
         },
         {
-          "name": "Mas\u0161h",
+          "name": "Masšh",
           "match": 0.065993
         },
         {
@@ -159,7 +159,7 @@
           "match": 0.063593
         },
         {
-          "name": "ARYM\u00c9",
+          "name": "ARYMÉ",
           "match": 0.063472
         },
         {
@@ -187,7 +187,7 @@
           "match": 0.056508
         },
         {
-          "name": "T\u00e2ches",
+          "name": "Tâches",
           "match": 0.055314
         },
         {
@@ -215,7 +215,7 @@
           "match": 0.051793
         },
         {
-          "name": "ANKHO\u00cf",
+          "name": "ANKHOÏ",
           "match": 0.051639
         }
       ],
@@ -268,7 +268,7 @@
       "genre": "Indie/Alt",
       "similar_artists": [
         {
-          "name": "Caf\u00e9 Canela",
+          "name": "Café Canela",
           "match": 1.0
         },
         {
@@ -340,7 +340,7 @@
           "match": 0.235283
         },
         {
-          "name": "Les Imprim\u00e9s",
+          "name": "Les Imprimés",
           "match": 0.232363
         },
         {
@@ -452,7 +452,7 @@
           "match": 0.130472
         },
         {
-          "name": "Mind\u2019s Eye",
+          "name": "Mind’s Eye",
           "match": 0.128728
         },
         {
@@ -496,6 +496,14 @@
           "deezer_url": "https://www.deezer.com/track/3344022491",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/f26cfe08d1548d9f27358dedffa4403d/56x56-000000-80-0-0.jpg"
         }
+      ],
+      "bfs_edges": [
+        {
+          "target": "Alex G",
+          "weight": 0.08285,
+          "via": "crisaunt → alex_g_offline",
+          "depth": 3
+        }
       ]
     },
     {
@@ -525,7 +533,7 @@
           "match": 0.995384
         },
         {
-          "name": "AD\u00c9LA",
+          "name": "ADÉLA",
           "match": 0.985684
         },
         {
@@ -553,7 +561,7 @@
           "match": 0.691487
         },
         {
-          "name": "ROSAL\u00cdA",
+          "name": "ROSALÍA",
           "match": 0.659179
         },
         {
@@ -826,7 +834,7 @@
           "match": 0.449239
         },
         {
-          "name": "Ben B\u00f6hmer",
+          "name": "Ben Böhmer",
           "match": 0.392165
         },
         {
@@ -846,7 +854,7 @@
           "match": 0.350377
         },
         {
-          "name": "Reb\u016bke",
+          "name": "Rebūke",
           "match": 0.348589
         },
         {
@@ -854,7 +862,7 @@
           "match": 0.342044
         },
         {
-          "name": "Patrice B\u00e4umel",
+          "name": "Patrice Bäumel",
           "match": 0.332263
         },
         {
@@ -967,7 +975,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/d88bff3a5bd4ba8055121e346ccc80c2/250x250-000000-80-0-0.jpg",
-      "bio": "Adrian & Adrian, two guys from Zurich started off with music just\nlike everyone else by trying several instruments and scratching on\ngrandfather\u2019s turntable, nothing special about that. Both were born\nin the mid 80\u2019s when the techno and house community was rising to\nthe top.\n\n90\u2019s dance, hip-hop & h",
+      "bio": "Adrian & Adrian, two guys from Zurich started off with music just\nlike everyone else by trying several instruments and scratching on\ngrandfather’s turntable, nothing special about that. Both were born\nin the mid 80’s when the techno and house community was rising to\nthe top.\n\n90’s dance, hip-hop & h",
       "top_tracks": [
         {
           "name": "Give It To Me 2025",
@@ -980,7 +988,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/a4f50f53b106e837c1f4cbaad23df2a5/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Miracle - R\u00dcF\u00dcS DU SOL Remix",
+          "name": "Miracle - RÜFÜS DU SOL Remix",
           "deezer_url": "https://www.deezer.com/track/2492716331",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/bf158adc0ecbc7146516e211c56d52f3/56x56-000000-80-0-0.jpg"
         },
@@ -1229,7 +1237,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/3a784a4366790be702d24fd9d3d850a0/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Saturday Night in Maddy\u2019s Basement",
+          "name": "Saturday Night in Maddy’s Basement",
           "deezer_url": "https://www.deezer.com/track/2766846341",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/3a784a4366790be702d24fd9d3d850a0/56x56-000000-80-0-0.jpg"
         },
@@ -1280,7 +1288,7 @@
           "match": 0.514386
         },
         {
-          "name": "Reb\u016bke",
+          "name": "Rebūke",
           "match": 0.361402
         },
         {
@@ -1320,7 +1328,7 @@
           "match": 0.203461
         },
         {
-          "name": "Ti\u00ebsto",
+          "name": "Tiësto",
           "match": 0.183231
         },
         {
@@ -1336,7 +1344,7 @@
           "match": 0.16294
         },
         {
-          "name": "K\u00f6lsch",
+          "name": "Kölsch",
           "match": 0.15179
         },
         {
@@ -1530,7 +1538,7 @@
           "match": 0.85282
         },
         {
-          "name": "Ti\u00ebsto",
+          "name": "Tiësto",
           "match": 0.839096
         },
         {
@@ -1638,7 +1646,7 @@
           "match": 0.47803
         },
         {
-          "name": "Hel:Sl\u00f8wed",
+          "name": "Hel:Sløwed",
           "match": 0.47433
         },
         {
@@ -1646,7 +1654,7 @@
           "match": 0.4709
         },
         {
-          "name": "\u00d8rjan Nilsen",
+          "name": "Ørjan Nilsen",
           "match": 0.467252
         },
         {
@@ -1890,7 +1898,7 @@
           "match": 0.334211
         },
         {
-          "name": "Reb\u016bke",
+          "name": "Rebūke",
           "match": 0.33406
         },
         {
@@ -1919,7 +1927,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/d0e284af11bc5053a1bdfa20d08f764e/250x250-000000-80-0-0.jpg",
-      "bio": "Armin Jozef Jacobus Dani\u00ebl van Buuren (born 25 December 1976) is a Dutch DJ and record producer. Since 2001, he has hosted \"A State of Trance\" (ASOT), a weekly radio show broadcast to nearly 40 million listeners in 84 countries via more than 100 FM radio stations.\n\nVan Buuren has received multiple a",
+      "bio": "Armin Jozef Jacobus Daniël van Buuren (born 25 December 1976) is a Dutch DJ and record producer. Since 2001, he has hosted \"A State of Trance\" (ASOT), a weekly radio show broadcast to nearly 40 million listeners in 84 countries via more than 100 FM radio stations.\n\nVan Buuren has received multiple a",
       "top_tracks": [
         {
           "name": "Set Me Free",
@@ -2151,7 +2159,7 @@
           "match": 0.234733
         },
         {
-          "name": "Ben B\u00f6hmer",
+          "name": "Ben Böhmer",
           "match": 0.23107
         },
         {
@@ -2168,7 +2176,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/23a68545f2eddef32e958317063d2d7d/250x250-000000-80-0-0.jpg",
-      "bio": "Adri\u00e1n Rodr\u00edguez is a spanish DJ and the name behind ARODES. Focused on deep and melodic house.",
+      "bio": "Adrián Rodríguez is a spanish DJ and the name behind ARODES. Focused on deep and melodic house.",
       "top_tracks": [
         {
           "name": "Teenage Crime (Francis Mercier Edit)",
@@ -2417,7 +2425,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/2df4895bc81a49788ae4c518c72b51fa/250x250-000000-80-0-0.jpg",
-      "bio": "Azzecca is a Chicago-based artist with a distinctive, underground style and a passion for the darker shades of house and techno.\nWhen she isn\u2019t commanding the dance floor with her own eclectic library of music, Azzecca can be found in the crowd in one of Chicago's underground clubs, or running her r",
+      "bio": "Azzecca is a Chicago-based artist with a distinctive, underground style and a passion for the darker shades of house and techno.\nWhen she isn’t commanding the dance floor with her own eclectic library of music, Azzecca can be found in the crowd in one of Chicago's underground clubs, or running her r",
       "top_tracks": [
         {
           "name": "find a reason",
@@ -2481,7 +2489,7 @@
           "match": 0.462348
         },
         {
-          "name": "S\u00e9bastien L\u00e9ger",
+          "name": "Sébastien Léger",
           "match": 0.448121
         },
         {
@@ -2541,7 +2549,7 @@
           "match": 0.163553
         },
         {
-          "name": "Ben B\u00f6hmer",
+          "name": "Ben Böhmer",
           "match": 0.162032
         },
         {
@@ -2714,7 +2722,7 @@
           "match": 1.0
         },
         {
-          "name": "Joe Rol\u00e9t",
+          "name": "Joe Rolét",
           "match": 0.693051
         },
         {
@@ -2746,7 +2754,7 @@
           "match": 0.404227
         },
         {
-          "name": "Mal\u00f3ne",
+          "name": "Malóne",
           "match": 0.401888
         },
         {
@@ -3224,7 +3232,7 @@
           "match": 0.676045
         },
         {
-          "name": "\ud0dc\uc591",
+          "name": "태양",
           "match": 0.649133
         },
         {
@@ -3232,7 +3240,7 @@
           "match": 0.455667
         },
         {
-          "name": "\uc2b9\ub9ac",
+          "name": "승리",
           "match": 0.286653
         },
         {
@@ -3276,7 +3284,7 @@
           "match": 0.134188
         },
         {
-          "name": "\uc2e0\ud654",
+          "name": "신화",
           "match": 0.13178
         },
         {
@@ -3316,7 +3324,7 @@
           "match": 0.117366
         },
         {
-          "name": "\u6771\u65b9\u795e\u8d77",
+          "name": "東方神起",
           "match": 0.11098
         },
         {
@@ -3352,7 +3360,7 @@
           "match": 0.102888
         },
         {
-          "name": "\uc545\ub3d9\ubba4\uc9c0\uc158",
+          "name": "악동뮤지션",
           "match": 0.098377
         },
         {
@@ -3392,7 +3400,7 @@
           "match": 0.087924
         },
         {
-          "name": "\uc5d0\uc77c\ub9ac",
+          "name": "에일리",
           "match": 0.086085
         },
         {
@@ -3409,7 +3417,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/ea97a8c7b5b863a8f3567c09a116b637/250x250-000000-80-0-0.jpg",
-      "bio": "There are two artists with the name Bigbang:\n\n1. Korean hip-hop/pop group \n2. Norwegian rock band\n\n1. BIGBANG (\ube45\ubc45) is a three-piece Hip-Hop/R&B group from Seoul, South Korea. The group was created by YG Entertainment, through a long audition process which aired on TV as a 10 episode documentary. The",
+      "bio": "There are two artists with the name Bigbang:\n\n1. Korean hip-hop/pop group \n2. Norwegian rock band\n\n1. BIGBANG (빅뱅) is a three-piece Hip-Hop/R&B group from Seoul, South Korea. The group was created by YG Entertainment, through a long audition process which aired on TV as a 10 episode documentary. The",
       "top_tracks": [
         {
           "name": "Fantastic Baby",
@@ -3766,7 +3774,7 @@
           "match": 0.508595
         },
         {
-          "name": "H\u00fcsker D\u00fc",
+          "name": "Hüsker Dü",
           "match": 0.479174
         },
         {
@@ -4405,7 +4413,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/63ee5c28add70150aaff4f33371ab5a5/250x250-000000-80-0-0.jpg",
-      "bio": "Blood Orange is the stage name of Devont\u00e9 Hynes (born David Joseph Michael Hynes, 23 December 1985 in Ilford, East London), an English\u2013American singer, songwriter, multi-instrumentalist, record producer, composer and director, currently based in New York City.\n\n\n\n Biography & Career\n\nEarly Years\n He",
+      "bio": "Blood Orange is the stage name of Devonté Hynes (born David Joseph Michael Hynes, 23 December 1985 in Ilford, East London), an English–American singer, songwriter, multi-instrumentalist, record producer, composer and director, currently based in New York City.\n\n\n\n Biography & Career\n\nEarly Years\n He",
       "top_tracks": [
         {
           "name": "Champagne Coast",
@@ -4541,7 +4549,7 @@
           "match": 0.548432
         },
         {
-          "name": "\u00c9tienne de Cr\u00e9cy",
+          "name": "Étienne de Crécy",
           "match": 0.513468
         },
         {
@@ -4730,7 +4738,7 @@
           "match": 0.932265
         },
         {
-          "name": "\u0141aszewo",
+          "name": "Łaszewo",
           "match": 0.878635
         },
         {
@@ -4919,7 +4927,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/cfc1d848a84c7f7e12cebf0b39c03a21/250x250-000000-80-0-0.jpg",
-      "bio": "BUNT., real name Levi Wijk (Levent G\u00fclteki), is a German electronic music producer from Stuttgart.\n\nDebuting in the mid-2010s, the project started out as a duo with Nicolas Crispin. The duo, who was high school friends, teamed up at the age of 16 to craft dance anthems inspired by Swedish House Mafi",
+      "bio": "BUNT., real name Levi Wijk (Levent Gülteki), is a German electronic music producer from Stuttgart.\n\nDebuting in the mid-2010s, the project started out as a duo with Nicolas Crispin. The duo, who was high school friends, teamed up at the age of 16 to craft dance anthems inspired by Swedish House Mafi",
       "top_tracks": [
         {
           "name": "Clouds",
@@ -5031,7 +5039,7 @@
           "match": 0.148767
         },
         {
-          "name": "\u00d1engo Flow",
+          "name": "Ñengo Flow",
           "match": 0.144598
         },
         {
@@ -5079,7 +5087,7 @@
           "match": 0.107946
         },
         {
-          "name": "H\u00e9ctor \"El Father\"",
+          "name": "Héctor \"El Father\"",
           "match": 0.106076
         },
         {
@@ -5191,7 +5199,7 @@
           "match": 0.192399
         },
         {
-          "name": "Urb\u00f8i",
+          "name": "Urbøi",
           "match": 0.190019
         },
         {
@@ -5211,7 +5219,7 @@
           "match": 0.133417
         },
         {
-          "name": "Samantha Barr\u00f3n",
+          "name": "Samantha Barrón",
           "match": 0.13213
         },
         {
@@ -5239,7 +5247,7 @@
           "match": 0.110867
         },
         {
-          "name": "El Mimoso Luis Antonio L\u00f3pez",
+          "name": "El Mimoso Luis Antonio López",
           "match": 0.108934
         },
         {
@@ -5247,7 +5255,7 @@
           "match": 0.108504
         },
         {
-          "name": "La Adictiva Banda San Jos\u00e9 de Mesillas",
+          "name": "La Adictiva Banda San José de Mesillas",
           "match": 0.108395
         },
         {
@@ -5299,7 +5307,7 @@
           "match": 0.068081
         },
         {
-          "name": "Bryan Mart\u00ednez",
+          "name": "Bryan Martínez",
           "match": 0.065593
         },
         {
@@ -5315,11 +5323,11 @@
           "match": 0.063674
         },
         {
-          "name": "NEGR\u00d8",
+          "name": "NEGRØ",
           "match": 0.062109
         },
         {
-          "name": "Ad\u00e1n Zapata",
+          "name": "Adán Zapata",
           "match": 0.060091
         },
         {
@@ -5339,7 +5347,7 @@
           "match": 0.0563
         },
         {
-          "name": "Un Le\u00f3n Marinero",
+          "name": "Un León Marinero",
           "match": 0.055915
         },
         {
@@ -5450,7 +5458,7 @@
           "match": 0.446166
         },
         {
-          "name": "Chlo\u00e9 Caillet",
+          "name": "Chloé Caillet",
           "match": 0.434853
         },
         {
@@ -5578,7 +5586,7 @@
           "match": 0.29151
         },
         {
-          "name": "Barry Can\u2019t Swim",
+          "name": "Barry Can’t Swim",
           "match": 0.283022
         },
         {
@@ -5634,7 +5642,7 @@
           "match": 0.528148
         },
         {
-          "name": "Obsk\u00fcr",
+          "name": "Obskür",
           "match": 0.447975
         },
         {
@@ -5827,7 +5835,7 @@
       "genre": "Indie/Alt",
       "similar_artists": [
         {
-          "name": "Alcal\u00e1 Norte",
+          "name": "Alcalá Norte",
           "match": 1.0
         },
         {
@@ -5851,7 +5859,7 @@
           "match": 0.63285
         },
         {
-          "name": "Ni\u00f1a Polaca",
+          "name": "Niña Polaca",
           "match": 0.632097
         },
         {
@@ -5875,7 +5883,7 @@
           "match": 0.498865
         },
         {
-          "name": "Arde Bogot\u00e1",
+          "name": "Arde Bogotá",
           "match": 0.450476
         },
         {
@@ -5891,7 +5899,7 @@
           "match": 0.397518
         },
         {
-          "name": "Tri\u00e1ngulo de Amor Bizarro",
+          "name": "Triángulo de Amor Bizarro",
           "match": 0.394422
         },
         {
@@ -5907,7 +5915,7 @@
           "match": 0.332015
         },
         {
-          "name": "Depresi\u00f3n Sonora",
+          "name": "Depresión Sonora",
           "match": 0.328676
         },
         {
@@ -5923,7 +5931,7 @@
           "match": 0.279898
         },
         {
-          "name": "Silo\u00e9",
+          "name": "Siloé",
           "match": 0.278493
         },
         {
@@ -5931,7 +5939,7 @@
           "match": 0.276824
         },
         {
-          "name": "Le\u00f3n Benavente",
+          "name": "León Benavente",
           "match": 0.256303
         },
         {
@@ -5963,7 +5971,7 @@
           "match": 0.216717
         },
         {
-          "name": "Xoel L\u00f3pez",
+          "name": "Xoel López",
           "match": 0.203357
         },
         {
@@ -5979,7 +5987,7 @@
           "match": 0.196442
         },
         {
-          "name": "Bestia Beb\u00e9",
+          "name": "Bestia Bebé",
           "match": 0.191252
         },
         {
@@ -5991,7 +5999,7 @@
           "match": 0.176581
         },
         {
-          "name": "Derby Motoreta\u2019s Burrito Kachimba",
+          "name": "Derby Motoreta’s Burrito Kachimba",
           "match": 0.162462
         },
         {
@@ -6024,7 +6032,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/8431269e96d26a20569323c547caf95d/250x250-000000-80-0-0.jpg",
-      "bio": "Carolina Durante es una banda madrile\u00f1a formada en 2017, cuya m\u00fasica puede catalogarse dentro de g\u00e9neros como el punk, el pop o el indie. La agrupaci\u00f3n musical est\u00e1 compuesta por Diego Ib\u00e1\u00f1ez, Mart\u00edn Vallhonrat, Juan Pedrayes y Mario del Valle.\u200b",
+      "bio": "Carolina Durante es una banda madrileña formada en 2017, cuya música puede catalogarse dentro de géneros como el punk, el pop o el indie. La agrupación musical está compuesta por Diego Ibáñez, Martín Vallhonrat, Juan Pedrayes y Mario del Valle.​",
       "top_tracks": [
         {
           "name": "Joderse La Vida",
@@ -6042,12 +6050,12 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/ca9620f708850c81d123f1cabcacc6aa/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Perdona (Ahora S\u00ed Que S\u00ed)",
+          "name": "Perdona (Ahora Sí Que Sí)",
           "deezer_url": "https://www.deezer.com/track/588269612",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/f7e1ea2066d7127f4b8ceb6babf02f7b/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Yo pensaba que me hab\u00eda tocado Dios",
+          "name": "Yo pensaba que me había tocado Dios",
           "deezer_url": "https://www.deezer.com/track/2876917142",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/a075586d45d79e0ed3f59f079028dcab/56x56-000000-80-0-0.jpg"
         }
@@ -6196,7 +6204,7 @@
           "match": 0.340166
         },
         {
-          "name": "Saint\u00e9",
+          "name": "Sainté",
           "match": 0.339162
         },
         {
@@ -6552,12 +6560,12 @@
       ]
     },
     {
-      "name": "Chlo\u00e9 Caillet x Rossi.",
+      "name": "Chloé Caillet x Rossi.",
       "day": "Friday",
       "weekend": "Both",
       "stage": "",
       "lastfm_artists": [
-        "Chlo\u00e9 Caillet",
+        "Chloé Caillet",
         "Rossi."
       ],
       "tags": [
@@ -6639,7 +6647,7 @@
           "match": 0.480115
         },
         {
-          "name": "Obsk\u00fcr",
+          "name": "Obskür",
           "match": 0.479026
         },
         {
@@ -6747,7 +6755,7 @@
           "match": 0.274517
         },
         {
-          "name": "cass\u00f6",
+          "name": "cassö",
           "match": 0.270736
         },
         {
@@ -6883,7 +6891,7 @@
           "match": 0.111556
         },
         {
-          "name": "Tom\u00e0n",
+          "name": "Tomàn",
           "match": 0.109991
         },
         {
@@ -6920,7 +6928,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/9bd8e66f3e546dead20e004b9be6f6d4/250x250-000000-80-0-0.jpg",
-      "bio": "Chlo\u00e9's Caillet is a writer, producer and performing artist. Her debut EP, \"Intro,\" released on CircoLoco Records, marked a milestone in her evolving production work. Her live performances, from festivals to iconic venues worldwide, reflect a captivating sound embraced by both music and fashion enth",
+      "bio": "Chloé's Caillet is a writer, producer and performing artist. Her debut EP, \"Intro,\" released on CircoLoco Records, marked a milestone in her evolving production work. Her live performances, from festivals to iconic venues worldwide, reflect a captivating sound embraced by both music and fashion enth",
       "top_tracks": [
         {
           "name": "Come Back 2 Me",
@@ -6938,7 +6946,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/9ced97ad8ca912694b7e2a5ef6e0c491/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "The One (Obsk\u00fcr Remix)",
+          "name": "The One (Obskür Remix)",
           "deezer_url": "https://www.deezer.com/track/3391136531",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/34470b0eb7119e2c8ae835997879229f/56x56-000000-80-0-0.jpg"
         },
@@ -7297,7 +7305,7 @@
           "match": 0.430524
         },
         {
-          "name": "Nil\u00fcfer Yanya",
+          "name": "Nilüfer Yanya",
           "match": 0.418863
         },
         {
@@ -7337,7 +7345,7 @@
           "match": 0.382083
         },
         {
-          "name": "Sin\u00e9ad O'Connor",
+          "name": "Sinéad O'Connor",
           "match": 0.350286
         },
         {
@@ -7582,7 +7590,7 @@
           "match": 0.090761
         },
         {
-          "name": "\u00c4ngie",
+          "name": "Ängie",
           "match": 0.089916
         },
         {
@@ -7618,7 +7626,7 @@
           "match": 0.06093
         },
         {
-          "name": "R\u00f3is\u00edn Murphy",
+          "name": "Róisín Murphy",
           "match": 0.059152
         },
         {
@@ -7635,7 +7643,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/512a5c7747481a897c40a82d9d45020a/250x250-000000-80-0-0.jpg",
-      "bio": "COBRAH is an eccentric artist from Sweden. The iconic queer performer makes electronic bangers heavily influenced both by her experience in the kink, vogue, and punk communities. As such, her music is inherently political and personal.\n\nAs of October 2024, COBRAH has released 3 EP\u2019s, 1 Remix EP and ",
+      "bio": "COBRAH is an eccentric artist from Sweden. The iconic queer performer makes electronic bangers heavily influenced both by her experience in the kink, vogue, and punk communities. As such, her music is inherently political and personal.\n\nAs of October 2024, COBRAH has released 3 EP’s, 1 Remix EP and ",
       "top_tracks": [
         {
           "name": "BRAND NEW BITCH",
@@ -7699,7 +7707,7 @@
           "match": 0.834155
         },
         {
-          "name": "\u7c73\u6d25\u7384\u5e2b",
+          "name": "米津玄師",
           "match": 0.817019
         },
         {
@@ -7779,11 +7787,11 @@
           "match": 0.514365
         },
         {
-          "name": "\u306a\u3068\u308a",
+          "name": "なとり",
           "match": 0.511865
         },
         {
-          "name": "\u30ad\u30bf\u30cb\u30bf\u30c4\u30e4",
+          "name": "キタニタツヤ",
           "match": 0.500655
         },
         {
@@ -7799,7 +7807,7 @@
           "match": 0.499088
         },
         {
-          "name": "Rude-\u03b1",
+          "name": "Rude-α",
           "match": 0.480577
         },
         {
@@ -7823,7 +7831,7 @@
           "match": 0.451746
         },
         {
-          "name": "HOME MADE \u5bb6\u65cf",
+          "name": "HOME MADE 家族",
           "match": 0.447738
         },
         {
@@ -7843,7 +7851,7 @@
           "match": 0.423628
         },
         {
-          "name": "\u9808\u7530\u666f\u51ea",
+          "name": "須田景凪",
           "match": 0.411564
         },
         {
@@ -7851,7 +7859,7 @@
           "match": 0.404281
         },
         {
-          "name": "Official\u9aed\u7537dism",
+          "name": "Official髭男dism",
           "match": 0.390358
         },
         {
@@ -7884,7 +7892,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/b7f4334dd626befb590e9349bca72c99/250x250-000000-80-0-0.jpg",
-      "bio": "Creepy Nuts are a Japanese Hip Hop pair comprised of R-Shitei and DJ Matsunaga. R-Shitei, whose rap name means \u201cR-Rated,\u201d spouts fast-paced rhymes over his partner\u2019s catchy tracks. The duo was formed in 2013 and released their first mini album in January 2016.\n\nR-Shitei (Kyohei Nogami) had slowly be",
+      "bio": "Creepy Nuts are a Japanese Hip Hop pair comprised of R-Shitei and DJ Matsunaga. R-Shitei, whose rap name means “R-Rated,” spouts fast-paced rhymes over his partner’s catchy tracks. The duo was formed in 2013 and released their first mini album in January 2016.\n\nR-Shitei (Kyohei Nogami) had slowly be",
       "top_tracks": [
         {
           "name": "Otonoke",
@@ -7988,7 +7996,7 @@
           "match": 0.128255
         },
         {
-          "name": "L'Imp\u00e9ratrice",
+          "name": "L'Impératrice",
           "match": 0.120996
         },
         {
@@ -8076,15 +8084,15 @@
           "match": 0.079667
         },
         {
-          "name": "\u043d\u0435\u0435\u0435\u0442, \u0442\u044b \u0447\u0442\u043e",
+          "name": "нееет, ты что",
           "match": 0.079533
         },
         {
-          "name": "\u0411\u0443\u043c\u0431\u043e\u043a\u0441",
+          "name": "Бумбокс",
           "match": 0.07587
         },
         {
-          "name": "\u041c\u0435\u0434\u0436\u0438\u043a\u0443\u043b",
+          "name": "Меджикул",
           "match": 0.075572
         },
         {
@@ -8462,7 +8470,7 @@
           "match": 0.659477
         },
         {
-          "name": "Ti\u00ebsto",
+          "name": "Tiësto",
           "match": 0.625288
         },
         {
@@ -9137,7 +9145,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/e54bda0628749119f7a9a05b71b40283/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "How It\u2019s Done",
+          "name": "How It’s Done",
           "deezer_url": "https://www.deezer.com/track/3412534551",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/e54bda0628749119f7a9a05b71b40283/56x56-000000-80-0-0.jpg"
         },
@@ -9213,7 +9221,7 @@
           "match": 0.628621
         },
         {
-          "name": "Sn\u00f5\u00f5per",
+          "name": "Snõõper",
           "match": 0.619816
         },
         {
@@ -9265,7 +9273,7 @@
           "match": 0.370704
         },
         {
-          "name": "Karen Di\u00f3",
+          "name": "Karen Dió",
           "match": 0.369373
         },
         {
@@ -9478,7 +9486,7 @@
           "match": 0.166216
         },
         {
-          "name": "D\u2019Angelo and The Vanguard",
+          "name": "D’Angelo and The Vanguard",
           "match": 0.154756
         },
         {
@@ -9602,7 +9610,7 @@
           "match": 0.074658
         },
         {
-          "name": "Foushe\u00e9",
+          "name": "Fousheé",
           "match": 0.072872
         },
         {
@@ -9610,7 +9618,7 @@
           "match": 0.071819
         },
         {
-          "name": "Giv\u0113on",
+          "name": "Givēon",
           "match": 0.070972
         },
         {
@@ -9884,7 +9892,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/e44468007c45f2523d056a0b19eed80a/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "She\u2019s Gone, Dance On",
+          "name": "She’s Gone, Dance On",
           "deezer_url": "https://www.deezer.com/track/2813082002",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/1346ad41412c615634a6aeee94eb70ca/56x56-000000-80-0-0.jpg"
         },
@@ -9924,7 +9932,7 @@
       "genre": "Hip-Hop",
       "similar_artists": [
         {
-          "name": "Jack \u00dc",
+          "name": "Jack Ü",
           "match": 1.0
         },
         {
@@ -10080,7 +10088,7 @@
           "match": 0.392435
         },
         {
-          "name": "Ti\u00ebsto",
+          "name": "Tiësto",
           "match": 0.386459
         },
         {
@@ -10623,7 +10631,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/4118024e71bd7fe8346e41042b624491/250x250-000000-80-0-0.jpg",
-      "bio": "Before 2012 Duke Dumont was known as a \u2018producer\u2019s producer\u2019. He was the name on a 12\u201d record the DJ knew to reach for when he wanted to please the crowd, without them knowing who had constructed the mesmerising sonic confection they were dancing to.\n\nIn 2012, two EPs on Tiga\u2019s Turbo Recordings (wit",
+      "bio": "Before 2012 Duke Dumont was known as a ‘producer’s producer’. He was the name on a 12” record the DJ knew to reach for when he wanted to please the crowd, without them knowing who had constructed the mesmerising sonic confection they were dancing to.\n\nIn 2012, two EPs on Tiga’s Turbo Recordings (wit",
       "top_tracks": [
         {
           "name": "Ocean Drive",
@@ -10671,7 +10679,7 @@
       "genre": "Electronic",
       "similar_artists": [
         {
-          "name": "Karen Di\u00f3",
+          "name": "Karen Dió",
           "match": 1.0
         },
         {
@@ -10872,7 +10880,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/c1e4a3715140f88c83ba2792a67debbc/250x250-000000-80-0-0.jpg",
-      "bio": "Ecca Vandal has already been labelled an enigma. It\u2019s not necessarily because of the lack of information available on her, but instead might have something to do with her musical pedigree and her defiant strut into a tornado of influences that she\u2019s seen to make on debut single White Flag.\n\nYou\u2019d be",
+      "bio": "Ecca Vandal has already been labelled an enigma. It’s not necessarily because of the lack of information available on her, but instead might have something to do with her musical pedigree and her defiant strut into a tornado of influences that she’s seen to make on debut single White Flag.\n\nYou’d be",
       "top_tracks": [
         {
           "name": "CRUISING TO SELF SOOTHE",
@@ -11012,7 +11020,7 @@
           "match": 0.113171
         },
         {
-          "name": "The Mar\u00edas",
+          "name": "The Marías",
           "match": 0.112874
         },
         {
@@ -11121,7 +11129,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/307730654d49fa43c7fb02bc5b693eb9/250x250-000000-80-0-0.jpg",
-      "bio": "Ethel Cain is a musical project of American singer-songwriter, record producer, and model Hayden Silas Anhed\u00f6nia (born March 24, 1998). This project is noted for lyrics focused on nostalgic and Southern Gothic themes, while the music has been associated with the ambient, indie rock, and contemporary",
+      "bio": "Ethel Cain is a musical project of American singer-songwriter, record producer, and model Hayden Silas Anhedönia (born March 24, 1998). This project is noted for lyrics focused on nostalgic and Southern Gothic themes, while the music has been associated with the ambient, indie rock, and contemporary",
       "top_tracks": [
         {
           "name": "Fuck Me Eyes",
@@ -11932,7 +11940,7 @@
           "match": 0.669236
         },
         {
-          "name": "Bj\u00f6rk",
+          "name": "Björk",
           "match": 0.636844
         },
         {
@@ -12016,7 +12024,7 @@
           "match": 0.151227
         },
         {
-          "name": "R\u00f3is\u00edn Murphy",
+          "name": "Róisín Murphy",
           "match": 0.150897
         },
         {
@@ -12064,7 +12072,7 @@
           "match": 0.109617
         },
         {
-          "name": "M\u00d8",
+          "name": "MØ",
           "match": 0.104345
         },
         {
@@ -12092,7 +12100,7 @@
           "match": 0.09119
         },
         {
-          "name": "The Mar\u00edas",
+          "name": "The Marías",
           "match": 0.090968
         },
         {
@@ -12562,7 +12570,7 @@
           "match": 0.22192
         },
         {
-          "name": "The Mar\u00edas",
+          "name": "The Marías",
           "match": 0.220665
         },
         {
@@ -12615,7 +12623,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/8bf45dae0c39a6b1b9acb135f5fde280/250x250-000000-80-0-0.jpg",
-      "bio": "Joyce Ciss\u00e9, known professionally as flowerovlove, is an English singer, songwriter and producer from London. She debuted in 2020 and has since released three EPs.\n\nShe won Artist to Watch at the 2022 A&R Awards and New Artist at the 2024 Music Week Women in Music Awards. In 2022, she was named one ",
+      "bio": "Joyce Cissé, known professionally as flowerovlove, is an English singer, songwriter and producer from London. She debuted in 2020 and has since released three EPs.\n\nShe won Artist to Watch at the 2022 A&R Awards and New Artist at the 2024 Music Week Women in Music Awards. In 2022, she was named one ",
       "top_tracks": [
         {
           "name": "a girl like me",
@@ -12727,7 +12735,7 @@
           "match": 0.580386
         },
         {
-          "name": "half\u2022alive",
+          "name": "half•alive",
           "match": 0.576277
         },
         {
@@ -13173,7 +13181,7 @@
           "match": 0.702122
         },
         {
-          "name": "Guerra Fr\u00eda",
+          "name": "Guerra Fría",
           "match": 0.686782
         },
         {
@@ -13225,11 +13233,11 @@
           "match": 0.46754
         },
         {
-          "name": "Dark\u00d8",
+          "name": "DarkØ",
           "match": 0.449847
         },
         {
-          "name": "Vac\u00edos Cuerpos",
+          "name": "Vacíos Cuerpos",
           "match": 0.44708
         },
         {
@@ -13249,7 +13257,7 @@
           "match": 0.389466
         },
         {
-          "name": "N\u00fcrnberg",
+          "name": "Nürnberg",
           "match": 0.362538
         },
         {
@@ -13438,7 +13446,7 @@
           "match": 0.625499
         },
         {
-          "name": "\u7c73\u6d25\u7384\u5e2b",
+          "name": "米津玄師",
           "match": 0.606393
         },
         {
@@ -13530,11 +13538,11 @@
           "match": 0.350557
         },
         {
-          "name": "\u306a\u3068\u308a",
+          "name": "なとり",
           "match": 0.344725
         },
         {
-          "name": "\u30ad\u30ea\u30f3\u30b8",
+          "name": "キリンジ",
           "match": 0.330588
         },
         {
@@ -13574,7 +13582,7 @@
           "match": 0.28136
         },
         {
-          "name": "\u5b87\u591a\u7530\u30d2\u30ab\u30eb",
+          "name": "宇多田ヒカル",
           "match": 0.278756
         },
         {
@@ -13602,7 +13610,7 @@
           "match": 0.248337
         },
         {
-          "name": "\u79e6\u57fa\u535a",
+          "name": "秦基博",
           "match": 0.247537
         },
         {
@@ -13611,7 +13619,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/16cbd84f0e0300725b734980f42112b6/250x250-000000-80-0-0.jpg",
-      "bio": "Fujii Kaze (\u85e4\u4e95\u98a8) is a Japanese musician and singer-songwriter under Universal Sigma. Fujii Kaze was born in 1997 in Satosho in Okayama, Japan, and is one of four brothers. As a child, he listened to all kinds of music such as jazz, classical music, pop, and enka. Starting at 12 years old, Kaze uploa",
+      "bio": "Fujii Kaze (藤井風) is a Japanese musician and singer-songwriter under Universal Sigma. Fujii Kaze was born in 1997 in Satosho in Okayama, Japan, and is one of four brothers. As a child, he listened to all kinds of music such as jazz, classical music, pop, and enka. Starting at 12 years old, Kaze uploa",
       "top_tracks": [
         {
           "name": "Shinunoga E-Wa",
@@ -14030,7 +14038,7 @@
           "match": 0.181414
         },
         {
-          "name": "Reb\u016bke",
+          "name": "Rebūke",
           "match": 0.180703
         },
         {
@@ -14203,7 +14211,7 @@
           "match": 0.505647
         },
         {
-          "name": "Chance Pe\u00f1a",
+          "name": "Chance Peña",
           "match": 0.501947
         },
         {
@@ -14386,12 +14394,12 @@
       ]
     },
     {
-      "name": "GIV\u0112ON",
+      "name": "GIVĒON",
       "day": "Saturday",
       "weekend": "Both",
       "stage": "",
       "lastfm_artists": [
-        "GIV\u0112ON"
+        "GIVĒON"
       ],
       "tags": [
         "rnb",
@@ -14552,7 +14560,7 @@
           "match": 0.32598
         },
         {
-          "name": "Jhen\u00e9 Aiko",
+          "name": "Jhené Aiko",
           "match": 0.31642
         },
         {
@@ -14572,7 +14580,7 @@
           "match": 0.30597
         },
         {
-          "name": "Kiana Led\u00e9",
+          "name": "Kiana Ledé",
           "match": 0.304444
         },
         {
@@ -14605,7 +14613,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/1d1d238f7e6de8714171499e6028add7/250x250-000000-80-0-0.jpg",
-      "bio": "Giveon Dezmann Evans (born 21 February 1995 in Long Beach, CA, United States), known mononymously as Giv\u0113on, is an American R&B singer and songwriter. He rose to prominence with his 2020 song 'Chicago Freestyle' (with Drake), which peaked at number 14 on the Billboard Hot 100. That same year, Giveon",
+      "bio": "Giveon Dezmann Evans (born 21 February 1995 in Long Beach, CA, United States), known mononymously as Givēon, is an American R&B singer and songwriter. He rose to prominence with his 2020 song 'Chicago Freestyle' (with Drake), which peaked at number 14 on the Billboard Hot 100. That same year, Giveon",
       "top_tracks": [
         {
           "name": "Unholy Matrimony",
@@ -14946,7 +14954,7 @@
           "match": 0.421723
         },
         {
-          "name": "K\u00f6lsch",
+          "name": "Kölsch",
           "match": 0.384465
         },
         {
@@ -15086,7 +15094,7 @@
           "match": 0.189789
         },
         {
-          "name": "\u00d6wnboss",
+          "name": "Öwnboss",
           "match": 0.188711
         },
         {
@@ -15126,7 +15134,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/bc4325a143963e2d64f6298fd0cc320a/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Pt\u2019sco Healing",
+          "name": "Pt’sco Healing",
           "deezer_url": "https://www.deezer.com/track/3465515211",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/ed756f75be9eae7fdaf4c0a3a4425fad/56x56-000000-80-0-0.jpg"
         }
@@ -15171,7 +15179,7 @@
           "match": 0.603486
         },
         {
-          "name": "Sven V\u00e4th",
+          "name": "Sven Väth",
           "match": 0.565974
         },
         {
@@ -15327,7 +15335,7 @@
           "match": 0.289958
         },
         {
-          "name": "K\u00f6lsch",
+          "name": "Kölsch",
           "match": 0.288567
         },
         {
@@ -15562,7 +15570,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/cda1f7f6c126e57540de93dd79c011bb/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "When It Kicks (Reb\u016bke Remix)",
+          "name": "When It Kicks (Rebūke Remix)",
           "deezer_url": "https://www.deezer.com/track/3762441702",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/135140ef1ed0d2cf5e08f0918f640645/56x56-000000-80-0-0.jpg"
         },
@@ -15628,7 +15636,7 @@
           "match": 0.714653
         },
         {
-          "name": "T\u00e9l\u00e9popmusik",
+          "name": "Télépopmusik",
           "match": 0.682947
         },
         {
@@ -15644,7 +15652,7 @@
           "match": 0.642991
         },
         {
-          "name": "R\u00f6yksopp",
+          "name": "Röyksopp",
           "match": 0.61852
         },
         {
@@ -16042,7 +16050,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/34300d763a598b930b738ec2d31f85fa/250x250-000000-80-0-0.jpg",
-      "bio": "Currently one of the most versatile producers in the scene, Hamdi\u2019s ability to produce a wide range of styles and genres has made him an exciting prospect for any label to get their hands on. Hamdi\u2019s signature blend of Dubstep, UKG and Grime has earned him support from some of the biggest artists in",
+      "bio": "Currently one of the most versatile producers in the scene, Hamdi’s ability to produce a wide range of styles and genres has made him an exciting prospect for any label to get their hands on. Hamdi’s signature blend of Dubstep, UKG and Grime has earned him support from some of the biggest artists in",
       "top_tracks": [
         {
           "name": "Push (feat. OFFAIAH)",
@@ -16254,7 +16262,7 @@
           "match": 0.384042
         },
         {
-          "name": "BL\u00dc EYES",
+          "name": "BLÜ EYES",
           "match": 0.380308
         },
         {
@@ -16536,7 +16544,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/10e5e3b0cddfb0ca0b03e95b1058f4af/250x250-000000-80-0-0.jpg",
-      "bio": "Michigan\u2019s upper peninsula is trapped under what seems like permafrost for most of the year. This chilling effect makes the landmass more comfortable with stationary lives rather than lives spent outside its natural sprawl. Hot Mulligan may have been born in this green giant, but they escaped its cl",
+      "bio": "Michigan’s upper peninsula is trapped under what seems like permafrost for most of the year. This chilling effect makes the landmass more comfortable with stationary lives rather than lives spent outside its natural sprawl. Hot Mulligan may have been born in this green giant, but they escaped its cl",
       "top_tracks": [
         {
           "name": "*Equip Sunglasses*",
@@ -16549,12 +16557,12 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/b40d7826e1139ba70cce1e6a185cb6be/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "I Don\u2019t Think It\u2019s the Right Time for Emojis",
+          "name": "I Don’t Think It’s the Right Time for Emojis",
           "deezer_url": "https://www.deezer.com/track/3763338032",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/d6dc51840c123894238e431ec9d02e26/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "How Do You Know It\u2019s Not Armadillo Shells?",
+          "name": "How Do You Know It’s Not Armadillo Shells?",
           "deezer_url": "https://www.deezer.com/track/1787215537",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/b40d7826e1139ba70cce1e6a185cb6be/56x56-000000-80-0-0.jpg"
         },
@@ -16594,7 +16602,7 @@
           "match": 0.571977
         },
         {
-          "name": "Eevil St\u00f6\u00f6",
+          "name": "Eevil Stöö",
           "match": 0.531603
         },
         {
@@ -16670,7 +16678,7 @@
           "match": 0.159882
         },
         {
-          "name": "Petri Nyg\u00e5rd",
+          "name": "Petri Nygård",
           "match": 0.151343
         },
         {
@@ -16690,7 +16698,7 @@
           "match": 0.136881
         },
         {
-          "name": "Nelj\u00e4 Ruusua",
+          "name": "Neljä Ruusua",
           "match": 0.131156
         },
         {
@@ -16742,7 +16750,7 @@
           "match": 0.095663
         },
         {
-          "name": "SMC L\u00e4hi\u00f6rotat",
+          "name": "SMC Lähiörotat",
           "match": 0.094561
         },
         {
@@ -16762,7 +16770,7 @@
           "match": 0.087922
         },
         {
-          "name": "Zen Caf\u00e9",
+          "name": "Zen Café",
           "match": 0.087902
         },
         {
@@ -16797,7 +16805,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/745fc836a6e5c4d8cbf6814a1de0ec9b/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "CORA\u00c7AO (20th Anniversary Mix)",
+          "name": "CORAÇAO (20th Anniversary Mix)",
           "deezer_url": "https://www.deezer.com/track/2866536552",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/30bebacb0818bcab0f29f6e0f59d0e8b/56x56-000000-80-0-0.jpg"
         },
@@ -17634,7 +17642,7 @@
           "match": 0.264815
         },
         {
-          "name": "Mila Journ\u00e9e",
+          "name": "Mila Journée",
           "match": 0.255061
         },
         {
@@ -17718,11 +17726,11 @@
           "match": 0.173983
         },
         {
-          "name": "\u00d8ostil",
+          "name": "Øostil",
           "match": 0.173852
         },
         {
-          "name": "Andf\u00f8lk",
+          "name": "Andfølk",
           "match": 0.17327
         },
         {
@@ -17730,7 +17738,7 @@
           "match": 0.16915
         },
         {
-          "name": "Mas\u0161h",
+          "name": "Masšh",
           "match": 0.16819
         },
         {
@@ -17742,7 +17750,7 @@
           "match": 0.161459
         },
         {
-          "name": "Av\u00f6",
+          "name": "Avö",
           "match": 0.157435
         },
         {
@@ -17788,7 +17796,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/4b29e4a1975062a0836283313b0902d7/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Lampia\u0303o (African Techno Mix)",
+          "name": "Lampião (African Techno Mix)",
           "deezer_url": "https://www.deezer.com/track/2671609302",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/49521e02f3002440cbb215963b0ca295/56x56-000000-80-0-0.jpg"
         },
@@ -17958,7 +17966,7 @@
           "match": 0.082771
         },
         {
-          "name": "K\u00e4\u00e4rij\u00e4",
+          "name": "Käärijä",
           "match": 0.079592
         },
         {
@@ -18344,7 +18352,7 @@
           "match": 0.634706
         },
         {
-          "name": "Giv\u0113on",
+          "name": "Givēon",
           "match": 0.634538
         },
         {
@@ -18380,7 +18388,7 @@
           "match": 0.528632
         },
         {
-          "name": "Jason Der\u00fclo",
+          "name": "Jason Derülo",
           "match": 0.528343
         },
         {
@@ -18633,7 +18641,7 @@
           "match": 0.531026
         },
         {
-          "name": "Sof\u00eda Reyes",
+          "name": "Sofía Reyes",
           "match": 0.529378
         },
         {
@@ -18701,7 +18709,7 @@
           "match": 0.376995
         },
         {
-          "name": "Be\u00e9le",
+          "name": "Beéle",
           "match": 0.36881
         },
         {
@@ -18733,7 +18741,7 @@
           "match": 0.336052
         },
         {
-          "name": "Anah\u00ed",
+          "name": "Anahí",
           "match": 0.335633
         },
         {
@@ -18890,7 +18898,7 @@
           "match": 0.444642
         },
         {
-          "name": "Ti\u00ebsto",
+          "name": "Tiësto",
           "match": 0.440642
         },
         {
@@ -18914,7 +18922,7 @@
           "match": 0.410236
         },
         {
-          "name": "Ben B\u00f6hmer",
+          "name": "Ben Böhmer",
           "match": 0.406652
         },
         {
@@ -19059,7 +19067,7 @@
       "genre": "Pop",
       "similar_artists": [
         {
-          "name": "AD\u00c9LA",
+          "name": "ADÉLA",
           "match": 1.0
         },
         {
@@ -19179,7 +19187,7 @@
           "match": 0.449751
         },
         {
-          "name": "Ros\u00e9",
+          "name": "Rosé",
           "match": 0.449548
         },
         {
@@ -19344,7 +19352,7 @@
           "match": 0.421496
         },
         {
-          "name": "Obsk\u00fcr",
+          "name": "Obskür",
           "match": 0.416946
         },
         {
@@ -19641,7 +19649,7 @@
           "match": 0.340718
         },
         {
-          "name": "Beyonc\u00e9",
+          "name": "Beyoncé",
           "match": 0.337654
         },
         {
@@ -19677,7 +19685,7 @@
           "match": 0.309598
         },
         {
-          "name": "Jason Der\u00fclo",
+          "name": "Jason Derülo",
           "match": 0.306964
         },
         {
@@ -19753,7 +19761,7 @@
           "match": 0.2513
         },
         {
-          "name": "Elley Duh\u00e9",
+          "name": "Elley Duhé",
           "match": 0.248067
         }
       ],
@@ -19962,7 +19970,7 @@
           "match": 0.224041
         },
         {
-          "name": "Sn\u00f5\u00f5per",
+          "name": "Snõõper",
           "match": 0.219941
         },
         {
@@ -20007,7 +20015,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/3fb2be645d332497f605899c64921129/250x250-000000-80-0-0.jpg",
-      "bio": "Punk group based in Brighton, England, UK, formed in 2019.\n\n\u201cLAMBRINI GIRLS! Despite being named after the beloved perry drink this Brighton three-piece's sound is neither light nor fruity. You should instead expect to knock back raw, face melting garage-punk and ruddy well like it!\u201d- Tell Everyone ",
+      "bio": "Punk group based in Brighton, England, UK, formed in 2019.\n\n“LAMBRINI GIRLS! Despite being named after the beloved perry drink this Brighton three-piece's sound is neither light nor fruity. You should instead expect to knock back raw, face melting garage-punk and ruddy well like it!”- Tell Everyone ",
       "top_tracks": [
         {
           "name": "Cuntology 101",
@@ -20063,7 +20071,7 @@
           "match": 0.520414
         },
         {
-          "name": "\u5c0f\u91ce\u30ea\u30b5",
+          "name": "小野リサ",
           "match": 0.329307
         },
         {
@@ -20143,7 +20151,7 @@
           "match": 0.060978
         },
         {
-          "name": "Michael Bubl\u00e9",
+          "name": "Michael Bublé",
           "match": 0.060907
         },
         {
@@ -20152,7 +20160,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/0eca5dd5f8ac336e55bf390da9ce13d0/250x250-000000-80-0-0.jpg",
-      "bio": "Laufey L\u00edn Bing J\u00f3nsd\u00f3ttir is an Icelandic singer-songwriter. She spent much of her childhood traveling between Reykjav\u00edk and Washington, DC, where she learned to speak English with barely a trace of an accent. Inspired in part by her mother, a classical violinist, she took up piano and cello early ",
+      "bio": "Laufey Lín Bing Jónsdóttir is an Icelandic singer-songwriter. She spent much of her childhood traveling between Reykjavík and Washington, DC, where she learned to speak English with barely a trace of an accent. Inspired in part by her mother, a classical violinist, she took up piano and cello early ",
       "top_tracks": [
         {
           "name": "From The Start",
@@ -20248,7 +20256,7 @@
           "match": 0.599769
         },
         {
-          "name": "Demay\u00e4",
+          "name": "Demayä",
           "match": 0.593427
         },
         {
@@ -20280,11 +20288,11 @@
           "match": 0.533265
         },
         {
-          "name": "ARYM\u00c9",
+          "name": "ARYMÉ",
           "match": 0.525332
         },
         {
-          "name": "Mas\u0161h",
+          "name": "Masšh",
           "match": 0.516261
         },
         {
@@ -20320,23 +20328,23 @@
           "match": 0.475221
         },
         {
-          "name": "Coll\u00e9",
+          "name": "Collé",
           "match": 0.470746
         },
         {
-          "name": "Cl\u00e9r Letiv",
+          "name": "Clér Letiv",
           "match": 0.469295
         },
         {
-          "name": "ANKHO\u00cf",
+          "name": "ANKHOÏ",
           "match": 0.463704
         },
         {
-          "name": "AM\u00c9M\u00c9",
+          "name": "AMÉMÉ",
           "match": 0.459287
         },
         {
-          "name": "Av\u00f6",
+          "name": "Avö",
           "match": 0.44677
         },
         {
@@ -20854,7 +20862,7 @@
           "match": 0.384193
         },
         {
-          "name": "Amin\u00e9",
+          "name": "Aminé",
           "match": 0.382253
         },
         {
@@ -21216,7 +21224,7 @@
           "match": 0.16148
         },
         {
-          "name": "The Mar\u00edas",
+          "name": "The Marías",
           "match": 0.160677
         },
         {
@@ -21291,12 +21299,12 @@
       ]
     },
     {
-      "name": "Lu\u00edsa Sonza",
+      "name": "Luísa Sonza",
       "day": "Saturday",
       "weekend": "Both",
       "stage": "",
       "lastfm_artists": [
-        "Lu\u00edsa Sonza"
+        "Luísa Sonza"
       ],
       "tags": [
         "pop",
@@ -21337,7 +21345,7 @@
           "match": 0.626734
         },
         {
-          "name": "Thiago Pantale\u00e3o",
+          "name": "Thiago Pantaleão",
           "match": 0.609272
         },
         {
@@ -21357,7 +21365,7 @@
           "match": 0.538531
         },
         {
-          "name": "J\u00e3o",
+          "name": "Jão",
           "match": 0.501062
         },
         {
@@ -21425,7 +21433,7 @@
           "match": 0.270236
         },
         {
-          "name": "Vit\u00e3o",
+          "name": "Vitão",
           "match": 0.268298
         },
         {
@@ -21465,11 +21473,11 @@
           "match": 0.230044
         },
         {
-          "name": "L\u00e9o Santana",
+          "name": "Léo Santana",
           "match": 0.228896
         },
         {
-          "name": "Anavit\u00f3ria",
+          "name": "Anavitória",
           "match": 0.226239
         },
         {
@@ -21485,7 +21493,7 @@
           "match": 0.219814
         },
         {
-          "name": "Lu\u00edsa Sonza & Mariah Angeliq",
+          "name": "Luísa Sonza & Mariah Angeliq",
           "match": 0.219559
         },
         {
@@ -21493,7 +21501,7 @@
           "match": 0.218895
         },
         {
-          "name": "Irm\u00e3s de Pau",
+          "name": "Irmãs de Pau",
           "match": 0.216643
         },
         {
@@ -21510,7 +21518,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/29cb0c453174b6382964ce3ee3168bfa/250x250-000000-80-0-0.jpg",
-      "bio": "Lu\u00edsa Sonza is a singer and songwriter and from Rio Grande do Sul. With a decade-long career marked by versatility, she moves between pop, funk, and Brazilian rhythms, establishing herself as one of the biggest names in Brazilian music. Throughout her career, Lu\u00edsa has been nominated three times for",
+      "bio": "Luísa Sonza is a singer and songwriter and from Rio Grande do Sul. With a decade-long career marked by versatility, she moves between pop, funk, and Brazilian rhythms, establishing herself as one of the biggest names in Brazilian music. Throughout her career, Luísa has been nominated three times for",
       "top_tracks": [
         {
           "name": "MOTINHA 2.0 (Mete Marcha)",
@@ -21523,7 +21531,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/9e7b571ac6e35181ef5b57b0d8356448/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Tenta\u00e7\u00e3o",
+          "name": "Tentação",
           "deezer_url": "https://www.deezer.com/track/1359423792",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/2c3f0b4617b04d20c619031c45ba589a/56x56-000000-80-0-0.jpg"
         },
@@ -21562,7 +21570,7 @@
           "match": 1.0
         },
         {
-          "name": "M\u00d8",
+          "name": "MØ",
           "match": 0.875686
         },
         {
@@ -21678,7 +21686,7 @@
           "match": 0.485644
         },
         {
-          "name": "R\u00f3is\u00edn Murphy",
+          "name": "Róisín Murphy",
           "match": 0.469062
         },
         {
@@ -21734,7 +21742,7 @@
           "match": 0.403483
         },
         {
-          "name": "R\u00f6yksopp & Robyn",
+          "name": "Röyksopp & Robyn",
           "match": 0.401537
         },
         {
@@ -21751,7 +21759,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/0d776174915264017bbdd9d7243251a2/250x250-000000-80-0-0.jpg",
-      "bio": "Li Lykke Timotej Zachrisson (born on March 18, 1986) is a Swedish singer, songwriter and model from Stockholm. She is known for her blend of indie pop, dream pop, and electronic music. She grew up in a creatively and musically supportive environment; her mother, K\u00e4rsti Stiege, was a photographer and",
+      "bio": "Li Lykke Timotej Zachrisson (born on March 18, 1986) is a Swedish singer, songwriter and model from Stockholm. She is known for her blend of indie pop, dream pop, and electronic music. She grew up in a creatively and musically supportive environment; her mother, Kärsti Stiege, was a photographer and",
       "top_tracks": [
         {
           "name": "Little Bit",
@@ -21811,7 +21819,7 @@
           "match": 0.756053
         },
         {
-          "name": "Zeynep Bast\u0131k",
+          "name": "Zeynep Bastık",
           "match": 0.529354
         },
         {
@@ -21843,7 +21851,7 @@
           "match": 0.45693
         },
         {
-          "name": "Serdar Orta\u00e7",
+          "name": "Serdar Ortaç",
           "match": 0.455394
         },
         {
@@ -21855,7 +21863,7 @@
           "match": 0.413607
         },
         {
-          "name": "Murat Dalk\u0131l\u0131\u00e7",
+          "name": "Murat Dalkılıç",
           "match": 0.410771
         },
         {
@@ -21875,7 +21883,7 @@
           "match": 0.384598
         },
         {
-          "name": "Y\u00fczy\u00fczeyken Konu\u015furuz",
+          "name": "Yüzyüzeyken Konuşuruz",
           "match": 0.38131
         },
         {
@@ -21883,15 +21891,15 @@
           "match": 0.377115
         },
         {
-          "name": "Melike \u015eahin",
+          "name": "Melike Şahin",
           "match": 0.374048
         },
         {
-          "name": "Kenan Do\u011fulu",
+          "name": "Kenan Doğulu",
           "match": 0.372295
         },
         {
-          "name": "Beng\u00fc",
+          "name": "Bengü",
           "match": 0.36865
         },
         {
@@ -21907,11 +21915,11 @@
           "match": 0.315438
         },
         {
-          "name": "G\u00fcl\u015fen",
+          "name": "Gülşen",
           "match": 0.301448
         },
         {
-          "name": "I\u0307brahim Tatl\u0131ses",
+          "name": "İbrahim Tatlıses",
           "match": 0.299522
         },
         {
@@ -21919,7 +21927,7 @@
           "match": 0.27974
         },
         {
-          "name": "Sena \u015eener",
+          "name": "Sena Şener",
           "match": 0.279256
         },
         {
@@ -21931,7 +21939,7 @@
           "match": 0.274122
         },
         {
-          "name": "Bar\u0131\u015f Man\u00e7o",
+          "name": "Barış Manço",
           "match": 0.273767
         },
         {
@@ -21939,11 +21947,11 @@
           "match": 0.26595
         },
         {
-          "name": "Dedubl\u00fcman",
+          "name": "Dedublüman",
           "match": 0.262195
         },
         {
-          "name": "G\u00f6ksel",
+          "name": "Göksel",
           "match": 0.254301
         },
         {
@@ -21963,7 +21971,7 @@
           "match": 0.237629
         },
         {
-          "name": "Emir Can \u0130\u011frek",
+          "name": "Emir Can İğrek",
           "match": 0.233801
         },
         {
@@ -21971,11 +21979,11 @@
           "match": 0.232739
         },
         {
-          "name": "G\u00fclden Karab\u00f6cek",
+          "name": "Gülden Karaböcek",
           "match": 0.225316
         },
         {
-          "name": "Ebru G\u00fcnde\u015f",
+          "name": "Ebru Gündeş",
           "match": 0.219693
         },
         {
@@ -21987,11 +21995,11 @@
           "match": 0.215012
         },
         {
-          "name": "Derya Ulu\u011f",
+          "name": "Derya Uluğ",
           "match": 0.209889
         },
         {
-          "name": "Nil\u00fcfer",
+          "name": "Nilüfer",
           "match": 0.208695
         }
       ],
@@ -22329,7 +22337,7 @@
           "match": 0.612739
         },
         {
-          "name": "cass\u00f6",
+          "name": "cassö",
           "match": 0.612621
         },
         {
@@ -22773,7 +22781,7 @@
           "match": 0.145538
         },
         {
-          "name": "Obsk\u00fcr",
+          "name": "Obskür",
           "match": 0.143821
         },
         {
@@ -22793,7 +22801,7 @@
           "match": 0.126538
         },
         {
-          "name": "geods sor\u00e8d",
+          "name": "geods sorèd",
           "match": 0.120362
         },
         {
@@ -22822,7 +22830,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/03844bcb7273970954e4362da91c6906/250x250-000000-80-0-0.jpg",
-      "bio": "DJ Mag \u2018Best of British\u2019 nominee and one of Mixmag\u2019s breakthrough DJs of 2024, Max Dean, the driving force behind neXup recz, is carving an indelible path in the new wave of House music. Max continues to thrive as a versatile DJ, prolific producer, and visionary label boss, cementing his reputation ",
+      "bio": "DJ Mag ‘Best of British’ nominee and one of Mixmag’s breakthrough DJs of 2024, Max Dean, the driving force behind neXup recz, is carving an indelible path in the new wave of House music. Max continues to thrive as a versatile DJ, prolific producer, and visionary label boss, cementing his reputation ",
       "top_tracks": [
         {
           "name": "Can't Decide",
@@ -23002,7 +23010,7 @@
           "match": 0.170425
         },
         {
-          "name": "Reb\u016bke",
+          "name": "Rebūke",
           "match": 0.168568
         },
         {
@@ -23119,7 +23127,7 @@
       "genre": "Indie/Alt",
       "similar_artists": [
         {
-          "name": "Pino D'Angi\u00f2",
+          "name": "Pino D'Angiò",
           "match": 1.0
         },
         {
@@ -23212,7 +23220,7 @@
       "genre": "Electronic",
       "similar_artists": [
         {
-          "name": "R\u00f6yksopp",
+          "name": "Röyksopp",
           "match": 1.0
         },
         {
@@ -23296,7 +23304,7 @@
           "match": 0.563222
         },
         {
-          "name": "T\u00e9l\u00e9popmusik",
+          "name": "Télépopmusik",
           "match": 0.549908
         },
         {
@@ -23384,7 +23392,7 @@
           "match": 0.406523
         },
         {
-          "name": "Trentem\u00f8ller",
+          "name": "Trentemøller",
           "match": 0.402069
         },
         {
@@ -23439,6 +23447,14 @@
           "name": "Estrella del Mar",
           "deezer_url": "https://www.deezer.com/track/3774561532",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/4f767ce48ce1631a0642228d2f02a9e4/56x56-000000-80-0-0.jpg"
+        }
+      ],
+      "bfs_edges": [
+        {
+          "target": "Fatboy Slim",
+          "weight": 0.377763,
+          "via": "The Chemical Brothers",
+          "depth": 2
         }
       ]
     },
@@ -23575,7 +23591,7 @@
           "match": 0.255429
         },
         {
-          "name": "Obsk\u00fcr",
+          "name": "Obskür",
           "match": 0.246215
         },
         {
@@ -23961,7 +23977,7 @@
           "match": 1.0
         },
         {
-          "name": "TIM\u00d8",
+          "name": "TIMØ",
           "match": 0.848846
         },
         {
@@ -23985,7 +24001,7 @@
           "match": 0.599014
         },
         {
-          "name": "Mike Bah\u00eda",
+          "name": "Mike Bahía",
           "match": 0.548267
         },
         {
@@ -24021,7 +24037,7 @@
           "match": 0.305188
         },
         {
-          "name": "Juan Mag\u00e1n",
+          "name": "Juan Magán",
           "match": 0.282545
         },
         {
@@ -24033,7 +24049,7 @@
           "match": 0.260273
         },
         {
-          "name": "Paty Cant\u00fa",
+          "name": "Paty Cantú",
           "match": 0.25126
         },
         {
@@ -24073,7 +24089,7 @@
           "match": 0.133174
         },
         {
-          "name": "Marc Segu\u00ed",
+          "name": "Marc Seguí",
           "match": 0.115066
         },
         {
@@ -24105,7 +24121,7 @@
           "match": 0.073584
         },
         {
-          "name": "Guayac\u00e1n Orquesta",
+          "name": "Guayacán Orquesta",
           "match": 0.070116
         },
         {
@@ -24117,7 +24133,7 @@
           "match": 0.063131
         },
         {
-          "name": "Anah\u00ed",
+          "name": "Anahí",
           "match": 0.062229
         },
         {
@@ -24134,15 +24150,15 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/98d8836cb131fb50bc733ff2b3328497/250x250-000000-80-0-0.jpg",
-      "bio": "Morat is a Colombian band formed in the country's capital city, Bogot\u00e1. The band is formed by Juan Pablo Isaza (guitars and vocals), Juan Pablo Villamil (banjo and vocals) and the brothers Sim\u00f3n Vargas (bass and choruses) and Mart\u00edn Vargas (percussion and choirs). Previously, until the end of 2016, ",
+      "bio": "Morat is a Colombian band formed in the country's capital city, Bogotá. The band is formed by Juan Pablo Isaza (guitars and vocals), Juan Pablo Villamil (banjo and vocals) and the brothers Simón Vargas (bass and choruses) and Martín Vargas (percussion and choirs). Previously, until the end of 2016, ",
       "top_tracks": [
         {
-          "name": "Tu C\u00e1rcel",
+          "name": "Tu Cárcel",
           "deezer_url": "https://www.deezer.com/track/3865498991",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/ec7cddb9b0fe18546e605610d4090171/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Deb\u00ed Suponerlo (Versi\u00f3n Mariachi)",
+          "name": "Debí Suponerlo (Versión Mariachi)",
           "deezer_url": "https://www.deezer.com/track/2107230887",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/555de055f3cc114242a1f6b192dc0405/56x56-000000-80-0-0.jpg"
         },
@@ -24152,7 +24168,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/cf9f5e9175ac8cb4a9e63b78fb870853/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Me Toca A M\u00ed",
+          "name": "Me Toca A Mí",
           "deezer_url": "https://www.deezer.com/track/3288120021",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/86096c543c03737ace1714cd0fec6dd1/56x56-000000-80-0-0.jpg"
         },
@@ -24164,12 +24180,12 @@
       ]
     },
     {
-      "name": "M\u00cbSTIZA",
+      "name": "MËSTIZA",
       "day": "Sunday",
       "weekend": "Both",
       "stage": "",
       "lastfm_artists": [
-        "M\u00cbSTIZA"
+        "MËSTIZA"
       ],
       "tags": [
         "spain",
@@ -24182,7 +24198,7 @@
       "genre": "Electronic",
       "similar_artists": [
         {
-          "name": "Jes\u00fas Fern\u00e1ndez",
+          "name": "Jesús Fernández",
           "match": 1.0
         },
         {
@@ -24190,11 +24206,11 @@
           "match": 0.966521
         },
         {
-          "name": "Israel Fern\u00e1ndez",
+          "name": "Israel Fernández",
           "match": 0.853523
         },
         {
-          "name": "Mar\u00eda Pel\u00e1e",
+          "name": "María Peláe",
           "match": 0.836009
         },
         {
@@ -24202,7 +24218,7 @@
           "match": 0.624984
         },
         {
-          "name": "\u00c1ngeles Toledano",
+          "name": "Ángeles Toledano",
           "match": 0.606631
         },
         {
@@ -24302,11 +24318,11 @@
           "match": 0.275787
         },
         {
-          "name": "Anto\u00f1ito Molina",
+          "name": "Antoñito Molina",
           "match": 0.271328
         },
         {
-          "name": "Luis Cort\u00e9s",
+          "name": "Luis Cortés",
           "match": 0.268418
         },
         {
@@ -24322,7 +24338,7 @@
           "match": 0.25573
         },
         {
-          "name": "Bea Fern\u00e1ndez",
+          "name": "Bea Fernández",
           "match": 0.248537
         },
         {
@@ -24342,11 +24358,11 @@
           "match": 0.227447
         },
         {
-          "name": "Ant\u00edlopez",
+          "name": "Antílopez",
           "match": 0.226742
         },
         {
-          "name": "H\u00e9roes 2020",
+          "name": "Héroes 2020",
           "match": 0.222654
         },
         {
@@ -24366,7 +24382,7 @@
           "match": 0.216752
         },
         {
-          "name": "Mar\u00eda Jim\u00e9nez",
+          "name": "María Jiménez",
           "match": 0.212951
         },
         {
@@ -24374,7 +24390,7 @@
           "match": 0.212383
         },
         {
-          "name": "Jos\u00e9 El Franc\u00e9s",
+          "name": "José El Francés",
           "match": 0.207805
         },
         {
@@ -24406,7 +24422,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/f0ba388c270181816391b5d99614742a/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Compa\u00f1era",
+          "name": "Compañera",
           "deezer_url": "https://www.deezer.com/track/3340637661",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/7ac37a8c05d13507097ffa6831dfd9be/56x56-000000-80-0-0.jpg"
         }
@@ -25098,7 +25114,7 @@
           "match": 0.115351
         },
         {
-          "name": "Einst\u00fcrzende Neubauten",
+          "name": "Einstürzende Neubauten",
           "match": 0.113206
         },
         {
@@ -25114,7 +25130,7 @@
           "match": 0.109379
         },
         {
-          "name": "\u2020\u2020\u2020",
+          "name": "†††",
           "match": 0.109291
         },
         {
@@ -25206,7 +25222,7 @@
           "match": 0.548432
         },
         {
-          "name": "\u00c9tienne de Cr\u00e9cy",
+          "name": "Étienne de Crécy",
           "match": 0.513468
         },
         {
@@ -25335,7 +25351,7 @@
         }
       ],
       "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
-      "bio": "Nine Inch Nails, commonly abbreviated as NIN (stylized as NI\u0418), is an American industrial rock band formed in 1988 in Cleveland, Ohio. Singer, songwriter, multi-instrumentalist, and producer Trent Reznor was the only permanent member of the band until the official addition of English musician Atticu",
+      "bio": "Nine Inch Nails, commonly abbreviated as NIN (stylized as NIИ), is an American industrial rock band formed in 1988 in Cleveland, Ohio. Singer, songwriter, multi-instrumentalist, and producer Trent Reznor was the only permanent member of the band until the official addition of English musician Atticu",
       "top_tracks": [
         {
           "name": "Closer",
@@ -25361,6 +25377,14 @@
           "name": "As Alive As You Need Me To Be",
           "deezer_url": "https://www.deezer.com/track/3555126861",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/9c641ed35652fdde63cd07e7b106ace9/56x56-000000-80-0-0.jpg"
+        }
+      ],
+      "bfs_edges": [
+        {
+          "target": "Boys Noize",
+          "weight": 0.349677,
+          "via": "MSTRKRFT",
+          "depth": 2
         }
       ]
     },
@@ -25391,7 +25415,7 @@
           "match": 0.91645
         },
         {
-          "name": "\u05d0\u05d1\u05d9\u05ea\u05e8 \u05d1\u05e0\u05d0\u05d9",
+          "name": "אביתר בנאי",
           "match": 0.786962
         },
         {
@@ -25411,11 +25435,11 @@
           "match": 0.637236
         },
         {
-          "name": "L\u00e9onie Pernet",
+          "name": "Léonie Pernet",
           "match": 0.59618
         },
         {
-          "name": "\u05d1\u05e8\u05d9 \u05e1\u05d7\u05e8\u05d5\u05e3",
+          "name": "ברי סחרוף",
           "match": 0.586648
         },
         {
@@ -25427,7 +25451,7 @@
           "match": 0.515631
         },
         {
-          "name": "\u05d9\u05d4\u05d5\u05d3\u05d9\u05ea \u05e8\u05d1\u05d9\u05e5",
+          "name": "יהודית רביץ",
           "match": 0.512731
         },
         {
@@ -25487,7 +25511,7 @@
           "match": 0.363259
         },
         {
-          "name": "\u05db\u05d5\u05d5\u05e8\u05ea",
+          "name": "כוורת",
           "match": 0.361284
         },
         {
@@ -25499,7 +25523,7 @@
           "match": 0.35691
         },
         {
-          "name": "\u05e9\u05dc\u05de\u05d4 \u05d0\u05e8\u05e6\u05d9",
+          "name": "שלמה ארצי",
           "match": 0.347392
         },
         {
@@ -25519,7 +25543,7 @@
           "match": 0.338077
         },
         {
-          "name": "\u05de\u05d5\u05e0\u05d9\u05e7\u05d4 \u05e1\u05e7\u05e1",
+          "name": "מוניקה סקס",
           "match": 0.336154
         },
         {
@@ -25531,11 +25555,11 @@
           "match": 0.323517
         },
         {
-          "name": "\u05de\u05e9\u05d9\u05e0\u05d4",
+          "name": "משינה",
           "match": 0.3176
         },
         {
-          "name": "Grossstadtgefl\u00fcster",
+          "name": "Grossstadtgeflüster",
           "match": 0.312123
         },
         {
@@ -25584,7 +25608,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/0f0e6a92e94d371e79817b6c6fc07af9/250x250-000000-80-0-0.jpg",
-      "bio": "Noga Erez is an Israeli musician, singer-songwriter, keyboardist and producer.\n\nBorn and living just outside Tel Aviv, multi-instrumentalist Erez\u2019s grainy textures and potent atmospheres forged with her synths and ingenious beats bravely straddle genres, energized further by the environment in which",
+      "bio": "Noga Erez is an Israeli musician, singer-songwriter, keyboardist and producer.\n\nBorn and living just outside Tel Aviv, multi-instrumentalist Erez’s grainy textures and potent atmospheres forged with her synths and ingenious beats bravely straddle genres, energized further by the environment in which",
       "top_tracks": [
         {
           "name": "Vandalist",
@@ -25804,7 +25828,7 @@
           "match": 0.181905
         },
         {
-          "name": "Bj\u00f6rk & Rosal\u00eda",
+          "name": "Björk & Rosalía",
           "match": 0.154673
         },
         {
@@ -25820,7 +25844,7 @@
           "match": 0.138574
         },
         {
-          "name": "caro\u2661",
+          "name": "caro♡",
           "match": 0.134627
         },
         {
@@ -25945,7 +25969,7 @@
           "match": 0.422366
         },
         {
-          "name": "Obsk\u00fcr",
+          "name": "Obskür",
           "match": 0.420313
         },
         {
@@ -26082,7 +26106,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/d239501231d60980c6eb1ba64948289c/250x250-000000-80-0-0.jpg",
-      "bio": "PAWSA is a name that has consistently emerged from the burgeoning house and techno scene in recent times. The London-based producer kickstarted his remarkable rise with a bonafide EP on the renowned Lost Records in 2014. The appropriately named 'Pilot\u2019, put a marker down both on Beatport and in the ",
+      "bio": "PAWSA is a name that has consistently emerged from the burgeoning house and techno scene in recent times. The London-based producer kickstarted his remarkable rise with a bonafide EP on the renowned Lost Records in 2014. The appropriately named 'Pilot’, put a marker down both on Beatport and in the ",
       "top_tracks": [
         {
           "name": "Dirty Cash (Money Talks)",
@@ -26174,7 +26198,7 @@
           "match": 0.530586
         },
         {
-          "name": "AD\u00c9LA",
+          "name": "ADÉLA",
           "match": 0.521025
         },
         {
@@ -26286,7 +26310,7 @@
           "match": 0.251444
         },
         {
-          "name": "Beyonc\u00e9",
+          "name": "Beyoncé",
           "match": 0.25075
         },
         {
@@ -26563,7 +26587,7 @@
           "match": 0.395022
         },
         {
-          "name": "Obsk\u00fcr",
+          "name": "Obskür",
           "match": 0.393572
         },
         {
@@ -27134,7 +27158,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/fe33173e8b5277172e1787e420c8e626/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "i hate this tune \u00a0",
+          "name": "i hate this tune  ",
           "deezer_url": "https://www.deezer.com/track/3509397661",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/db5635a16270ecad28ed8fe87855b1f5/56x56-000000-80-0-0.jpg"
         },
@@ -27196,7 +27220,7 @@
           "match": 0.477915
         },
         {
-          "name": "M\u00c9NE",
+          "name": "MÉNE",
           "match": 0.468553
         },
         {
@@ -27204,7 +27228,7 @@
           "match": 0.441347
         },
         {
-          "name": "Cruz Cafun\u00e9",
+          "name": "Cruz Cafuné",
           "match": 0.431708
         },
         {
@@ -27256,7 +27280,7 @@
           "match": 0.256808
         },
         {
-          "name": "Depresi\u00f3n Sonora",
+          "name": "Depresión Sonora",
           "match": 0.256783
         },
         {
@@ -27264,7 +27288,7 @@
           "match": 0.244806
         },
         {
-          "name": "Bel\u00e9n Aguilera",
+          "name": "Belén Aguilera",
           "match": 0.244092
         },
         {
@@ -27284,7 +27308,7 @@
           "match": 0.207786
         },
         {
-          "name": "ROSAL\u00cdA",
+          "name": "ROSALÍA",
           "match": 0.195996
         },
         {
@@ -27304,7 +27328,7 @@
           "match": 0.14596
         },
         {
-          "name": "Cari\u00f1o",
+          "name": "Cariño",
           "match": 0.144522
         },
         {
@@ -27320,7 +27344,7 @@
           "match": 0.140186
         },
         {
-          "name": "ROSAL\u00cdA & Rauw Alejandro",
+          "name": "ROSALÍA & Rauw Alejandro",
           "match": 0.137412
         },
         {
@@ -27332,7 +27356,7 @@
           "match": 0.137079
         },
         {
-          "name": "Mar\u00eda Escarmiento",
+          "name": "María Escarmiento",
           "match": 0.129436
         },
         {
@@ -27395,12 +27419,12 @@
       ]
     },
     {
-      "name": "R\u00f6yksopp (DJ Set)",
+      "name": "Röyksopp (DJ Set)",
       "day": "Sunday",
       "weekend": "Both",
       "stage": "",
       "lastfm_artists": [
-        "R\u00f6yksopp"
+        "Röyksopp"
       ],
       "tags": [
         "electronic",
@@ -27433,7 +27457,7 @@
           "match": 0.824349
         },
         {
-          "name": "Trentem\u00f8ller",
+          "name": "Trentemøller",
           "match": 0.786603
         },
         {
@@ -27461,7 +27485,7 @@
           "match": 0.631099
         },
         {
-          "name": "Susanne Sundf\u00f8r",
+          "name": "Susanne Sundfør",
           "match": 0.627168
         },
         {
@@ -27469,7 +27493,7 @@
           "match": 0.626444
         },
         {
-          "name": "T\u00e9l\u00e9popmusik",
+          "name": "Télépopmusik",
           "match": 0.614348
         },
         {
@@ -27581,7 +27605,7 @@
           "match": 0.439944
         },
         {
-          "name": "Lindstr\u00f8m",
+          "name": "Lindstrøm",
           "match": 0.436594
         },
         {
@@ -27589,7 +27613,7 @@
           "match": 0.436233
         },
         {
-          "name": "S\u00e9bastien Tellier",
+          "name": "Sébastien Tellier",
           "match": 0.429617
         },
         {
@@ -27597,7 +27621,7 @@
           "match": 0.427493
         },
         {
-          "name": "R\u00f3is\u00edn Murphy",
+          "name": "Róisín Murphy",
           "match": 0.423825
         },
         {
@@ -27614,7 +27638,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/41923b4d4a4a58dbb316eb335b6c6cb0/250x250-000000-80-0-0.jpg",
-      "bio": "R\u00f6yksopp is a Norwegian electronic music duo formed in 1998 in Troms\u00f8 and currently based in Bergen. The band consists of Torbj\u00f8rn Brundtland and Svein Berge, both being songwriters, producers and remixers. They usually rely on the use of other vocalists for their songs and occasionally they perform",
+      "bio": "Röyksopp is a Norwegian electronic music duo formed in 1998 in Tromsø and currently based in Bergen. The band consists of Torbjørn Brundtland and Svein Berge, both being songwriters, producers and remixers. They usually rely on the use of other vocalists for their songs and occasionally they perform",
       "top_tracks": [
         {
           "name": "EVERYWHERE I GO (REMIND ME)",
@@ -27644,12 +27668,12 @@
       ]
     },
     {
-      "name": "R\u00d8Z",
+      "name": "RØZ",
       "day": "Sunday",
       "weekend": "Both",
       "stage": "",
       "lastfm_artists": [
-        "R\u00d8Z"
+        "RØZ"
       ],
       "tags": [
         "electronic",
@@ -27670,7 +27694,7 @@
           "match": 0.826888
         },
         {
-          "name": "Jack \u00dc",
+          "name": "Jack Ü",
           "match": 0.66601
         },
         {
@@ -27810,7 +27834,7 @@
           "match": 0.272261
         },
         {
-          "name": "cass\u00f6",
+          "name": "cassö",
           "match": 0.262684
         },
         {
@@ -27931,7 +27955,7 @@
           "match": 0.705288
         },
         {
-          "name": "Rene\u00e9 Rapp",
+          "name": "Reneé Rapp",
           "match": 0.589045
         },
         {
@@ -28087,7 +28111,7 @@
           "match": 0.210666
         },
         {
-          "name": "AD\u00c9LA",
+          "name": "ADÉLA",
           "match": 0.208704
         },
         {
@@ -28216,7 +28240,7 @@
           "match": 0.415933
         },
         {
-          "name": "Andr\u00e9 Sobota",
+          "name": "André Sobota",
           "match": 0.412578
         },
         {
@@ -28252,7 +28276,7 @@
           "match": 0.30655
         },
         {
-          "name": "INV\u014cKER",
+          "name": "INVŌKER",
           "match": 0.306437
         },
         {
@@ -28340,7 +28364,7 @@
           "match": 0.163205
         },
         {
-          "name": "Andr\u00e9 Moret",
+          "name": "André Moret",
           "match": 0.162881
         },
         {
@@ -28361,7 +28385,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/3ca6998cf4786d132b9b4dc08ccfb30b/250x250-000000-80-0-0.jpg",
-      "bio": "Growing up in his native Israel, Sahar began playing the piano at a very young age, cementing a foundation which was to launch his passion for music.\nInfluenced by Pink Floyd, The Art of Noise, and other 80\u2019s music Sahar began spinning records and began his DJ career at the \"Pythagoras\" club in Jeru",
+      "bio": "Growing up in his native Israel, Sahar began playing the piano at a very young age, cementing a foundation which was to launch his passion for music.\nInfluenced by Pink Floyd, The Art of Noise, and other 80’s music Sahar began spinning records and began his DJ career at the \"Pythagoras\" club in Jeru",
       "top_tracks": [
         {
           "name": "They Made Me Do It (Radio Edit)",
@@ -28610,7 +28634,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/fb8e23717c2f2bf7fb0e1e64aac7dfd5/250x250-000000-80-0-0.jpg",
-      "bio": "Samia is American singer-songwriter Samia Finnerty (born Samia Najimy Finnerty in Los Angeles on 12 December 1996). Based in New York City, she is the daughter of actress Kathy Najimy, and musician Dan Finnerty of the Dan Band. Performing since she was seventeen around New York, Samia\u2019s musical repe",
+      "bio": "Samia is American singer-songwriter Samia Finnerty (born Samia Najimy Finnerty in Los Angeles on 12 December 1996). Based in New York City, she is the daughter of actress Kathy Najimy, and musician Dan Finnerty of the Dan Band. Performing since she was seventeen around New York, Samia’s musical repe",
       "top_tracks": [
         {
           "name": "Pool (Stripped)",
@@ -28710,7 +28734,7 @@
           "match": 0.599032
         },
         {
-          "name": "Shl\u00f8mo",
+          "name": "Shlømo",
           "match": 0.585498
         },
         {
@@ -28726,7 +28750,7 @@
           "match": 0.566001
         },
         {
-          "name": "APH\u00d8TIC",
+          "name": "APHØTIC",
           "match": 0.525581
         },
         {
@@ -28850,11 +28874,11 @@
           "match": 0.230884
         },
         {
-          "name": "\u2727BRAINDAAMAGE\u2727",
+          "name": "✧BRAINDAAMAGE✧",
           "match": 0.219812
         },
         {
-          "name": "David L\u00f6hlein",
+          "name": "David Löhlein",
           "match": 0.189938
         }
       ],
@@ -29088,7 +29112,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/5b4a7d84536a2f0edde7eca15469057d/250x250-000000-80-0-0.jpg",
-      "bio": "Janae Nierah Wherry (born April 15, 1998), known professionally as Sexyy Red, is an American rapper. She gained wider recognition following the release of her 2023 single \"Pound Town,\" produced by Tay Keith. The song\u2019s popularity led to the release of a remix titled \"Pound Town 2,\" featuring Nicki M",
+      "bio": "Janae Nierah Wherry (born April 15, 1998), known professionally as Sexyy Red, is an American rapper. She gained wider recognition following the release of her 2023 single \"Pound Town,\" produced by Tay Keith. The song’s popularity led to the release of a remix titled \"Pound Town 2,\" featuring Nicki M",
       "top_tracks": [
         {
           "name": "Sticky (feat. GloRilla, Sexyy Red & Lil Wayne)",
@@ -29164,7 +29188,7 @@
           "match": 0.536028
         },
         {
-          "name": "AD\u00c9LA",
+          "name": "ADÉLA",
           "match": 0.530422
         },
         {
@@ -29413,7 +29437,7 @@
           "match": 0.648752
         },
         {
-          "name": "K\u00f6lsch",
+          "name": "Kölsch",
           "match": 0.611872
         },
         {
@@ -29477,7 +29501,7 @@
           "match": 0.486008
         },
         {
-          "name": "Ben B\u00f6hmer",
+          "name": "Ben Böhmer",
           "match": 0.472359
         },
         {
@@ -29907,7 +29931,7 @@
           "match": 0.631228
         },
         {
-          "name": "Ti\u00ebsto",
+          "name": "Tiësto",
           "match": 0.606278
         },
         {
@@ -30453,7 +30477,7 @@
           "match": 0.434308
         },
         {
-          "name": "Ratos De Por\u00e3o",
+          "name": "Ratos De Porão",
           "match": 0.428944
         },
         {
@@ -30871,7 +30895,7 @@
       "tags": [
         "k-pop",
         "korean",
-        "\ud0dc\ubbfc",
+        "태민",
         "pop",
         "kpop"
       ],
@@ -30887,7 +30911,7 @@
           "match": 0.82468
         },
         {
-          "name": "\uc628\uc720",
+          "name": "온유",
           "match": 0.823148
         },
         {
@@ -30923,7 +30947,7 @@
           "match": 0.276665
         },
         {
-          "name": "\u6771\u65b9\u795e\u8d77",
+          "name": "東方神起",
           "match": 0.268993
         },
         {
@@ -30995,7 +31019,7 @@
           "match": 0.204076
         },
         {
-          "name": "\uc218\ud638",
+          "name": "수호",
           "match": 0.202997
         },
         {
@@ -31071,7 +31095,7 @@
           "match": 0.163658
         },
         {
-          "name": "\ud0dc\uc5f0",
+          "name": "태연",
           "match": 0.163128
         },
         {
@@ -31080,7 +31104,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/3537db999f0e7051fbc471d7e455d8ee/250x250-000000-80-0-0.jpg",
-      "bio": "Lee Tae-min (Korean: \uc774\ud0dc\ubbfc; born July 18, 1993), known mononymously as Taemin (\ud0dc\ubbfc) is a South Korean singer and actor. He is a member of the South Korean boy group SHINee, dance-centered group S.M. The Performance, and super-group SuperM.\n\nTaemin was discovered at the 2005 S.M. Open Weekend Audition C",
+      "bio": "Lee Tae-min (Korean: 이태민; born July 18, 1993), known mononymously as Taemin (태민) is a South Korean singer and actor. He is a member of the South Korean boy group SHINee, dance-centered group S.M. The Performance, and super-group SuperM.\n\nTaemin was discovered at the 2005 S.M. Open Weekend Audition C",
       "top_tracks": [
         {
           "name": "Heaven",
@@ -31216,7 +31240,7 @@
           "match": 0.314813
         },
         {
-          "name": "Emeli Sand\u00e9",
+          "name": "Emeli Sandé",
           "match": 0.306618
         },
         {
@@ -31329,7 +31353,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/a982bedff1b6fb87ae114b728e250e56/250x250-000000-80-0-0.jpg",
-      "bio": "Jaten Dimsdale, known by his moniker, Teddy Swims, is an American Singer-songwriter from Atlanta, GA.\n\nTeddy grew up navigating different worlds: he was a football player, a musical theater student and the grandson of a Pentecostal pastor. Teddy was exposed to a wider variety of music than most \u201ccou",
+      "bio": "Jaten Dimsdale, known by his moniker, Teddy Swims, is an American Singer-songwriter from Atlanta, GA.\n\nTeddy grew up navigating different worlds: he was a football player, a musical theater student and the grandson of a Pentecostal pastor. Teddy was exposed to a wider variety of music than most “cou",
       "top_tracks": [
         {
           "name": "Lose Control",
@@ -31557,7 +31581,7 @@
           "match": 0.230584
         },
         {
-          "name": "Sn\u00f5\u00f5per",
+          "name": "Snõõper",
           "match": 0.228575
         },
         {
@@ -32132,7 +32156,7 @@
           "match": 0.816486
         },
         {
-          "name": "The Mar\u00edas",
+          "name": "The Marías",
           "match": 0.727294
         },
         {
@@ -32188,7 +32212,7 @@
           "match": 0.361664
         },
         {
-          "name": "Eyedress, The Mar\u00edas",
+          "name": "Eyedress, The Marías",
           "match": 0.36152
         },
         {
@@ -32256,7 +32280,7 @@
           "match": 0.25063
         },
         {
-          "name": "Selena Gomez, benny blanco, The Mar\u00edas",
+          "name": "Selena Gomez, benny blanco, The Marías",
           "match": 0.242856
         },
         {
@@ -32268,7 +32292,7 @@
           "match": 0.240491
         },
         {
-          "name": "Cuco, The Mar\u00edas",
+          "name": "Cuco, The Marías",
           "match": 0.235915
         },
         {
@@ -32276,7 +32300,7 @@
           "match": 0.234742
         },
         {
-          "name": "Bad Bunny, The Mar\u00edas",
+          "name": "Bad Bunny, The Marías",
           "match": 0.232289
         },
         {
@@ -32325,10 +32349,10 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/deeaaf340dfadd98e0eb86736b5da92f/250x250-000000-80-0-0.jpg",
-      "bio": "The Two Lips are an LA-based Latina/Filipina indie dream pop duo formed by best friends, Jewlz & Andrea. They formed in the Fall of 2023 and have been making music and performing ever since. Truly encompassing the term, \u201cbedroom dream pop\u201d, the duo create all their music in the comfort of their room",
+      "bio": "The Two Lips are an LA-based Latina/Filipina indie dream pop duo formed by best friends, Jewlz & Andrea. They formed in the Fall of 2023 and have been making music and performing ever since. Truly encompassing the term, “bedroom dream pop”, the duo create all their music in the comfort of their room",
       "top_tracks": [
         {
-          "name": "still love you (todav\u00eda)",
+          "name": "still love you (todavía)",
           "deezer_url": "https://www.deezer.com/track/3455996611",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/4994e8854fd1940cdfcda45a0e09e57d/56x56-000000-80-0-0.jpg"
         },
@@ -32654,7 +32678,7 @@
           "match": 0.451957
         },
         {
-          "name": "R\u00f3is\u00edn Murphy",
+          "name": "Róisín Murphy",
           "match": 0.431653
         },
         {
@@ -32718,7 +32742,7 @@
           "match": 0.258618
         },
         {
-          "name": "L\u00e9onie Pernet",
+          "name": "Léonie Pernet",
           "match": 0.241902
         },
         {
@@ -32958,7 +32982,7 @@
           "match": 0.279857
         },
         {
-          "name": "Touch\u00e9 Amor\u00e9",
+          "name": "Touché Amoré",
           "match": 0.279129
         },
         {
@@ -33383,7 +33407,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/8a22859ecaf89fcb363298f165377b83/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "C\u2019est Comme \u00c7a (Re: Wet Leg)",
+          "name": "C’est Comme Ça (Re: Wet Leg)",
           "deezer_url": "https://www.deezer.com/track/2471250071",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/18f9c013a3ffb6db4e58e10826aa812d/56x56-000000-80-0-0.jpg"
         }
@@ -33444,7 +33468,7 @@
           "match": 0.343249
         },
         {
-          "name": "Amin\u00e9",
+          "name": "Aminé",
           "match": 0.332828
         },
         {
@@ -33657,7 +33681,7 @@
       "genre": "Electronic",
       "similar_artists": [
         {
-          "name": "Kasper Bj\u00f8rke",
+          "name": "Kasper Bjørke",
           "match": 1.0
         },
         {
@@ -33693,7 +33717,7 @@
           "match": 0.568408
         },
         {
-          "name": "Trentem\u00f8ller",
+          "name": "Trentemøller",
           "match": 0.566537
         },
         {
@@ -33713,7 +33737,7 @@
           "match": 0.491406
         },
         {
-          "name": "R\u00dcF\u00dcS",
+          "name": "RÜFÜS",
           "match": 0.470113
         },
         {
@@ -33785,7 +33809,7 @@
           "match": 0.345351
         },
         {
-          "name": "R\u00f6yksopp",
+          "name": "Röyksopp",
           "match": 0.34377
         },
         {
@@ -33866,7 +33890,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/a4f50f53b106e837c1f4cbaad23df2a5/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Miracle - R\u00dcF\u00dcS DU SOL Remix",
+          "name": "Miracle - RÜFÜS DU SOL Remix",
           "deezer_url": "https://www.deezer.com/track/2492716331",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/bf158adc0ecbc7146516e211c56d52f3/56x56-000000-80-0-0.jpg"
         },
@@ -34306,7 +34330,7 @@
           "match": 0.365275
         },
         {
-          "name": "Cl\u00fcb De Combat",
+          "name": "Clüb De Combat",
           "match": 0.359181
         },
         {
@@ -34501,7 +34525,7 @@
           "match": 0.742713
         },
         {
-          "name": "\uc5d0\uc77c\ub9ac",
+          "name": "에일리",
           "match": 0.722579
         },
         {
@@ -34581,7 +34605,7 @@
           "match": 0.601812
         },
         {
-          "name": "\ud0dc\uc5f0",
+          "name": "태연",
           "match": 0.600181
         },
         {
@@ -34593,7 +34617,7 @@
           "match": 0.581374
         },
         {
-          "name": "\uc5ec\uc790\uce5c\uad6c",
+          "name": "여자친구",
           "match": 0.568797
         },
         {
@@ -34645,7 +34669,7 @@
           "match": 0.512812
         },
         {
-          "name": "\uc545\ub3d9\ubba4\uc9c0\uc158",
+          "name": "악동뮤지션",
           "match": 0.512112
         },
         {
@@ -34878,7 +34902,7 @@
           "match": 0.260519
         },
         {
-          "name": "Pi\u2019erre Bourne",
+          "name": "Pi’erre Bourne",
           "match": 0.259343
         },
         {
@@ -35104,7 +35128,7 @@
           "match": 0.263443
         },
         {
-          "name": "Obsk\u00fcr",
+          "name": "Obskür",
           "match": 0.254907
         },
         {
@@ -35128,7 +35152,7 @@
           "match": 0.240958
         },
         {
-          "name": "Barry Can\u2019t Swim",
+          "name": "Barry Can’t Swim",
           "match": 0.22534
         },
         {
@@ -35169,7 +35193,7 @@
           "album_art": "https://cdn-images.dzcdn.net/images/cover/92129fa52f869196b9bebb865b1d46a8/56x56-000000-80-0-0.jpg"
         },
         {
-          "name": "Campe\u00f3n",
+          "name": "Campeón",
           "deezer_url": "https://www.deezer.com/track/3419819791",
           "album_art": "https://cdn-images.dzcdn.net/images/cover/be38b1fbdc55c10ccd331af51ef5724f/56x56-000000-80-0-0.jpg"
         },
@@ -35181,12 +35205,12 @@
       ]
     },
     {
-      "name": "\u00a5\u00d8U$UK\u20ac \u00a5UK1MAT$U",
+      "name": "¥ØU$UK€ ¥UK1MAT$U",
       "day": "Saturday",
       "weekend": "Both",
       "stage": "",
       "lastfm_artists": [
-        "\u00a5\u00d8U$UK\u20ac \u00a5UK1MAT$U"
+        "¥ØU$UK€ ¥UK1MAT$U"
       ],
       "tags": [
         "japanese",
@@ -35198,7 +35222,7 @@
       "genre": "Unknown",
       "similar_artists": [
         {
-          "name": "\u7db2\u5b88\u5c06\u5e73",
+          "name": "網守将平",
           "match": 1.0
         },
         {
@@ -35206,7 +35230,7 @@
           "match": 0.427407
         },
         {
-          "name": "Luiz Bonf\u00e1 / Don Burrows",
+          "name": "Luiz Bonfá / Don Burrows",
           "match": 0.243716
         },
         {
@@ -35222,7 +35246,7 @@
           "match": 0.165035
         },
         {
-          "name": "Minna-no-kimochi (\u307f\u3093\u306a\u306e\u304d\u3082\u3061)",
+          "name": "Minna-no-kimochi (みんなのきもち)",
           "match": 0.14497
         },
         {
@@ -35230,7 +35254,7 @@
           "match": 0.140549
         },
         {
-          "name": "\u307f\u3093\u306a\u306e\u304d\u3082\u3061",
+          "name": "みんなのきもち",
           "match": 0.14024
         },
         {
@@ -35326,11 +35350,11 @@
           "match": 0.087696
         },
         {
-          "name": "\u30d1\u30a4\u30f3",
+          "name": "パイン",
           "match": 0.087696
         },
         {
-          "name": "\u879f\u4e0a?\u90a8\u3085\uff4f\u7e67",
+          "name": "螟上?邨ゅｏ繧",
           "match": 0.087696
         },
         {
@@ -35350,11 +35374,11 @@
           "match": 0.087696
         },
         {
-          "name": "\u30e8\u30a2\u30bd\u30d3",
+          "name": "ヨアソビ",
           "match": 0.087696
         },
         {
-          "name": "\u7532\u7530\u307e\u3072\u308b",
+          "name": "甲田まひる",
           "match": 0.087696
         },
         {
@@ -35362,7 +35386,7 @@
           "match": 0.087696
         },
         {
-          "name": "\u30b6\u30fb\u30a6\u30a3\u30fc\u30ba",
+          "name": "ザ・ウィーズ",
           "match": 0.087696
         },
         {
@@ -35390,7 +35414,7 @@
           "match": 0.087696
         },
         {
-          "name": "\u5929\u9053\u82b1\u6190(CV.\u91d1\u5143\u5bff\u5b50)&\u661f\u30ce\u5b88\u5343\u79cb(CV.\u77f3\u898b\u821e\u83dc\u9999)&\u4e9c\u7396\u7483(CV.\u5927\u4e45\u4fdd\u7460\u7f8e)",
+          "name": "天道花憐(CV.金元寿子)&星ノ守千秋(CV.石見舞菜香)&亜玖璃(CV.大久保瑠美)",
           "match": 0.087696
         },
         {
@@ -35399,7 +35423,7 @@
         }
       ],
       "image_url": "https://cdn-images.dzcdn.net/images/artist/3e4b8ac499234eb020ead8b72e18c2f0/250x250-000000-80-0-0.jpg",
-      "bio": "\u00a5\u00d8U$UK\u20ac \u00a5UK1MAT$U  (\u884c\u677e\u967d\u4ecb) is a Japanese DJ and producer known for his genre-blending, technically complex sets that seamlessly weave together diverse styles like techno, gabber, ambient, and noise. Hailing from Osaka and now based in Tokyo, he gained a significant following through his performances ",
+      "bio": "¥ØU$UK€ ¥UK1MAT$U  (行松陽介) is a Japanese DJ and producer known for his genre-blending, technically complex sets that seamlessly weave together diverse styles like techno, gabber, ambient, and noise. Hailing from Osaka and now based in Tokyo, he gained a significant following through his performances ",
       "top_tracks": [
         {
           "name": "CARNIVAL",

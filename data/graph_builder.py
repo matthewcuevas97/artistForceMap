@@ -71,64 +71,7 @@ def build_edges(nodes, threshold=0.1):
 
 
 def build_genre_edges(nodes):
-    # Group by genre
-    genre_groups = defaultdict(list)
-    for node in nodes:
-        genre = node.get("genre", "Unknown")
-        if genre != "Unknown":
-            genre_groups[genre].append(node)
-
-    seen = set()
-    edges = []
-
-    for genre, group in genre_groups.items():
-        sorted_group = sorted(group, key=lambda n: n.get("listeners", 0), reverse=True)
-
-        # Small genre: fully connect every pair
-        if len(sorted_group) <= 3:
-            for i, a in enumerate(sorted_group):
-                for b in sorted_group[i + 1:]:
-                    key = tuple(sorted([a["name"], b["name"]]))
-                    if key not in seen:
-                        seen.add(key)
-                        edges.append({
-                            "source": a["name"],
-                            "target": b["name"],
-                            "weight": 0.15,
-                            "type": "genre",
-                        })
-            continue
-
-        anchor_names = [n["name"] for n in sorted_group[:3]]
-
-        for node in sorted_group:
-            if node["name"] in anchor_names:
-                continue
-            for anchor_name in anchor_names[:2]:
-                key = tuple(sorted([node["name"], anchor_name]))
-                if key not in seen:
-                    seen.add(key)
-                    edges.append({
-                        "source": node["name"],
-                        "target": anchor_name,
-                        "weight": 0.15,
-                        "type": "genre",
-                    })
-
-        # Fully connect the 3 anchors to each other
-        for i, a in enumerate(anchor_names):
-            for b in anchor_names[i + 1:]:
-                key = tuple(sorted([a, b]))
-                if key not in seen:
-                    seen.add(key)
-                    edges.append({
-                        "source": a,
-                        "target": b,
-                        "weight": 0.15,
-                        "type": "genre",
-                    })
-
-    return edges
+    return []
 
 
 def normalize_listeners(nodes, scores):
