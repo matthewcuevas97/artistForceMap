@@ -33,6 +33,26 @@ def get_similar_artists(artist_name, limit=50, threshold=0.1):
     ]
 
 
+def get_artist_top_tags(artist_name, limit=100):
+    """Returns a list of tag name strings."""
+    params = {
+        "method": "artist.getTopTags",
+        "artist": artist_name,
+        "limit": limit,
+        "api_key": API_KEY,
+        "format": "json",
+    }
+    try:
+        response = requests.get(BASE_URL, params=params, timeout=10)
+        data = response.json()
+        if "error" in data:
+            return []
+        tags = data.get("toptags", {}).get("tag", [])
+        return [t["name"].lower() for t in tags]
+    except Exception:
+        return []
+
+
 def get_artist_info(artist_name):
     params = {
         "method": "artist.getInfo",
@@ -48,11 +68,9 @@ def get_artist_info(artist_name):
 
     artist = data.get("artist", {})
     listeners = int(artist.get("stats", {}).get("listeners", 0))
-    tags = [t["name"].lower() for t in artist.get("tags", {}).get("tag", [])[:5]]
     return {
         "name": artist.get("name", artist_name),
         "listeners": listeners,
-        "tags": tags,
     }
 
 
