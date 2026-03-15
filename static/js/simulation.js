@@ -299,7 +299,7 @@ export function buildGraph(onNodeClick, onBgClick) {
   gNodes.selectAll("*").remove();
   gLabels.selectAll("*").remove();
 
-  const keptSet  = trimEdges(S.rawNodes, S.rawEdges, 6);
+  const keptSet  = trimEdges(S.rawNodes, S.rawEdges, 3);
   const newNodes = S.rawNodes.map(d => ({ ...d }));
   const newEdges = S.rawEdges
     .filter(e => keptSet.has(e))
@@ -309,20 +309,20 @@ export function buildGraph(onNodeClick, onBgClick) {
   S.setSimEdges(newEdges);
 
   simulation = d3.forceSimulation(newNodes)
-    .force("link",    d3.forceLink(newEdges).id(d => d.name).strength(e => e.weight * 0.3))
-    .force("charge",  d3.forceManyBody().strength(-300))
+    .force("link",    d3.forceLink(newEdges).id(d => d.name).strength(e => e.weight * 0.7))
+    .force("charge",  d3.forceManyBody().strength(-800))
     .force("center",  d3.forceCenter(S.W / 2, S.H / 2))
     .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 2))
-    .force("x",       d3.forceX(S.W / 2).strength(0.05))
-    .force("y",       d3.forceY(S.H / 2).strength(0.05))
+    .force("x",       d3.forceX(S.W / 2).strength(0.15))
+    .force("y",       d3.forceY(S.H / 2).strength(0.3))
     .stop();
 
-  for (let i = 0; i < 300; ++i) simulation.tick();
+  for (let i = 0; i < 3000; ++i) simulation.tick();
 
   edgeEl = gEdges.selectAll("line")
     .data(newEdges).enter().append("line")
     .attr("stroke",       "#ffffff")
-    .attr("stroke-width", e => (0.5 + e.weight * 2).toFixed(2))
+    .attr("stroke-width", e => (2 + e.weight * 2).toFixed(2))
     .attr("opacity",      e => edgeBaseOpacity(e));
 
   nodeEl = gNodes.selectAll("circle")

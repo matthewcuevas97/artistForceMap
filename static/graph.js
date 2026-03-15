@@ -186,7 +186,7 @@ function buildTopEdgeSet(edges) {
   const topSet = new Set();
   for (const list of Object.values(byNode)) {
     list.sort((a, b) => b.weight - a.weight);
-    list.slice(0, 8).forEach(e => topSet.add(e));
+    list.slice(0, 3).forEach(e => topSet.add(e));
   }
   return topSet;
 }
@@ -872,7 +872,7 @@ async function openPanel(artistName) {
 const drag = d3.drag()
   .on("start", (event, d) => {
     dragMoved = false;
-    if (!event.active) simulation.alphaTarget(0.3).restart();
+    if (!event.active) simulation.alphaTarget(.3).restart();
     d.fx = d.x;
     d.fy = d.y;
   })

@@ -1,9 +1,18 @@
 # Code Review: artistForceMap
 
-**Date**: 2026-03-07
-**Reviewer**: Claude Opus 4.6
-**Commit**: `cdf4bcd` (main)
+**Date**: 2026-03-14 (updated)
+**Latest Review**: 2026-03-07 (Claude Opus 4.6)
+**Current Branch**: `feature/bfs-similarity` (`743308a`)
 **Scope**: Full codebase — backend (Python/Flask), frontend (D3.js), data pipeline, configuration
+
+## Summary of Latest Changes (2026-03-14)
+
+On branch `feature/bfs-similarity`, the following changes have been made:
+1. **Edge filtering**: Reduced from 8 to 3 edges per node (performance + clarity)
+2. **Force simulation tuning**: Increased repulsion (-800), link strength (0.7), centering forces
+3. **Pre-ticking**: Increased from 300 to 3000 iterations (more stable layout, longer UI freeze)
+4. **UI/UX**: Mutual exclusivity between control panels, modular frontend prep
+5. **Status**: Checkpoint reached; BFS expansion not yet implemented
 
 ---
 
@@ -296,6 +305,7 @@ Dependencies are unpinned. This means builds are not reproducible — a future `
 |----------|-------|----------|
 | CRITICAL | API secrets may be in git history | `.env`, `.cache` |
 | CRITICAL | `build_edges` typo crashes offline pipeline | `data/graph_builder.py:52` |
+| HIGH | UI freeze (3000 pre-ticks = 500-1000ms block) | `static/js/simulation.js:321` |
 | HIGH | No token refresh for Spotify | `app.py` |
 | HIGH | Weak default Flask secret key | `app.py:16` |
 | HIGH | No tests | project-wide |
@@ -308,3 +318,61 @@ Dependencies are unpinned. This means builds are not reproducible — a future `
 | LOW | No rate limiting on Deezer calls | `app.py:27-52` |
 | LOW | Monolithic 1560-line JS file | `static/graph.js` |
 | LOW | All CSS inline in HTML | `templates/index.html` |
+
+---
+
+## 6. Next Steps & Recommendations
+
+### Immediate (Before Merge)
+
+1. **Reduce pre-ticking iterations or async them**: 3000 iterations causes a 500-1000ms UI freeze. Options:
+   - Reduce back to 300-500 and allow live settling
+   - Move to Web Worker to avoid blocking main thread
+   - Progressive rendering (start with partial ticks, re-render as more ticks complete)
+
+2. **Test graph stability with 3-edge limit**: With only 3 edges per node, verify that:
+   - Key community clusters are still visible
+   - Discovery mode doesn't miss important connections
+   - The layout isn't too spread out / too dense
+
+3. **Profile force parameters**: The new force values (0.7 link strength, -800 charge) may need tuning for the 3-edge limit. Visual feedback from users would be valuable.
+
+### Short-term (Next Development Cycle)
+
+1. **Implement BFS similarity expansion** (original goal of the branch):
+   - On node click, fetch 1-hop neighborhood from backend (similar artists)
+   - Add new nodes to graph dynamically with caching
+   - Animate nodes entering the visualization
+
+2. **Fix `build_edges` typo** and verify offline pipeline works (`data/graph_builder.py:52`)
+
+3. **Implement Spotify token refresh** (`app.py`)
+
+4. **Add loading UI** during graph fetch and node expansion (currently no user feedback)
+
+### Medium-term (Quality & Scalability)
+
+1. **Reduce initial load time**:
+   - Consider async pre-ticking (Web Worker or chunked rendering)
+   - Add loading indicator while graph settles
+
+2. **Fix XSS in panel rendering** (use `textContent` or DOM sanitization)
+
+3. **Optimize scoring loop** (pre-normalize names, O(1) lookups)
+
+4. **Pin dependencies** (`pip freeze > requirements.txt`)
+
+5. **Add tests** (at minimum: scoring logic, edge building, auth flows)
+
+---
+
+## 7. Architecture Notes
+
+The recent changes (edges 8→3, pre-ticks 300→3000) suggest an exploratory optimization phase. The goal appears to be:
+- **Visual clarity**: Fewer edges reduce visual noise
+- **Layout stability**: More ticks before rendering produces a more settled graph
+- **Possible trade-off**: Weaker connection visibility and longer startup time
+
+The **modular frontend rewrite** and **mutual panel exclusivity** indicate preparation for more complex UX (likely the planned BFS expansion feature). This is good architectural hygiene — separating concerns before adding more behavior.
+
+**Recommendation**: Before merging to main, decide if this edge-reduction + pre-ticking change is intentional (final) or experimental. If experimental, consider a feature flag to let users switch between the two modes, or revert to 8 edges and lower pre-ticking with a plan to fix the freeze via Web Worker.

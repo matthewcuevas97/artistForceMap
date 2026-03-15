@@ -1,8 +1,8 @@
 # Design Document: artistForceMap
 
-**Version**: 1.0
-**Date**: 2026-03-07
-**Status**: Pre-deployment (local development only)
+**Version**: 1.1
+**Date**: 2026-03-14
+**Status**: Pre-deployment (local development only; BFS similarity expansion in progress)
 
 ---
 
@@ -394,7 +394,45 @@ The data pipeline (`scripts/precompute.py` + `scripts/build_slim.py`) is designe
 
 ---
 
-## 9. Known Limitations
+## 9. Recent Changes (2026-03-14)
+
+### 9.1 BFS Similarity Graph Expansion with Caching
+
+**Branch**: `feature/bfs-similarity`
+**Commits**:
+- `743308a` feat: add BFS similarity graph expansion with caching
+- `bc0a063` checkpoint: clean frontend before bfs experiment
+- `d27bf41` feat: mutual exclusivity between controls, playlist, and artist bio panels
+- `6d889f9` feat: modular frontend rewrite with edge trimming and selection boost
+
+**Changes**:
+1. **Edge filtering optimization** (`static/graph.js`, `static/js/simulation.js`):
+   - Reduced top-N edges per node from 8 to 3 (reduces visual clutter, improves performance)
+   - Updated edge stroke width calculation for better visual clarity
+   - Changes affect graph layout significantly — fewer connections force nodes to spread
+
+2. **Force simulation tuning** (`static/js/simulation.js`):
+   - Link force strength: 0.3 → 0.7 (stronger attraction to connected neighbors)
+   - Charge force: -300 → -800 (stronger repulsion, prevents node overlap)
+   - X/Y centering forces: 0.05 → 0.15/0.3 (stronger gravitation toward viewport center)
+   - Pre-ticking iterations: 300 → 3000 (more stable initial layout, higher UI freeze time)
+
+3. **UI improvements**:
+   - Mutual exclusivity between controls, playlist, and artist bio panels (improved mobile UX)
+   - Modular frontend structure (preparation for BFS expansion)
+   - Selection boost for highlighted nodes
+
+**Impact**: The graph now renders fewer edges but with stronger repulsion and attraction forces. Initial layout takes longer to compute (3000 ticks ~500-1000ms vs 300 ticks ~50-100ms) but is more stable. The reduced edge count may impact discovery of weak connections between artists.
+
+### 9.2 Remaining BFS Features (Not Yet Implemented)
+
+- **BFS neighbor expansion**: When clicking a node, fetch similar artists from the backend and add them to the graph dynamically
+- **Caching layer**: Backend cache for expanded neighborhoods (avoid redundant API calls)
+- **Progressive UI**: Loading spinner during BFS expansion
+
+---
+
+## 10. Known Limitations
 
 1. **No token refresh**: Spotify sessions expire after 1 hour with no auto-refresh
 2. **No offline/PWA support**: Requires network for all API calls and CDN assets
@@ -405,10 +443,11 @@ The data pipeline (`scripts/precompute.py` + `scripts/build_slim.py`) is designe
 7. **Deezer preview expiry**: Preview URLs from Deezer expire, which is why they're fetched live on panel open rather than cached
 8. **142-node limit**: The graph is designed for a festival-sized dataset (~100-200 artists). Performance characteristics would change significantly at 1000+ nodes
 9. **`build_edges` bug**: The offline edge builder has a typo (`for nodes in nodes`) that prevents re-running the data pipeline
+10. **UI freeze on initial load**: 3000 pre-ticking iterations block the main thread for 500-1000ms on graph rebuild
 
 ---
 
-## 10. File Inventory
+## 11. File Inventory
 
 ```
 artistForceMap/
