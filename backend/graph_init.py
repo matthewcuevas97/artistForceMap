@@ -1,12 +1,45 @@
 """
 Graph initialization: fetch full metadata for seed artists and build initial graph.
+Uses cache for similar artists and artist metadata.
 """
 
 import time
 from typing import Dict, List, Any, Tuple
 
 from lastfm.fetch import get_similar_artists, get_top_tracks
+from backend.cache import (
+    get_cached_artist, set_cached_artist,
+    get_cached_similar_artists, set_cached_similar_artists,
+    get_cached_deezer_info, set_cached_deezer_info
+)
 from backend.user_data import load_user_db, load_user_map, save_user_map, update_user_db
+
+
+def _derive_genre(tags: List[str]) -> str:
+    """
+    Map Last.fm tags to readable genre names matching GENRE_HUE keys.
+    """
+    tag_lower = [t.lower() for t in tags]
+
+    # Map common Last.fm tags to genre buckets
+    genre_map = {
+        "Electronic": ["electronic", "house", "techno", "edm", "synth", "ambient", "synthpop"],
+        "Indie/Alt": ["indie", "alternative", "indie rock", "alternative rock", "indie pop"],
+        "Hip-Hop": ["hip-hop", "hip hop", "rap", "hip-hop/rap"],
+        "R&B/Soul": ["r&b", "r and b", "soul", "rnb"],
+        "Pop": ["pop", "poppy"],
+        "Punk/Metal": ["metal", "punk", "hard rock", "rock metal"],
+        "Latin/Afro": ["latin", "reggaeton", "afrobeats", "spanish", "afro"],
+        "Singer-Songwriter/Jazz": ["singer-songwriter", "jazz", "folk", "acoustic"],
+    }
+
+    # Check for matches in order of genre buckets
+    for genre, keywords in genre_map.items():
+        if any(kw in tag_lower for kw in keywords):
+            return genre
+
+    # Default if no matches
+    return "Unknown"
 
 
 def fetch_deezer_artist_info(artist_name: str) -> Dict[str, Any]:
@@ -64,35 +97,80 @@ def fetch_deezer_artist_info(artist_name: str) -> Dict[str, Any]:
         return {"error": str(e)}
 
 
-def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict) -> Dict[str, Any]:
+def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict, idx: int = 0, total: int = 0) -> Dict[str, Any]:
     """
     Fetch complete metadata for a seed artist.
-    Combines Last.fm and Deezer data.
+    Combines Last.fm and Deezer data. Normalizes node schema with all required fields.
+    Uses cache for similar artists to avoid redundant API calls.
     """
-    print(f"  Fetching metadata for {artist_name}...", end=" ", flush=True)
+    # Get similar artists from Last.fm with progress message
+    frames = ["-", "\\", "|", "/"]
+    frame_idx = idx % len(frames)
+    frame = frames[frame_idx]
 
-    # Get similar artists from Last.fm
-    similar = get_similar_artists(artist_name, limit=20, threshold=0.05)
-    time.sleep(0.15)
+    # Check if similar artists are cached (90-day TTL)
+    similar = get_cached_similar_artists(artist_name)
+    was_cached_similar = similar is not None
 
-    # Get Deezer data
-    deezer_info = fetch_deezer_artist_info(artist_name)
-    time.sleep(0.1)
+    if similar is None:
+        # Not in cache, fetch from API
+        if idx > 0 and total > 0:
+            print(f"[{idx}/{total}] Gathering {artist_name} -{frame}*-{frame}* LOADING")
+        similar = get_similar_artists(artist_name, limit=20, threshold=0.05)
+        # Cache it for 90 days
+        set_cached_similar_artists(artist_name, similar)
+    else:
+        # Found in cache
+        if idx > 0 and total > 0:
+            print(f"[{idx}/{total}] Gathering {artist_name} - Cache ✓")
 
-    # Combine all data
+    # Rate limiting only for API calls (cached data doesn't need rate limiting)
+    if not was_cached_similar:
+        time.sleep(0.15)
+
+    # Get Deezer data (cached, 90-day TTL)
+    deezer_info = get_cached_deezer_info(artist_name)
+    was_cached_deezer = deezer_info is not None
+
+    if deezer_info is None:
+        # Not in cache, fetch from API
+        deezer_info = fetch_deezer_artist_info(artist_name)
+        # Cache it for 90 days
+        if deezer_info and "error" not in deezer_info:
+            set_cached_deezer_info(artist_name, deezer_info)
+
+    if not was_cached_deezer:
+        time.sleep(0.1)
+
+    # Derive genre from tags
+    tags = lastfm_data.get("tags", [])
+    genre = _derive_genre(tags)
+
+    # Combine all data (prefer Deezer images over Last.fm)
+    image_url = deezer_info.get("image_url") or lastfm_data.get("image_url")
     metadata = {
         "name": artist_name,
         "rank": lastfm_data.get("rank"),
         "listeners": lastfm_data.get("listeners", 0),
-        "tags": lastfm_data.get("tags", []),
-        "image_url": lastfm_data.get("image_url") or deezer_info.get("image_url"),
+        "tags": tags,
+        "image_url": image_url,
         "bio": lastfm_data.get("bio"),
         "similar_artists": similar,
         "top_tracks": deezer_info.get("top_tracks", []),
         "deezer_fans": deezer_info.get("fans", 0),
+        # Normalized fields for frontend
+        "genre": genre,
+        "lastfm_artists": [artist_name],
+        "artist_profiles": [{
+            "name": artist_name,
+            "image_url": image_url,
+            "bio": lastfm_data.get("bio")
+        }],
+        "stage": "",
+        "day": "",
+        "weekend": "",
     }
 
-    print("✓")
     return metadata
 
 
@@ -211,13 +289,13 @@ def initialize_user_graph(user_id: str) -> Dict[str, Any]:
     if not seed_artists:
         raise ValueError(f"No seed artists found for user {user_id}")
 
-    print(f"Initializing graph for {len(seed_artists)} seed artists...")
+    print(f"Gathering related artists")
 
     # Fetch metadata for each seed artist
     all_artists_metadata = {}
-    for artist_name in seed_artists:
+    for idx, artist_name in enumerate(seed_artists, 1):
         lastfm_data = all_artists.get(artist_name, {})
-        metadata = fetch_seed_artist_metadata(artist_name, lastfm_data)
+        metadata = fetch_seed_artist_metadata(artist_name, lastfm_data, idx=idx, total=len(seed_artists))
         all_artists_metadata[artist_name] = metadata
         time.sleep(0.1)
 

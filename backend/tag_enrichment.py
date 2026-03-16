@@ -1,12 +1,13 @@
 """
 Tag enrichment: fetch Last.fm artist info and tags for all top 25 artists.
+Uses global artist cache (90 days) to avoid redundant API calls.
 """
 
 import time
 from typing import Dict, List, Any
 
 from lastfm.fetch import get_artist_info, get_artist_top_tags, get_artist_image_and_bio
-
+from backend.cache import get_cached_artist, set_cached_artist
 from backend.user_data import load_user_db, update_user_db
 
 
@@ -37,6 +38,7 @@ def enrich_artist_with_lastfm(artist_name: str) -> Dict[str, Any]:
 def enrich_top_25_artists(user_id: str) -> Dict[str, Any]:
     """
     Enrich all top 25 artists with Last.fm data.
+    Uses global cache (90 days) to avoid redundant API calls.
     Saves to user_db.json under all_artists key.
     """
     db = load_user_db(user_id)
@@ -44,19 +46,41 @@ def enrich_top_25_artists(user_id: str) -> Dict[str, Any]:
 
     all_artists = {}
 
-    print(f"Enriching {len(top_artists)} artists with Last.fm data...")
+    print(f"Fetching top {len(top_artists)} artists")
+
+    # Animation frames for loading indicator
+    frames = ["-", "\\", "|", "/"]
+    frame_idx = 0
 
     for i, artist in enumerate(top_artists, 1):
         artist_name = artist.get("name")
-        print(f"  [{i}/{len(top_artists)}] {artist_name}...", end=" ", flush=True)
+        frame = frames[frame_idx % len(frames)]
+        frame_idx += 1
+        was_cached = False
 
         try:
-            enriched = enrich_artist_with_lastfm(artist_name)
+            # Check cache first
+            cached = get_cached_artist(artist_name)
+            if cached:
+                enriched = cached
+                was_cached = True
+                status = "MONEY!" if i <= 5 else "✓"
+                print(f"[{i}/{len(top_artists)}] Gathering {artist_name} - Cache {status}")
+            else:
+                # Not in cache, fetch from API
+                enriched = enrich_artist_with_lastfm(artist_name)
+                # Save to cache
+                set_cached_artist(artist_name, enriched)
+                frame = frames[frame_idx % len(frames)]
+                frame_idx += 1
+                print(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* LOADING")
+
             enriched["rank"] = artist.get("rank", i)  # Preserve original rank
             all_artists[artist_name] = enriched
-            print("✓")
         except Exception as e:
-            print(f"✗ ({str(e)})")
+            frame = frames[frame_idx % len(frames)]
+            frame_idx += 1
+            print(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* ERROR")
             # Still add minimal data
             all_artists[artist_name] = {
                 "name": artist_name,
@@ -65,7 +89,9 @@ def enrich_top_25_artists(user_id: str) -> Dict[str, Any]:
                 "listeners": 0,
             }
 
-        time.sleep(0.2)  # Rate limiting
+        # Rate limiting only for API calls (cached data doesn't need rate limiting)
+        if not was_cached:
+            time.sleep(0.05)
 
     # Save enriched data
     db["all_artists"] = all_artists

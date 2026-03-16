@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UNIVERSAL ARTIST MAP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #111111;
+      overflow: hidden;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #aaaaaa;
+    }
+
+    #graph {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* ── Controls panel ─────────────────────────────── */
+    #controls {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      background: rgba(14, 14, 14, 0.90);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      padding: 18px 20px;
+      min-width: 236px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      user-select: none;
+      z-index: 50;
+      transition: padding 0.25s ease, min-width 0.25s ease;
+    }
+
+    #menuHeader {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    #menuToggle {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.35);
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      line-height: 1;
+      padding: 0 0 0 12px;
+    }
+    #menuToggle:hover { color: rgba(255,255,255,0.7); }
+
+    #controls.minimized {
+      padding: 10px 14px;
+      min-width: 0;
+    }
+    #controls.minimized > *:not(#menuHeader) {
+      display: none !important;
+    }
+    #controls.minimized #menuHeader {
+      margin-bottom: 0;
+    }
+
+    .ctrl-row {
+      margin-bottom: 15px;
+    }
+
+    .ctrl-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .ctrl-label {
+      display: block;
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      color: rgba(255, 255, 255, 0.28);
+      margin-bottom: 7px;
+    }
+
+    /* ── Auth section ─── */
+    .auth-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .auth-col {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .auth-btn {
+      width: 100%;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.72);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      padding: 7px 6px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+
+    .auth-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.38);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .auth-user {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .auth-disconnect {
+      width: 100%;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      color: rgba(255, 255, 255, 0.35);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.10em;
+      padding: 5px 4px;
+      cursor: pointer;
+      transition: border-color 0.1s, color 0.1s;
+    }
+
+    .auth-disconnect:hover {
+      border-color: rgba(255, 255, 255, 0.28);
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .lastfm-row {
+      display: flex;
+      gap: 4px;
+    }
+
+    .lastfm-row input[type="text"] {
+      flex: 1;
+      min-width: 0;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.72);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      padding: 6px 6px;
+      outline: none;
+    }
+
+    .lastfm-row input[type="text"]::placeholder {
+      color: rgba(255, 255, 255, 0.22);
+    }
+
+    .lastfm-row input[type="text"]:focus {
+      border-color: rgba(255, 255, 255, 0.38);
+    }
+
+    .lastfm-go {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.72);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.10em;
+      padding: 6px 7px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+
+    .lastfm-go:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.38);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .auth-error {
+      font-size: 8px;
+      letter-spacing: 0.08em;
+      color: rgba(255, 100, 100, 0.75);
+      margin-top: 5px;
+    }
+
+    .auth-status {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: rgba(100, 200, 100, 0.75);
+      margin-top: 5px;
+    }
+
+    /* ── Sliders ─── */
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 7px;
+    }
+
+    .slider-header .ctrl-label {
+      margin-bottom: 0;
+    }
+
+    .slider-value {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, 0.45);
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.1);
+      outline: none;
+      border-radius: 1px;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: rgba(255, 255, 255, 0.88);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      border: none;
+    }
+
+    /* ── Checkboxes ─── */
+    .check-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      color: rgba(255, 255, 255, 0.38);
+      cursor: pointer;
+      margin-bottom: 7px;
+      transition: color 0.1s;
+    }
+
+    .check-label:last-child {
+      margin-bottom: 0;
+    }
+
+    .check-label:hover {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    .check-label input[type="checkbox"] {
+      accent-color: rgba(255, 255, 255, 0.75);
+      width: 11px;
+      height: 11px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ── Separator ─── */
+    .ctrl-sep {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin: 15px 0;
+    }
+
+    /* ── Artist panel ─── */
+    .artist-panel {
+      position: fixed;
+      right: 0;
+      top: 0;
+      height: 100vh;
+      width: 320px;
+      background: #1a1a1a;
+      border-left: 1px solid rgba(255, 255, 255, 0.08);
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+      z-index: 100;
+      overflow-y: auto;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .artist-panel.open {
+      transform: translateX(0);
+    }
+
+    #panelClose {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    /* Panel artist image */
+    .panel-hero {
+      width: 100%;
+      max-height: 260px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .panel-body {
+      padding: 18px 16px;
+    }
+
+    .panel-name {
+      font-size: 15px;
+      font-weight: 500;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .panel-meta {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.42);
+      margin-bottom: 12px;
+    }
+
+    .panel-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 14px;
+    }
+
+    .panel-tag {
+      font-size: 8px;
+      letter-spacing: 0.1em;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      padding: 3px 7px;
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .panel-bio {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.52);
+      line-height: 1.65;
+      margin-bottom: 18px;
+    }
+
+    .panel-section-label {
+      font-size: 8px;
+      letter-spacing: 0.14em;
+      color: rgba(255, 255, 255, 0.28);
+      margin-bottom: 8px;
+    }
+
+    /* Track rows */
+    .track-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      cursor: default;
+    }
+
+    .track-art {
+      width: 36px;
+      height: 36px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .track-name {
+      flex: 1;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.72);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-play {
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 9px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+      transition: border-color 0.1s, color 0.1s;
+    }
+
+    .track-play:hover {
+      border-color: rgba(255, 255, 255, 0.55);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .track-play.playing {
+      border-color: rgba(100, 200, 100, 0.7);
+      color: rgba(100, 200, 100, 0.9);
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.08);
+      border-top-color: rgba(255,255,255,0.45);
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Init button ─── */
+    #initBtn {
+      width: 100%;
+      background: none;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: rgba(255, 255, 255, 0.72);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      padding: 7px 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    #initBtn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.38);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    #initBtn.loading {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* ── Init status display ─── */
+    #initStatus {
+      font-size: 9px;
+      letter-spacing: 0.06em;
+      color: rgba(100, 200, 100, 0.75);
+      margin-top: 10px;
+      max-height: 120px;
+      overflow-y: auto;
+      padding: 8px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(100, 200, 100, 0.2);
+      border-radius: 3px;
+    }
+
+    #initStatus div {
+      margin: 2px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</head>
+<body>
+
+  <svg id="graph"></svg>
+
+  <div id="artistPanel" class="artist-panel">
+    <button id="panelClose">✕</button>
+    <div id="panelContent"></div>
+  </div>
+
+  <div id="controls">
+    <div id="menuHeader">
+      <span style="font-size:9px;letter-spacing:0.12em;color:rgba(255,255,255,0.25)">UNIVERSAL MAP</span>
+      <button id="menuToggle" title="Minimize">−</button>
+    </div>
+
+    <!-- Auth section: Spotify + Last.fm -->
+    <div class="ctrl-row">
+      <div class="auth-row">
+        <!-- Spotify column -->
+        <div class="auth-col" id="spotifyCol">
+          <span class="ctrl-label">SPOTIFY</span>
+          <div id="spotifyConnected" style="display:none">
+            <div id="spotifyUserLabel" class="auth-user"></div>
+            <button id="spotifyDisconnect" class="auth-disconnect">DISCONNECT</button>
+          </div>
+          <button id="spotifyBtn" class="auth-btn">CONNECT ▶</button>
+        </div>
+        <!-- Last.fm column -->
+        <div class="auth-col" id="lastfmCol">
+          <span class="ctrl-label">LAST.FM</span>
+          <div id="lastfmConnected" style="display:none">
+            <div id="lastfmUserLabel" class="auth-user"></div>
+            <button id="lastfmDisconnect" class="auth-disconnect">DISCONNECT</button>
+          </div>
+          <div id="lastfmInput">
+            <div class="lastfm-row">
+              <input type="text" id="lastfmUsername" placeholder="username" />
+              <button id="lastfmGo" class="lastfm-go">GO</button>
+            </div>
+            <div id="lastfmError" class="auth-error" style="display:none">User not found</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctrl-row" id="initRow" style="display:none">
+      <button id="initBtn">GENERATE MY MAP</button>
+      <div id="initStatus" style="display:none"></div>
+    </div>
+
+    <hr class="ctrl-sep" id="sep1" style="display:none" />
+
+    <!-- Node size slider -->
+    <div class="ctrl-row" id="sizeRow" style="display:none">
+      <div class="slider-header">
+        <span class="ctrl-label">NODE SIZE</span>
+        <span class="slider-value" id="nodeSizeValue">1.0</span>
+      </div>
+      <input type="range" id="nodeSizeSlider" min="0.5" max="3" step="0.05" value="1" />
+    </div>
+
+    <div class="ctrl-row" id="chargeRow" style="display:none">
+      <div class="slider-header">
+        <span class="ctrl-label">REPULSION</span>
+        <span class="slider-value" id="chargeValue">-50</span>
+      </div>
+      <input type="range" id="chargeSlider" min="-100" max="-10" step="10" value="-50" />
+    </div>
+
+    <hr class="ctrl-sep" id="sep2" style="display:none" />
+
+    <div class="ctrl-row" id="optionsRow" style="display:none">
+      <label class="check-label">
+        <input type="checkbox" id="labelsCheck" checked />
+        SHOW LABELS
+      </label>
+    </div>
+  </div>
+
+  <script>
+    window.SPOTIFY_DISPLAY_NAME = {{ session.get('spotify_display_name') | tojson }};
+    window.LASTFM_USER = {{ session.get('lastfm_user') | tojson }};
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script src="/static/js/universal_map.js"></script>
+
+</body>
+</html>
