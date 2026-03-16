@@ -23,11 +23,21 @@ export function setDrawerState(state) {
   S.setDrawerState(state);
   const drawer   = document.getElementById("artistDrawer");
   const scrollEl = document.getElementById("drawerScroll");
+  const hero     = document.getElementById("drawerHero");
   if (!drawer) return;
 
   drawer.classList.remove("drawer-hidden", "drawer-collapsed", "drawer-expanded", "drawer-peek");
   drawer.classList.add("drawer-" + state);
   drawer.style.pointerEvents = (state === 'hidden') ? 'none' : 'auto';
+
+  // Toggle carousel arrows visibility on hero
+  if (hero) {
+    if (state === 'expanded') {
+      hero.classList.add("drawer-arrows-visible");
+    } else {
+      hero.classList.remove("drawer-arrows-visible");
+    }
+  }
 
   if (state === 'hidden') {
     drawer.style.transform = 'translateY(100%)';
@@ -108,11 +118,40 @@ export async function populateDrawer(d) {
   S.setDrawerTracks([]);
   S.setDrawerExpandedIdx(null);
 
-  const imgUrl = d.image_url || "";
-  const imgSrc = (!imgUrl || imgUrl.includes(PLACEHOLDER_HASH))
-    ? "/static/placeholder_artist.jpeg" : imgUrl;
+  const artistProfiles = d.artist_profiles || [];
+  let activeProfileIdx = 0;
+
   const hero = document.getElementById("drawerHero");
-  hero.style.backgroundImage = `url('${imgSrc}')`;
+  const bioEl = document.getElementById("drawerBio");
+
+  function getProfileImageUrl(idx) {
+    if (artistProfiles[idx]) {
+      const url = artistProfiles[idx].image_url || "";
+      return (!url || url.includes(PLACEHOLDER_HASH)) ? "/static/placeholder_artist.jpeg" : url;
+    }
+    const imgUrl = d.image_url || "";
+    return (!imgUrl || imgUrl.includes(PLACEHOLDER_HASH)) ? "/static/placeholder_artist.jpeg" : imgUrl;
+  }
+
+  function getProfileBio(idx) {
+    if (artistProfiles[idx] && artistProfiles[idx].bio) {
+      return artistProfiles[idx].bio;
+    }
+    return d.bio || "";
+  }
+
+  function updateCarouselImage(idx) {
+    if (hero) {
+      hero.style.backgroundImage = `url('${getProfileImageUrl(idx)}')`;
+    }
+    if (bioEl) {
+      bioEl.textContent = getProfileBio(idx);
+      bioEl.style.display = getProfileBio(idx) ? "block" : "none";
+    }
+  }
+
+  // Set initial hero image
+  hero.style.backgroundImage = `url('${getProfileImageUrl(0)}')`;
   document.getElementById("drawerHeroName").textContent = d.name || "";
 
   const metaStr = [d.genre, d.stage, d.day].filter(Boolean).join(" · ");
@@ -121,11 +160,36 @@ export async function populateDrawer(d) {
   document.getElementById("drawerMetaTags").innerHTML = (d.tags || [])
     .map(t => `<span class="drawer-tag">${escapeHtml(t)}</span>`).join("");
 
+  // Clear old carousel arrows if they exist
+  hero.querySelectorAll(".carousel-arrow").forEach(el => el.remove());
+
+  // Add carousel arrows if multi-artist
+  if (artistProfiles.length > 1) {
+    const leftBtn = document.createElement("button");
+    leftBtn.className = "carousel-arrow carousel-arrow-left";
+    leftBtn.textContent = "‹";
+    leftBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      activeProfileIdx = (activeProfileIdx - 1 + artistProfiles.length) % artistProfiles.length;
+      updateCarouselImage(activeProfileIdx);
+    });
+    hero.appendChild(leftBtn);
+
+    const rightBtn = document.createElement("button");
+    rightBtn.className = "carousel-arrow carousel-arrow-right";
+    rightBtn.textContent = "›";
+    rightBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      activeProfileIdx = (activeProfileIdx + 1) % artistProfiles.length;
+      updateCarouselImage(activeProfileIdx);
+    });
+    hero.appendChild(rightBtn);
+  }
+
   const tracksEl = document.getElementById("drawerTracks");
   tracksEl.innerHTML =
     `<div style="display:flex;justify-content:center;align-items:center;padding:24px 0">` +
     `<div class="spinner"></div></div>`;
-  const bioEl = document.getElementById("drawerBio");
   bioEl.style.display = "none";
   bioEl.textContent   = "";
 
@@ -147,12 +211,13 @@ export async function populateDrawer(d) {
       const rows = S.drawerTracks.map((track, idx) => {
         const art     = track.album_art || "/static/placeholder_artist.jpeg";
         const preview = track.preview_url || "";
+        const artistName = track.artist || d.name;
         return (
           `<div class="drawer-track-row" data-drawer-track-index="${idx}">` +
           `<img class="drawer-track-art" src="${escapeHtml(art)}" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
           `<div class="drawer-track-info">` +
           `<div class="drawer-track-name">${escapeHtml(track.name)}</div>` +
-          `<div class="drawer-track-artist">${escapeHtml(d.name)}</div>` +
+          `<div class="drawer-track-artist">${escapeHtml(artistName)}</div>` +
           `</div>` +
           `<button class="drawer-play-btn" data-preview="${escapeHtml(preview)}" style="${preview ? "" : "opacity:0.25;pointer-events:none;"}">${DRAWER_PLAY_SVG}</button>` +
           `</div>` +
@@ -172,16 +237,12 @@ export async function populateDrawer(d) {
       `<div style="font-size:9px;color:rgba(255,255,255,0.2);padding:16px;text-align:center;font-family:'IBM Plex Mono',monospace;letter-spacing:0.1em">NO TRACKS AVAILABLE</div>`;
   }
 
-  // Fetch bio
-  try {
-    const bio = d.bio || await (async () => {
-      const r = await fetch("/api/artist/" + encodeURIComponent(d.name));
-      if (!r.ok) return null;
-      return (await r.json()).bio || null;
-    })();
-    if (myId !== S.drawerRequestId) return;
-    if (bio) { bioEl.textContent = bio; bioEl.style.display = "block"; }
-  } catch (_) {}
+  // Set initial bio
+  const initialBio = getProfileBio(0);
+  if (initialBio) {
+    bioEl.textContent = initialBio;
+    bioEl.style.display = "block";
+  }
 }
 
 export function collapseDrawerSubmenu() {

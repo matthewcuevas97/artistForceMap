@@ -138,6 +138,13 @@ function onPanelClose() {
   closePanel();
 }
 
+// ── Threshold change handler ──────────────────────────────────────────────────
+
+function onThresholdChange() {
+  S.setRawEdges(S.edgesByLevel[S.edgeThreshold.toFixed(2)] || []);
+  buildGraph(onNodeClick, onBgClick);
+}
+
 // ── Graph loading ─────────────────────────────────────────────────────────────
 
 function _statusEl() {
@@ -176,24 +183,19 @@ function hideStatus() {
   if (el) el.style.display = "none";
 }
 
-async function fetchAndBuild(threshold) {
+async function fetchAndBuild() {
   showLoading();
   try {
-    if (!S.frontierEdgesLoaded) {
-      S.setFrontierEdgesLoaded(true);
-      fetch("/api/graph?threshold=0.05")
-        .then(r => r.ok ? r.json() : null)
-        .then(data => { if (data?.edges) S.setAllEdgesForFrontier(data.edges); })
-        .catch(() => {});
-    }
-    const resp = await fetch(`/api/graph?threshold=${threshold.toFixed(2)}`);
+    const resp = await fetch("/api/graph");
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const data = await resp.json();
     if (data.error) throw new Error(data.error);
 
+    S.setEdgesByLevel(data.edges_by_level);
     S.setRawNodes(data.nodes);
-    S.setRawEdges(data.edges);
+    S.setRawEdges(data.edges_by_level[S.edgeThreshold.toFixed(2)] || []);
     S.setUserSeeds(new Set(data.user_seeds || []));
+    S.setAllEdgesForFrontier(data.edges_by_level["0.30"] || []);
 
     buildGraph(onNodeClick, onBgClick);
 
@@ -208,6 +210,6 @@ async function fetchAndBuild(threshold) {
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 
-initControls(fetchAndBuild, () => S.userSeeds, onPanelClose);
+initControls(fetchAndBuild, onThresholdChange, () => S.userSeeds, onPanelClose);
 initDrawerGestures();
-fetchAndBuild(S.edgeThreshold);
+fetchAndBuild();

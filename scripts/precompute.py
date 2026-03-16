@@ -18,6 +18,7 @@ from lastfm.fetch import get_similar_artists, get_artist_info, get_artist_image_
 EDGE_CAP = 6
 RBO_BASE_THRESHOLD = 0.21
 RBO_FLOOR_THRESHOLD = 0.05
+CACHE_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "lastfm_api_cache.json")
 
 TAG_TO_GENRE = {
     # Electronic
@@ -53,19 +54,23 @@ TAG_TO_GENRE = {
     "folk": "Singer-Songwriter/Jazz", "indie folk": "Singer-Songwriter/Jazz",
 }
 
-DEEZER_NAME_OVERRIDES = {
-    "DJ Snake's Pardon My French": "DJ Snake", "Armin van Buuren x Adam Beyer": "Armin van Buuren",
-    "Carlita x Josh Baker": "Carlita", "Chloé Caillet x Rossi.": "Chloé Caillet",
-    "Green Velvet x AYYBO": "Green Velvet", "Max Dean x Luke Dean": "Max Dean",
-    "Groove Armada (DJ Set)": "Groove Armada", "Röyksopp (DJ Set)": "Röyksopp",
-    "Worship (Sub Focus, Dimension, Culture Shock, 1991)": "Sub Focus",
-    "Sara Landry's Blood Oath": "Sara Landry", "¥ØU$UK€ ¥UK1MAT$U": "Yousuke Yukimatsu",
-}
+# --- Caching Functions ---
+def load_cache():
+    if not os.path.exists(CACHE_PATH):
+        return {"artist_info": {}, "artist_top_tags": {}, "similar_artists": {}}
+    try:
+        with open(CACHE_PATH, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, FileNotFoundError):
+        return {"artist_info": {}, "artist_top_tags": {}, "similar_artists": {}}
 
-LASTFM_PLACEHOLDER_HASH = "2a96cbd8b46e442fc41c2b86b821562f"
+def save_cache(cache):
+    with open(CACHE_PATH, "w", encoding="utf-8") as f:
+        json.dump(cache, f, indent=2)
 
-
+# --- Core Logic ---
 def rbo(list1, list2, p=0.9):
+    # ... (implementation unchanged)
     if not list1 and not list2: return 1.0
     if not list1 or not list2: return 0.0
     sl, ll = set(), set()
@@ -78,8 +83,8 @@ def rbo(list1, list2, p=0.9):
         score += (1 - p) * (p ** (d - 1)) * agreement
     return score
 
-
 def build_graph_edges(nodes):
+    # ... (implementation unchanged)
     print("\n--- Building Graph Edges ---")
     node_map = {n["name"]: n for n in nodes}
     degrees = defaultdict(int)
@@ -87,10 +92,8 @@ def build_graph_edges(nodes):
     links = []
 
     def add_edge(n1_name, n2_name, source_pass):
-        # Always use alphabetical order for the tuple to avoid duplicates
         a, b = sorted((n1_name, n2_name))
-        if a == b or (a, b) in accepted_edges:
-            return False
+        if a == b or (a, b) in accepted_edges: return False
         if degrees[a] < EDGE_CAP and degrees[b] < EDGE_CAP:
             accepted_edges.add((a, b))
             degrees[a] += 1
@@ -99,7 +102,7 @@ def build_graph_edges(nodes):
             return True
         return False
 
-    # Pass 1: Gold Standard Edges (from Last.fm similar artists)
+    # Pass 1: Gold Standard
     print("Edge Pass 1: Gold Standard")
     gold_standard_candidates = []
     for node in nodes:
@@ -107,26 +110,21 @@ def build_graph_edges(nodes):
             if similar["name"] in node_map:
                 a, b = sorted((node["name"], similar["name"]))
                 gold_standard_candidates.append((a, b))
-
     gold_standard_candidates.sort()
-    for a, b in gold_standard_candidates:
-        add_edge(a, b, 1)
+    for a, b in gold_standard_candidates: add_edge(a, b, 1)
     print(f"  > Edges after pass: {len(links)}")
 
-    # Pass 2: Base RBO Edges
+    # Pass 2: Base RBO
     print("Edge Pass 2: Base RBO")
-    rbo_candidates = []
-    rejected_rbo_edges = []
+    rbo_candidates, rejected_rbo_edges = [], []
     for node1, node2 in combinations(nodes, 2):
         score = rbo(node1.get("tags", []), node2.get("tags", []))
         if score >= RBO_BASE_THRESHOLD:
             a, b = sorted((node1["name"], node2["name"]))
             rbo_candidates.append({"a": a, "b": b, "score": score})
-
     rbo_candidates.sort(key=lambda x: (-x["score"], x["a"], x["b"]))
     for edge in rbo_candidates:
-        if not add_edge(edge["a"], edge["b"], 2):
-            rejected_rbo_edges.append(edge)
+        if not add_edge(edge["a"], edge["b"], 2): rejected_rbo_edges.append(edge)
     print(f"  > Edges after pass: {len(links)}")
 
     # Pass 3: Conditional Rewiring
@@ -134,32 +132,19 @@ def build_graph_edges(nodes):
     rewired_orphans = set()
     for rejected in rejected_rbo_edges:
         n1, n2 = rejected["a"], rejected["b"]
-        if n1 in rewired_orphans or n2 in rewired_orphans:
-            continue
-
-        n1_under_cap = degrees[n1] < EDGE_CAP
-        n2_under_cap = degrees[n2] < EDGE_CAP
-
-        if n1_under_cap and not n2_under_cap:
-            orphan, capped = n1, n2
-        elif not n1_under_cap and n2_under_cap:
-            orphan, capped = n2, n1
-        else:
-            continue
-
+        if n1 in rewired_orphans or n2 in rewired_orphans: continue
+        n1_under_cap, n2_under_cap = degrees[n1] < EDGE_CAP, degrees[n2] < EDGE_CAP
+        if n1_under_cap and not n2_under_cap: orphan, capped = n1, n2
+        elif not n1_under_cap and n2_under_cap: orphan, capped = n2, n1
+        else: continue
         capped_neighbors = [target if source == capped else source for source, target in accepted_edges if source == capped or target == capped]
-        
         neighbor_scores = []
         for neighbor_name in capped_neighbors:
             if neighbor_name == orphan: continue
-            neighbor_node = node_map[neighbor_name]
-            orphan_node = node_map[orphan]
+            neighbor_node, orphan_node = node_map[neighbor_name], node_map[orphan]
             score = rbo(orphan_node.get("tags", []), neighbor_node.get("tags", []))
-            if score > 0:
-                neighbor_scores.append({"name": neighbor_name, "score": score})
-        
+            if score > 0: neighbor_scores.append({"name": neighbor_name, "score": score})
         neighbor_scores.sort(key=lambda x: (-x["score"], x["name"]))
-
         for best_neighbor in neighbor_scores:
             if add_edge(orphan, best_neighbor["name"], 3):
                 rewired_orphans.add(orphan)
@@ -170,91 +155,93 @@ def build_graph_edges(nodes):
     print("Edge Pass 4: Adaptive Floor")
     zero_degree_nodes = [n for n in nodes if degrees[n["name"]] == 0]
     for node in zero_degree_nodes:
-        best_candidate = None
-        highest_score = -1
-        
+        best_candidate, highest_score = None, -1
         for other_node in nodes:
-            if node["name"] == other_node["name"] or degrees[other_node["name"]] >= EDGE_CAP:
-                continue
-            
+            if node["name"] == other_node["name"] or degrees[other_node["name"]] >= EDGE_CAP: continue
             score = rbo(node.get("tags", []), other_node.get("tags", []))
             if score > highest_score:
-                highest_score = score
-                best_candidate = other_node["name"]
-        
-        if highest_score >= RBO_FLOOR_THRESHOLD:
-            add_edge(node["name"], best_candidate, 4)
+                highest_score, best_candidate = score, other_node["name"]
+        if highest_score >= RBO_FLOOR_THRESHOLD: add_edge(node["name"], best_candidate, 4)
     print(f"  > Edges after pass: {len(links)}")
 
-    # Pass 5: Hail Mary (Genre Match)
+    # Pass 5: Hail Mary
     print("Edge Pass 5: Hail Mary")
     nodes_by_listeners = sorted(nodes, key=lambda x: x.get("listeners", 0), reverse=True)
     still_zero_degree_nodes = [n for n in nodes if degrees[n["name"]] == 0]
-
     for node in still_zero_degree_nodes:
-        if not node.get("genre") or node["genre"] == "Unknown":
-            continue
-        
+        if not node.get("genre") or node["genre"] == "Unknown": continue
         for candidate in nodes_by_listeners:
             if node["name"] == candidate["name"]: continue
-            if candidate.get("genre") == node["genre"]:
-                if add_edge(node["name"], candidate["name"], 5):
-                    break
+            if candidate.get("genre") == node["genre"] and add_edge(node["name"], candidate["name"], 5):
+                break
     print(f"  > Edges after pass: {len(links)}")
-    
     return links
 
+def slim_node(node):
+    # ... (implementation unchanged)
+    keep_fields = {"name", "genre", "listeners", "day", "weekend", "stage", "image_url", "bio", "lastfm_artists", "artist_profiles"}
+    slimmed_node = {k: node.get(k) for k in keep_fields}
+    slimmed_node["tags"] = (node.get("tags") or [])[:3]
+    slimmed_node["top_tracks"] = [
+        {k: v for k, v in t.items() if k != "preview_url"}
+        for t in node.get("top_tracks", [])
+    ]
+    return slimmed_node
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--pass1-only", action="store_true", help="Run only pass 1 (tags, listeners, genre)")
-    parser.add_argument("--pass3-only", action="store_true", help="Skip passes 1 and 2, only run pass 3")
-    parser.add_argument("--pass4-only", action="store_true", help="Skip passes 1-3, only run pass 4")
-    parser.add_argument("--tracks-only", action="store_true", help="Re-fetch only top_tracks from Deezer and rebuild slim graph")
+    parser.add_argument("--no-cache", action="store_true", help="Bypass the API cache and fetch fresh data.")
     args = parser.parse_args()
 
-    if any([args.pass1_only, args.pass3_only, args.pass4_only, args.tracks_only]):
-        print("Running specific pass... (Edge generation logic will be skipped)")
-        # Simplified logic for single passes can be added here if needed
-        if args.pass1_only: run_pass1_only()
-        # ... etc
-        return
+    use_cache = not args.no_cache
+    cache = load_cache() if use_cache else {"artist_info": {}, "artist_top_tags": {}, "similar_artists": {}}
 
-    # --- Full Precomputation Pipeline ---
     lineup = load_lineup()
     total = len(lineup)
     nodes = [{"name": a["name"], "day": a["day"], "weekend": a["weekend"], "stage": a["stage"], "lastfm_artists": a.get("lastfm_artists", [])} for a in lineup]
     node_map = {n["name"]: n for n in nodes}
 
-    # Pass 1: fetch artist info (tags, listeners, genre)
+    # Pass 1: Fetch artist info
     print("--- Pass 1: Fetching Artist Info ---")
     for i, artist in enumerate(lineup, 1):
         print(f"Processing {i}/{total}: {artist['name']}")
         node = node_map[artist["name"]]
         lastfm_names = artist.get("lastfm_artists", [])
         if not lastfm_names:
-            node.update({"tags": [], "listeners": 0, "genre": "Unknown"})
+            node.update({"tags": [], "listeners": 0, "genre": "Unknown", "similar_artists": []})
             continue
 
         max_listeners = 0
         all_tags, seen_tags = [], set()
         for lastfm_name in lastfm_names:
-            info = get_artist_info(lastfm_name)
+            # Get artist info (listeners)
+            info = cache["artist_info"].get(lastfm_name)
+            if not info:
+                print(f"  > Fetching info for '{lastfm_name}'...")
+                info = get_artist_info(lastfm_name)
+                cache["artist_info"][lastfm_name] = info
+                time.sleep(0.25)
             if info and info.get("listeners", 0) > max_listeners:
                 max_listeners = info["listeners"]
+
+            # Get artist top tags
+            tags = cache["artist_top_tags"].get(lastfm_name)
+            if not tags:
+                print(f"  > Fetching tags for '{lastfm_name}'...")
+                tags = get_artist_top_tags(lastfm_name, limit=10)
+                cache["artist_top_tags"][lastfm_name] = tags
+                time.sleep(0.25)
             
-            tags = get_artist_top_tags(lastfm_name, limit=10)
-            for tag in tags:
+            for tag in (tags or []):
                 if tag not in seen_tags:
                     seen_tags.add(tag)
                     all_tags.append(tag)
-            time.sleep(0.25)
 
         node["tags"] = all_tags
         node["listeners"] = max_listeners
         node["genre"] = next((TAG_TO_GENRE[t] for t in all_tags if t in TAG_TO_GENRE), "Unknown")
 
-    # Pass 2: fetch similar artists (used for Gold Standard edges)
+    # Pass 2: Fetch similar artists
     print("\n--- Pass 2: Fetching Similar Artists ---")
     for i, artist in enumerate(lineup, 1):
         print(f"Processing {i}/{total}: {artist['name']}")
@@ -266,53 +253,37 @@ def main():
 
         combined = {}
         for lastfm_name in lastfm_names:
-            for s in get_similar_artists(lastfm_name, limit=50, threshold=0.05):
+            similar = cache["similar_artists"].get(lastfm_name)
+            if not similar:
+                print(f"  > Fetching similar for '{lastfm_name}'...")
+                similar = get_similar_artists(lastfm_name, limit=50, threshold=0.05)
+                cache["similar_artists"][lastfm_name] = similar
+                time.sleep(0.25)
+
+            for s in (similar or []):
                 if s["name"] not in combined or s["match"] > combined[s["name"]]:
                     combined[s["name"]] = s["match"]
-            time.sleep(0.25)
         node["similar_artists"] = [{"name": name, "match": match} for name, match in combined.items()]
 
-    # New: Generate Edges using the 5-pass pipeline
+    if use_cache:
+        print("\nSaving API data to cache...")
+        save_cache(cache)
+
     links = build_graph_edges(nodes)
 
-    # Clean up nodes for final output (optional)
     for node in nodes:
-        del node["similar_artists"]
+        if "image_url" not in node: node["image_url"] = None
+        if "bio" not in node: node["bio"] = None
+        if "top_tracks" not in node: node["top_tracks"] = []
 
-    # Final Graph Assembly
-    graph = {"nodes": nodes, "links": links}
+    slimmed_nodes = [slim_node(n) for n in nodes]
+    graph = {"nodes": slimmed_nodes, "links": links}
+    
     out_path = os.path.join(os.path.dirname(__file__), "..", "data", "graph_static.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(graph, f, indent=2)
-    print(f"\nSaved to data/graph_static.json. Total nodes: {len(nodes)}, Total links: {len(links)}")
 
-    # Run remaining passes to enrich the data (images, tracks, etc.)
-    print("\n--- Running Enrichment Passes (3 and 4) ---")
-    # run_pass3() # This function needs to be adapted to the new graph structure
-    # run_pass4() # This function needs to be adapted to the new graph structure
-    print("\nEnrichment passes skipped. Re-run with --pass3-only or --pass4-only if needed.")
-
-
-# --- Standalone Pass Functions (Need Adaptation) ---
-# Note: These functions still operate on the old structure and would need to be
-# updated to handle the new graph format if run standalone.
-
-def run_pass1_only():
-    # ... (implementation remains the same but only affects nodes)
-    print("Pass 1 complete. Node data updated.")
-
-def run_pass3():
-    # ... (needs update)
-    print("Pass 3 needs to be updated for the new graph structure.")
-
-def run_pass4():
-    # ... (needs update)
-    print("Pass 4 needs to be updated for the new graph structure.")
-
-def run_tracks_only():
-    # ... (needs update)
-    print("Tracks-only mode needs to be updated for the new graph structure.")
-
+    print(f"\nSaved to data/graph_static.json. Total nodes: {len(slimmed_nodes)}, Total links: {len(links)}")
 
 if __name__ == "__main__":
     main()

@@ -46,7 +46,7 @@ export function updateAuthUI() {
   }
 }
 
-export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
+export function initControls(fetchAndBuild, onThresholdChange, getUserSeeds, onPanelClose) {
   // When playlist back-button is pressed: close playlist, reopen controls
   setOnBackClose(() => expandMenu());
 
@@ -77,7 +77,7 @@ export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
     window.AUTHENTICATED = false;
     window.SPOTIFY_DISPLAY_NAME = null;
     updateAuthUI();
-    fetchAndBuild(S.edgeThreshold);
+    fetchAndBuild();
   });
 
   // Last.fm GO
@@ -98,7 +98,7 @@ export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
       window.LASTFM_USER = username;
       window.AUTHENTICATED = false;
       updateAuthUI();
-      fetchAndBuild(S.edgeThreshold);
+      fetchAndBuild();
     } else {
       lastfmError.style.display = "block";
     }
@@ -111,7 +111,7 @@ export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
     await fetch("/api/lastfm/logout", { method: "POST" });
     window.LASTFM_USER = null;
     updateAuthUI();
-    fetchAndBuild(S.edgeThreshold);
+    fetchAndBuild();
   });
 
   updateAuthUI();
@@ -140,8 +140,7 @@ export function initControls(fetchAndBuild, getUserSeeds, onPanelClose) {
     const idx = parseInt(thresholdSlider.value, 10);
     S.setEdgeThreshold(THRESHOLD_LEVELS[idx]);
     thresholdValue.textContent = S.edgeThreshold.toFixed(2);
-    clearTimeout(S.thresholdDebounce);
-    S.setThresholdDebounce(setTimeout(() => fetchAndBuild(S.edgeThreshold), 500));
+    onThresholdChange();
   });
 
   // Node size slider

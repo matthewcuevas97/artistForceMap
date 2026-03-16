@@ -12,7 +12,7 @@ export const GENRE_HUE = {
 
 export const DAY_MAP = { FRI: "Friday", SAT: "Saturday", SUN: "Sunday" };
 
-export const THRESHOLD_LEVELS = [0.05, 0.10, 0.20, 0.30, 0.50];
+export const THRESHOLD_LEVELS = [0.30, 0.32, 0.34, 0.36, 0.38, 0.40];
 
 export const DRAWER_PEEK_H = 64;
 

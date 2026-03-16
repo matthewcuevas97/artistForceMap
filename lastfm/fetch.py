@@ -156,3 +156,23 @@ def get_top_tracks(artist_name, limit=10):
 
     tracks = data.get("toptracks", {}).get("track", [])
     return [t["name"] for t in tracks]
+
+
+def get_artist_image_from_deezer(artist_name):
+    """Fetch artist image from Deezer as fallback for Last.fm."""
+    try:
+        resp = requests.get(
+            "https://api.deezer.com/search/artist",
+            params={"q": artist_name, "limit": 1},
+            timeout=5
+        )
+        data = resp.json()
+        results = data.get("data", [])
+
+        if results:
+            artist = results[0]
+            # Use the largest available image
+            return artist.get("picture_xl") or artist.get("picture_big") or artist.get("picture_medium")
+    except Exception:
+        pass
+    return None

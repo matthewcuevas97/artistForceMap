@@ -3,6 +3,7 @@ import { THRESHOLD_LEVELS, DRAWER_PEEK_H } from './constants.js';
 // ── Raw data (never mutated after fetch) ──────────────────────────────────────
 export let rawNodes = [];
 export let rawEdges = [];
+export let edgesByLevel = {};
 export let allEdgesForFrontier = [];
 export let frontierEdgesLoaded = false;
 export let userSeeds = new Set();
@@ -13,7 +14,7 @@ export let simEdges = [];
 
 // ── Control state ─────────────────────────────────────────────────────────────
 export let nodeScale      = 1.0;
-export let edgeThreshold  = THRESHOLD_LEVELS[2];
+export let edgeThreshold  = THRESHOLD_LEVELS[0];
 export let showSimilarity = true;
 export let showGenre      = true;
 export let dayFilter      = "ALL";
@@ -64,6 +65,7 @@ export const drawerExpandedH  = () => Math.round(window.innerHeight * 0.85);
 // ── Setters (used by modules that need to mutate shared state) ─────────────────
 export function setRawNodes(v)              { rawNodes = v; }
 export function setRawEdges(v)              { rawEdges = v; }
+export function setEdgesByLevel(v)          { edgesByLevel = v; }
 export function setSimNodes(v)              { simNodes = v; }
 export function setSimEdges(v)              { simEdges = v; }
 export function setAllEdgesForFrontier(v)   { allEdgesForFrontier = v; }

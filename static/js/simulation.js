@@ -5,7 +5,6 @@
  * Uses global `d3` (loaded via UMD <script> tag in HTML).
  */
 
-import { trimEdges } from './edgeTrimmer.js';
 import { nodeRadius, nodeColor, labelOpacity, edgeBaseOpacity, escapeHtml } from './utils.js';
 import { DAY_MAP } from './constants.js';
 import * as S from './state.js';
@@ -299,11 +298,8 @@ export function buildGraph(onNodeClick, onBgClick) {
   gNodes.selectAll("*").remove();
   gLabels.selectAll("*").remove();
 
-  const keptSet  = trimEdges(S.rawNodes, S.rawEdges, 3);
   const newNodes = S.rawNodes.map(d => ({ ...d }));
-  const newEdges = S.rawEdges
-    .filter(e => keptSet.has(e))
-    .map(e => ({ source: e.source, target: e.target, weight: e.weight, type: e.type }));
+  const newEdges = S.rawEdges.map(e => ({ source: e.source, target: e.target, weight: e.weight, type: e.type }));
 
   S.setSimNodes(newNodes);
   S.setSimEdges(newEdges);

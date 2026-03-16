@@ -766,6 +766,47 @@
         border-top: 1px solid rgba(255, 255, 255, 0.06);
       }
     }
+
+    /* ── Hero carousel (desktop & mobile) ── */
+    .hero-carousel {
+      position: relative;
+    }
+
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.35);
+      border: none;
+      color: white;
+      font-size: 20px;
+      padding: 8px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      z-index: 2;
+      transition: background 0.15s;
+    }
+
+    .carousel-arrow:hover {
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    .carousel-arrow-left {
+      left: 8px;
+    }
+
+    .carousel-arrow-right {
+      right: 8px;
+    }
+
+    /* Mobile: arrows hidden until expanded */
+    #drawerHero .carousel-arrow {
+      display: none;
+    }
+
+    #drawerHero.drawer-arrows-visible .carousel-arrow {
+      display: block;
+    }
   </style>
 </head>
 <body>
@@ -829,14 +870,14 @@
       </div>
     </div>
 
-    <!-- Edge threshold (re-fetches on change) -->
+    <!-- Edge threshold (instant, no network request) -->
     <div class="ctrl-row">
       <div class="slider-header">
         <span class="ctrl-label">EDGE THRESHOLD</span>
-        <span class="slider-value" id="thresholdValue">0.20</span>
+        <span class="slider-value" id="thresholdValue">0.30</span>
 
       </div>
-      <input type="range" id="thresholdSlider" min="0" max="4" step="1" value="2" />
+      <input type="range" id="thresholdSlider" min="0" max="5" step="1" value="0" />
     </div>
 
     <!-- Node size (live) -->

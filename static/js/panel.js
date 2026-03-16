@@ -132,24 +132,81 @@ export async function openPanel(artistName) {
   if (!resp.ok) return;
   const d = await resp.json();
 
-  const imgUrl = d.image_url || "";
-  const imgSrc = (!imgUrl || imgUrl.includes(PLACEHOLDER_HASH))
-    ? "/static/placeholder_artist.jpeg" : imgUrl;
+  const artistProfiles = d.artist_profiles || [];
+  let activeProfileIdx = 0;
+
   const metaParts = [d.genre, d.stage, d.day].filter(Boolean);
   const tagsHtml  = (d.tags || []).map(tag =>
     `<span style="display:inline-block;background:rgba(255,255,255,0.07);border-radius:3px;padding:2px 6px;font-size:9px;color:rgba(255,255,255,0.4);margin:0 4px 4px 0">${escapeHtml(tag)}</span>`
   ).join("");
-  const bioHtml = d.bio
-    ? `<div style="font-size:10px;line-height:1.6;color:rgba(255,255,255,0.55);margin:0 16px 16px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px">${escapeHtml(d.bio)}</div>`
-    : "";
+
+  function getProfileImageUrl(idx) {
+    if (artistProfiles[idx]) {
+      const url = artistProfiles[idx].image_url || "";
+      return (!url || url.includes(PLACEHOLDER_HASH)) ? "/static/placeholder_artist.jpeg" : url;
+    }
+    const imgUrl = d.image_url || "";
+    return (!imgUrl || imgUrl.includes(PLACEHOLDER_HASH)) ? "/static/placeholder_artist.jpeg" : imgUrl;
+  }
+
+  function getProfileBio(idx) {
+    if (artistProfiles[idx] && artistProfiles[idx].bio) {
+      return `<div style="font-size:10px;line-height:1.6;color:rgba(255,255,255,0.55);margin:0 16px 16px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px">${escapeHtml(artistProfiles[idx].bio)}</div>`;
+    }
+    return "";
+  }
+
+  function updateCarouselImage(idx) {
+    const img = document.getElementById("panelHeroImg");
+    if (img) {
+      img.src = getProfileImageUrl(idx);
+    }
+    const bioEl = document.getElementById("panelBio");
+    if (bioEl) {
+      bioEl.innerHTML = getProfileBio(idx);
+    }
+  }
+
+  const imgUrl = artistProfiles[0]?.image_url || d.image_url || "";
+  const imgSrc = getProfileImageUrl(0);
+  const bioHtml = getProfileBio(0);
+
+  // Build carousel HTML if multiple profiles
+  const carouselHtml = artistProfiles.length > 1
+    ? `<div class="hero-carousel" id="panelCarousel">` +
+      `<img id="panelHeroImg" src="${imgSrc}" style="width:100%;object-fit:cover;max-height:280px;display:block" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
+      `<button class="carousel-arrow carousel-arrow-left" id="panelArrowLeft">‹</button>` +
+      `<button class="carousel-arrow carousel-arrow-right" id="panelArrowRight">›</button>` +
+      `</div>`
+    : `<img id="panelHeroImg" src="${imgSrc}" style="width:100%;object-fit:cover;max-height:280px;display:block" onerror="this.src='/static/placeholder_artist.jpeg'" />`;
 
   document.getElementById("panelContent").innerHTML =
-    `<img src="${imgSrc}" style="width:100%;object-fit:cover;max-height:280px;display:block" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
+    carouselHtml +
     `<div style="font-size:15px;font-weight:bold;color:white;margin:12px 16px 4px">${escapeHtml(d.name)}</div>` +
     `<div style="font-size:10px;color:rgba(255,255,255,0.45);margin:0 16px 8px">${metaParts.map(escapeHtml).join(" · ")}</div>` +
     `<div style="margin:0 16px 12px">${tagsHtml}</div>` +
-    bioHtml +
+    `<div id="panelBio">${bioHtml}</div>` +
     `<div id="tracksLoading" style="display:flex;justify-content:center;align-items:center;padding:24px 0"><div class="spinner"></div></div>`;
+
+  // Wire carousel arrows if multi-artist
+  if (artistProfiles.length > 1) {
+    const leftBtn = document.getElementById("panelArrowLeft");
+    const rightBtn = document.getElementById("panelArrowRight");
+    if (leftBtn) {
+      leftBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        activeProfileIdx = (activeProfileIdx - 1 + artistProfiles.length) % artistProfiles.length;
+        updateCarouselImage(activeProfileIdx);
+      });
+    }
+    if (rightBtn) {
+      rightBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        activeProfileIdx = (activeProfileIdx + 1) % artistProfiles.length;
+        updateCarouselImage(activeProfileIdx);
+      });
+    }
+  }
 
   document.getElementById("artistPanel").classList.add("open");
 
