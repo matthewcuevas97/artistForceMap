@@ -8,7 +8,7 @@ from typing import Dict, List, Any
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-from backend.user_data import get_or_create_user, update_user_db
+from backend.user_data import get_or_create_user, update_user_db, set_user_top_artists
 
 
 # OAuth configuration (stub - replace with actual credentials)
@@ -110,8 +110,23 @@ def ingest_user(auth_data: Dict[str, Any]) -> Dict[str, Any]:
     else:
         raise ValueError(f"Unknown provider: {provider}")
 
-    # Save to user database
-    user_db["top_artists"] = top_artists
+    # Save to user database using cache system
+    # Convert to format expected by caching system
+    formatted_artists = [
+        {
+            "name": artist["name"],
+            "score": 1.0 - (i / max(len(top_artists) - 1, 1))  # Normalize score
+        }
+        for i, artist in enumerate(top_artists)
+    ]
+
+    # Use caching system to store artists
+    if provider == "spotify":
+        set_user_top_artists(user_id, spotify_artists=formatted_artists)
+    else:
+        set_user_top_artists(user_id, lastfm_artists=formatted_artists)
+
+    # Also update legacy top_artists field for compatibility
     update_user_db(user_id, {"top_artists": top_artists})
 
     return {

@@ -1,0 +1,432 @@
+{
+  "Magdalena Bay": {
+    "similar_artists": [
+      {
+        "name": "Caroline Polachek",
+        "match": 1.0
+      },
+      {
+        "name": "Kero Kero Bonito",
+        "match": 0.969794
+      },
+      {
+        "name": "Allie X",
+        "match": 0.745869
+      },
+      {
+        "name": "Charli xcx",
+        "match": 0.701285
+      },
+      {
+        "name": "The Mar\u00edas",
+        "match": 0.624847
+      },
+      {
+        "name": "Grimes",
+        "match": 0.615952
+      },
+      {
+        "name": "Chairlift",
+        "match": 0.614177
+      },
+      {
+        "name": "Carly Rae Jepsen",
+        "match": 0.599968
+      },
+      {
+        "name": "Hemlocke Springs",
+        "match": 0.595678
+      },
+      {
+        "name": "Japanese Breakfast",
+        "match": 0.579657
+      },
+      {
+        "name": "Night Tapes",
+        "match": 0.578433
+      },
+      {
+        "name": "Not For Radio",
+        "match": 0.577316
+      },
+      {
+        "name": "yeule",
+        "match": 0.574512
+      },
+      {
+        "name": "Alvvays",
+        "match": 0.505493
+      },
+      {
+        "name": "Men I Trust",
+        "match": 0.503476
+      },
+      {
+        "name": "Rina Sawayama",
+        "match": 0.501834
+      },
+      {
+        "name": "Hatchie",
+        "match": 0.486074
+      },
+      {
+        "name": "Rebecca Black",
+        "match": 0.483012
+      },
+      {
+        "name": "Sky Ferreira",
+        "match": 0.475319
+      },
+      {
+        "name": "Remi Wolf",
+        "match": 0.472157
+      }
+    ],
+    "_created_at": 1773652662.1263812,
+    "_updated_at": "2026-03-16T02:17:42.126387"
+  },
+  "Ninajirachi": {
+    "similar_artists": [
+      {
+        "name": "Frost Children",
+        "match": 1.0
+      },
+      {
+        "name": "underscores",
+        "match": 0.881104
+      },
+      {
+        "name": "Jane Remover",
+        "match": 0.652514
+      },
+      {
+        "name": "Porter Robinson",
+        "match": 0.491391
+      },
+      {
+        "name": "Danny L Harle",
+        "match": 0.454005
+      },
+      {
+        "name": "MGNA Crrrta",
+        "match": 0.412152
+      },
+      {
+        "name": "kmoe",
+        "match": 0.401076
+      },
+      {
+        "name": "umru",
+        "match": 0.38777
+      },
+      {
+        "name": "100 gecs",
+        "match": 0.364698
+      },
+      {
+        "name": "8485",
+        "match": 0.351138
+      },
+      {
+        "name": "A. G. Cook",
+        "match": 0.346671
+      },
+      {
+        "name": "gabby start",
+        "match": 0.334285
+      },
+      {
+        "name": "Slayyyter",
+        "match": 0.3303
+      },
+      {
+        "name": "Kimj",
+        "match": 0.321057
+      },
+      {
+        "name": "Saoirse Dream",
+        "match": 0.316849
+      },
+      {
+        "name": "bassvictim",
+        "match": 0.31379
+      },
+      {
+        "name": "Namasenda",
+        "match": 0.307019
+      },
+      {
+        "name": "Charli xcx",
+        "match": 0.296546
+      },
+      {
+        "name": "Food House",
+        "match": 0.292983
+      },
+      {
+        "name": "webcage",
+        "match": 0.269507
+      }
+    ],
+    "_created_at": 1773652663.947047,
+    "_updated_at": "2026-03-16T02:17:43.947049"
+  },
+  "Charli xcx": {
+    "similar_artists": [
+      {
+        "name": "Sophie",
+        "match": 1.0
+      },
+      {
+        "name": "Slayyyter",
+        "match": 0.933129
+      },
+      {
+        "name": "Caroline Polachek",
+        "match": 0.721492
+      },
+      {
+        "name": "A. G. Cook",
+        "match": 0.679658
+      },
+      {
+        "name": "Addison Rae",
+        "match": 0.662988
+      },
+      {
+        "name": "Kim Petras",
+        "match": 0.65533
+      },
+      {
+        "name": "Sky Ferreira",
+        "match": 0.644037
+      },
+      {
+        "name": "GFOTY",
+        "match": 0.596184
+      },
+      {
+        "name": "Lorde",
+        "match": 0.542681
+      },
+      {
+        "name": "Hannah Diamond",
+        "match": 0.523185
+      },
+      {
+        "name": "PinkPantheress",
+        "match": 0.49977
+      },
+      {
+        "name": "Namasenda",
+        "match": 0.47316
+      },
+      {
+        "name": "Carly Rae Jepsen",
+        "match": 0.473005
+      },
+      {
+        "name": "QT",
+        "match": 0.411116
+      },
+      {
+        "name": "Charli XCX & Christine and the Queens",
+        "match": 0.404165
+      },
+      {
+        "name": "Chase Icon",
+        "match": 0.391262
+      },
+      {
+        "name": "Danny L Harle",
+        "match": 0.391145
+      },
+      {
+        "name": "LIZ",
+        "match": 0.389137
+      },
+      {
+        "name": "Thy Slaughter",
+        "match": 0.387793
+      },
+      {
+        "name": "Robyn",
+        "match": 0.382803
+      }
+    ],
+    "_created_at": 1773652665.526357,
+    "_updated_at": "2026-03-16T02:17:45.526358"
+  },
+  "Holly Humberstone": {
+    "similar_artists": [
+      {
+        "name": "Maisie Peters",
+        "match": 1.0
+      },
+      {
+        "name": "Griff",
+        "match": 0.897551
+      },
+      {
+        "name": "Maggie Rogers",
+        "match": 0.887835
+      },
+      {
+        "name": "Tommy Lefroy",
+        "match": 0.696074
+      },
+      {
+        "name": "Nieve Ella",
+        "match": 0.689032
+      },
+      {
+        "name": "Lizzy McAlpine",
+        "match": 0.646833
+      },
+      {
+        "name": "Maude Latour",
+        "match": 0.642824
+      },
+      {
+        "name": "Jensen McRae",
+        "match": 0.639008
+      },
+      {
+        "name": "Gracie Abrams",
+        "match": 0.633498
+      },
+      {
+        "name": "Del Water Gap",
+        "match": 0.605335
+      },
+      {
+        "name": "MUNA",
+        "match": 0.604841
+      },
+      {
+        "name": "Alix Page",
+        "match": 0.594637
+      },
+      {
+        "name": "Ella Jane",
+        "match": 0.590149
+      },
+      {
+        "name": "Gatlin",
+        "match": 0.554814
+      },
+      {
+        "name": "Carol Ades",
+        "match": 0.5528
+      },
+      {
+        "name": "Lennon Stella",
+        "match": 0.550973
+      },
+      {
+        "name": "Dagny",
+        "match": 0.533484
+      },
+      {
+        "name": "Matilda Mann",
+        "match": 0.509228
+      },
+      {
+        "name": "Sam Fender",
+        "match": 0.503221
+      },
+      {
+        "name": "Alessi Rose",
+        "match": 0.498173
+      }
+    ],
+    "_created_at": 1773652667.030169,
+    "_updated_at": "2026-03-16T02:17:47.030172"
+  },
+  "Slayyyter": {
+    "similar_artists": [
+      {
+        "name": "Kim Petras",
+        "match": 1.0
+      },
+      {
+        "name": "That Kid",
+        "match": 0.748977
+      },
+      {
+        "name": "Chase Icon",
+        "match": 0.726728
+      },
+      {
+        "name": "Charli xcx",
+        "match": 0.724806
+      },
+      {
+        "name": "Cobrah",
+        "match": 0.687808
+      },
+      {
+        "name": "Ayesha Erotica",
+        "match": 0.598392
+      },
+      {
+        "name": "Rebecca Black",
+        "match": 0.54995
+      },
+      {
+        "name": "Rose Gray",
+        "match": 0.522284
+      },
+      {
+        "name": "AD\u00c9LA",
+        "match": 0.519451
+      },
+      {
+        "name": "Addison Rae",
+        "match": 0.507205
+      },
+      {
+        "name": "Shygirl",
+        "match": 0.494047
+      },
+      {
+        "name": "LIZ",
+        "match": 0.405564
+      },
+      {
+        "name": "Miss Madeline",
+        "match": 0.387795
+      },
+      {
+        "name": "Namasenda",
+        "match": 0.386418
+      },
+      {
+        "name": "Allie X",
+        "match": 0.376604
+      },
+      {
+        "name": "Dorian Electra",
+        "match": 0.359728
+      },
+      {
+        "name": "Ashnikko",
+        "match": 0.354365
+      },
+      {
+        "name": "Ke$ha",
+        "match": 0.345848
+      },
+      {
+        "name": "Amara ctk100",
+        "match": 0.337812
+      },
+      {
+        "name": "Sophie",
+        "match": 0.325067
+      }
+    ],
+    "_created_at": 1773652668.443192,
+    "_updated_at": "2026-03-16T02:17:48.443193"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "user_id": "test_user_sensitive",
+  "auth_provider": "spotify",
+  "top_artists_spotify": [],
+  "top_artists_lastfm": [],
+  "top_artists_merged": [],
+  "seed_artists": [],
+  "map_id": null,
+  "_last_updated": "2026-03-16T01:03:15.347824"
+}

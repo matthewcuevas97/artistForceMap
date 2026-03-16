@@ -1,0 +1,1294 @@
+{
+  "Magdalena Bay": {
+    "name": "Magdalena Bay",
+    "rank": 1,
+    "listeners": 1419179,
+    "tags": [
+      "synthpop",
+      "electropop",
+      "indie pop",
+      "dream pop",
+      "pop",
+      "dance-pop",
+      "american",
+      "electronic",
+      "neo-psychedelia",
+      "female vocalists"
+    ],
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/d997d33abc84ad8158e6379c84eeb761/1000x1000-000000-80-0-0.jpg",
+    "bio": "Magdalena Bay is an American alternative pop duo from Miami, Florida, based in Los Angeles, California. The duo consists of couple Mica Tenenbaum and Matthew Lewin, who write and produce together. They have released two studio albums, three EPs, and three mixtapes. The mixtapes are called Mini Mixes",
+    "similar_artists": [
+      {
+        "name": "Caroline Polachek",
+        "match": 1.0
+      },
+      {
+        "name": "Kero Kero Bonito",
+        "match": 0.969794
+      },
+      {
+        "name": "Allie X",
+        "match": 0.745869
+      },
+      {
+        "name": "Charli xcx",
+        "match": 0.701285
+      },
+      {
+        "name": "The Mar\u00edas",
+        "match": 0.624847
+      },
+      {
+        "name": "Grimes",
+        "match": 0.615952
+      },
+      {
+        "name": "Chairlift",
+        "match": 0.614177
+      },
+      {
+        "name": "Carly Rae Jepsen",
+        "match": 0.599968
+      },
+      {
+        "name": "Hemlocke Springs",
+        "match": 0.595678
+      },
+      {
+        "name": "Japanese Breakfast",
+        "match": 0.579657
+      },
+      {
+        "name": "Night Tapes",
+        "match": 0.578433
+      },
+      {
+        "name": "Not For Radio",
+        "match": 0.577316
+      },
+      {
+        "name": "yeule",
+        "match": 0.574512
+      },
+      {
+        "name": "Alvvays",
+        "match": 0.505493
+      },
+      {
+        "name": "Men I Trust",
+        "match": 0.503476
+      },
+      {
+        "name": "Rina Sawayama",
+        "match": 0.501834
+      },
+      {
+        "name": "Hatchie",
+        "match": 0.486074
+      },
+      {
+        "name": "Rebecca Black",
+        "match": 0.483012
+      },
+      {
+        "name": "Sky Ferreira",
+        "match": 0.475319
+      },
+      {
+        "name": "Remi Wolf",
+        "match": 0.472157
+      }
+    ],
+    "top_tracks": [
+      {
+        "name": "Killshot",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/c/8/a/0/c8aa04a2227e4f4ae23b79e7622bf978.mp3?hdnea=exp=1773653319~acl=/api/1/1/c/8/a/0/c8aa04a2227e4f4ae23b79e7622bf978.mp3*~data=user_id=0,application_id=42~hmac=21e184844b75012c156c770f9379457488bef40eb22d1a6a0fd8b336688f5566",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/bfe8069fbbf5226c9c6e589c8a7504b4/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Death & Romance",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/b/7/d/0/b7dd5c43cb2beae7cb6771ebaa52b2a5.mp3?hdnea=exp=1773653319~acl=/api/1/1/b/7/d/0/b7dd5c43cb2beae7cb6771ebaa52b2a5.mp3*~data=user_id=0,application_id=42~hmac=b293a42dcf9670835893656d1adbff2f3663485a475fe8ec3a02ae3cf0853d7a",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c73ab49a506127eace6cd7dddd39fbda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Image",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/3/1/0/0/310e5c1192a6371e4b84c0ccb050c6be.mp3?hdnea=exp=1773653319~acl=/api/1/1/3/1/0/0/310e5c1192a6371e4b84c0ccb050c6be.mp3*~data=user_id=0,application_id=42~hmac=a5ce3bd15ab4f2157677857fa83e1e97c1136388a439e3410281f2de8ff2121e",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/a1e2df90b6ac6e57bfadb965d9aa503a/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Human Happens",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/0/4/d/0/04d53eb89ee97870de5f28aacd7095c9.mp3?hdnea=exp=1773653319~acl=/api/1/1/0/4/d/0/04d53eb89ee97870de5f28aacd7095c9.mp3*~data=user_id=0,application_id=42~hmac=558af0e00b809b0731ed4ca9b9d10a63c17a35b3364167bf1cf2e88620233a6d",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/571ad948e3c47c02a14d049cfa2ad9b2/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Killshot (Slowed + Reverb)",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/5/c/0/95cb8b7e267210bb3ec785f7a3a481f6.mp3?hdnea=exp=1773653319~acl=/api/1/1/9/5/c/0/95cb8b7e267210bb3ec785f7a3a481f6.mp3*~data=user_id=0,application_id=42~hmac=9f8a3359afeefffa37c612df72780a7dd788dcba7bd844b74f86a8ce4c15b366",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/23b8217031ed6b93d2a8068ed247625b/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Watching T.V.",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/8/e/4/0/8e4b8b0ed630c941c7c0688253d27c04.mp3?hdnea=exp=1773653319~acl=/api/1/1/8/e/4/0/8e4b8b0ed630c941c7c0688253d27c04.mp3*~data=user_id=0,application_id=42~hmac=ba86cd2ba98694c58a47b5a76adc9df3ead2efab33543218895f8d1e09ca3177",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c73ab49a506127eace6cd7dddd39fbda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Killing Time",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/2/2/6/0/226403edea1357ebbaba4f116384ee2f.mp3?hdnea=exp=1773653319~acl=/api/1/1/2/2/6/0/226403edea1357ebbaba4f116384ee2f.mp3*~data=user_id=0,application_id=42~hmac=59a1a10822c5d08d7414cd8bd7d9015f4e1dbc4815f85f152c428c33406d7e58",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c73ab49a506127eace6cd7dddd39fbda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Dreamcatching",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/7/6/8/0/768cfbef3c211bcecdc0310025647fbe.mp3?hdnea=exp=1773653319~acl=/api/1/1/7/6/8/0/768cfbef3c211bcecdc0310025647fbe.mp3*~data=user_id=0,application_id=42~hmac=c564f8cf744da55b3cf3766c898dbcc94d7d077d9eaa8aa60cf092829bb8e728",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/87dd7911f7c37b2a90ce9dd2b9ff7d82/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Fear, Sex",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/e/8/7/0/e875c865be0c5ca0f1ff3578857232e5.mp3?hdnea=exp=1773653319~acl=/api/1/1/e/8/7/0/e875c865be0c5ca0f1ff3578857232e5.mp3*~data=user_id=0,application_id=42~hmac=411b0f186aa76f74c47f7bea508109bb601ac3cddaa1f315dfd48a177f9d64fd",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c73ab49a506127eace6cd7dddd39fbda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "You Lose!",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/f/3/0/9f383fe9ff5f6e133735ad7d2faac7ec.mp3?hdnea=exp=1773653319~acl=/api/1/1/9/f/3/0/9f383fe9ff5f6e133735ad7d2faac7ec.mp3*~data=user_id=0,application_id=42~hmac=78188f42f84d73eaad40875eea5dcbbcf40e5bb4761e4a88f08540eb869fd270",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/87dd7911f7c37b2a90ce9dd2b9ff7d82/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "deezer_fans": 15672,
+    "genre": "Electronic",
+    "lastfm_artists": [
+      "Magdalena Bay"
+    ],
+    "artist_profiles": [
+      {
+        "name": "Magdalena Bay",
+        "image_url": "https://cdn-images.dzcdn.net/images/artist/d997d33abc84ad8158e6379c84eeb761/1000x1000-000000-80-0-0.jpg",
+        "bio": "Magdalena Bay is an American alternative pop duo from Miami, Florida, based in Los Angeles, California. The duo consists of couple Mica Tenenbaum and Matthew Lewin, who write and produce together. They have released two studio albums, three EPs, and three mixtapes. The mixtapes are called Mini Mixes"
+      }
+    ],
+    "stage": "",
+    "day": "",
+    "weekend": "",
+    "_created_at": 1773652419.991317,
+    "_updated_at": "2026-03-16T02:13:39.991325"
+  },
+  "Charli xcx": {
+    "name": "Charli xcx",
+    "rank": 2,
+    "listeners": 3719627,
+    "tags": [
+      "pop",
+      "synthpop",
+      "electronic",
+      "female vocalists",
+      "electroclash",
+      "electropop",
+      "hyperpop",
+      "british",
+      "bubblegum bass",
+      "pc music"
+    ],
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/89d204250a4e968f9be7171ba8efde00/1000x1000-000000-80-0-0.jpg",
+    "bio": "Charlotte Emma Aitchison (born 2 August 1992), known professionally as Charli xcx, is a British pop singer and songwriter. She began sharing her music on Myspace in 2008 before entering the London rave scene. In 2010, she signed with Asylum Records and released a series of singles and mixtapes. In 2",
+    "similar_artists": [
+      {
+        "name": "Sophie",
+        "match": 1.0
+      },
+      {
+        "name": "Slayyyter",
+        "match": 0.933129
+      },
+      {
+        "name": "Caroline Polachek",
+        "match": 0.721492
+      },
+      {
+        "name": "A. G. Cook",
+        "match": 0.679658
+      },
+      {
+        "name": "Addison Rae",
+        "match": 0.662988
+      },
+      {
+        "name": "Kim Petras",
+        "match": 0.65533
+      },
+      {
+        "name": "Sky Ferreira",
+        "match": 0.644037
+      },
+      {
+        "name": "GFOTY",
+        "match": 0.596184
+      },
+      {
+        "name": "Lorde",
+        "match": 0.542681
+      },
+      {
+        "name": "Hannah Diamond",
+        "match": 0.523185
+      },
+      {
+        "name": "PinkPantheress",
+        "match": 0.49977
+      },
+      {
+        "name": "Namasenda",
+        "match": 0.47316
+      },
+      {
+        "name": "Carly Rae Jepsen",
+        "match": 0.473005
+      },
+      {
+        "name": "QT",
+        "match": 0.411116
+      },
+      {
+        "name": "Charli XCX & Christine and the Queens",
+        "match": 0.404165
+      },
+      {
+        "name": "Chase Icon",
+        "match": 0.391262
+      },
+      {
+        "name": "Danny L Harle",
+        "match": 0.391145
+      },
+      {
+        "name": "LIZ",
+        "match": 0.389137
+      },
+      {
+        "name": "Thy Slaughter",
+        "match": 0.387793
+      },
+      {
+        "name": "Robyn",
+        "match": 0.382803
+      }
+    ],
+    "top_tracks": [
+      {
+        "name": "party 4 u",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/6/d/a/0/6da39aaf032e150e0b56294db24019ca.mp3?hdnea=exp=1773653322~acl=/api/1/1/6/d/a/0/6da39aaf032e150e0b56294db24019ca.mp3*~data=user_id=0,application_id=42~hmac=cd2347bab410b2fe105e664b2be64f50b4cfef780ec77c76d8ac1c7c23b9c585",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/f2315bc78a1049916d387cd23feeb3ee/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Guess featuring billie eilish",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/d/5/5/0/d5562cc6f099b3d6d0f3eea6258f0928.mp3?hdnea=exp=1773653322~acl=/api/1/1/d/5/5/0/d5562cc6f099b3d6d0f3eea6258f0928.mp3*~data=user_id=0,application_id=42~hmac=aaa843a840b2004bfb49a2387cd849dc1bb6afff66074caf0383f545fdc41c82",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/a6a00854b95f19a50772e50bdd2c4a0e/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Dying for You",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/5/7/7/0/5777081a473702a3c583d37d2f6c3f7b.mp3?hdnea=exp=1773653322~acl=/api/1/1/5/7/7/0/5777081a473702a3c583d37d2f6c3f7b.mp3*~data=user_id=0,application_id=42~hmac=290855655b29e967971dde8acbc72feeb9e8e3e39df4b2ac88707153d5c805cc",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/06024a909553e0f2ec76c0da1628cdda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Von dutch",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/5/7/a/0/57adc1a4c05fa745f9939adcc9c892b2.mp3?hdnea=exp=1773653322~acl=/api/1/1/5/7/a/0/57adc1a4c05fa745f9939adcc9c892b2.mp3*~data=user_id=0,application_id=42~hmac=ff85b5d05ff09f229bdcb58aa2c87b81f09dfd4aadc549a55b4f05752ac58f3a",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de9e79511cda59914de9add50946e43c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "360",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/6/d/f/0/6df461a2309db820e650158cee4f0b70.mp3?hdnea=exp=1773653322~acl=/api/1/1/6/d/f/0/6df461a2309db820e650158cee4f0b70.mp3*~data=user_id=0,application_id=42~hmac=d14c9d3c64f23ca151d1f9b602d90450c5cc50eee9d75ffea94b1da9cdc8471f",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de9e79511cda59914de9add50946e43c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Always Everywhere",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/4/b/8/0/4b84426deb906d5ec62e52d275613a54.mp3?hdnea=exp=1773653322~acl=/api/1/1/4/b/8/0/4b84426deb906d5ec62e52d275613a54.mp3*~data=user_id=0,application_id=42~hmac=81d4d7ca84d2c7987a5caa87869668ddaf8ea224fd6a9f33c4f06d7a734b3139",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/06024a909553e0f2ec76c0da1628cdda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Apple",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/d/8/6/0/d863ea5f62d2c02d615fc0553835802a.mp3?hdnea=exp=1773653322~acl=/api/1/1/d/8/6/0/d863ea5f62d2c02d615fc0553835802a.mp3*~data=user_id=0,application_id=42~hmac=9eee5c52346220ceb6f2b213ea387861aacc971350c7a6b1e9492fa36326d250",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de9e79511cda59914de9add50946e43c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Chains of Love",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/0/1/0/901adfdf64b4f5a67cb7d89e9b00ea8e.mp3?hdnea=exp=1773653322~acl=/api/1/1/9/0/1/0/901adfdf64b4f5a67cb7d89e9b00ea8e.mp3*~data=user_id=0,application_id=42~hmac=434242c5ce2126dfa564f26d8a059f58cf99bafe53d737efb79828c4ff03d25b",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/06024a909553e0f2ec76c0da1628cdda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Out of Myself",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/b/9/5/0/b9575dae9c81c3bac1b3b48ed3bf9624.mp3?hdnea=exp=1773653322~acl=/api/1/1/b/9/5/0/b9575dae9c81c3bac1b3b48ed3bf9624.mp3*~data=user_id=0,application_id=42~hmac=92bb9a1f28e17d83566edc7c23e334b114b048c1910aa1502ceef199879827bb",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/06024a909553e0f2ec76c0da1628cdda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "365",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/2/a/2/0/2a2937c5c088cd18c7e7cb062ea0494c.mp3?hdnea=exp=1773653322~acl=/api/1/1/2/a/2/0/2a2937c5c088cd18c7e7cb062ea0494c.mp3*~data=user_id=0,application_id=42~hmac=0577e43cc6c7c9c06315ed38b32405227f2321f4124be43aacab5aef64c345f9",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de9e79511cda59914de9add50946e43c/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "deezer_fans": 1845961,
+    "genre": "Electronic",
+    "lastfm_artists": [
+      "Charli xcx"
+    ],
+    "artist_profiles": [
+      {
+        "name": "Charli xcx",
+        "image_url": "https://cdn-images.dzcdn.net/images/artist/89d204250a4e968f9be7171ba8efde00/1000x1000-000000-80-0-0.jpg",
+        "bio": "Charlotte Emma Aitchison (born 2 August 1992), known professionally as Charli xcx, is a British pop singer and songwriter. She began sharing her music on Myspace in 2008 before entering the London rave scene. In 2010, she signed with Asylum Records and released a series of singles and mixtapes. In 2"
+      }
+    ],
+    "stage": "",
+    "day": "",
+    "weekend": "",
+    "_created_at": 1773652422.6641972,
+    "_updated_at": "2026-03-16T02:13:42.664205"
+  },
+  "Ninajirachi": {
+    "name": "Ninajirachi",
+    "rank": 3,
+    "listeners": 343701,
+    "tags": [
+      "hyperpop",
+      "electro house",
+      "bubblegum bass",
+      "electropop",
+      "electronic",
+      "house",
+      "australia",
+      "australian",
+      "dance-pop",
+      "uk bass"
+    ],
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/c4dc2676b8b1aa0c679d614deb66bcdf/1000x1000-000000-80-0-0.jpg",
+    "bio": "Ninajirachi is the moniker of Australian DJ Nina Wilson, who is based near Sydney, New South Wales. She creates an eclectic palette of snappy and inspired electronic musings to deliver what Triple J has described as 'dance music made in an ice cave' and Indie Shuffle has described as 'Lush and ether",
+    "similar_artists": [
+      {
+        "name": "Frost Children",
+        "match": 1.0
+      },
+      {
+        "name": "underscores",
+        "match": 0.881104
+      },
+      {
+        "name": "Jane Remover",
+        "match": 0.652514
+      },
+      {
+        "name": "Porter Robinson",
+        "match": 0.491391
+      },
+      {
+        "name": "Danny L Harle",
+        "match": 0.454005
+      },
+      {
+        "name": "MGNA Crrrta",
+        "match": 0.412152
+      },
+      {
+        "name": "kmoe",
+        "match": 0.401076
+      },
+      {
+        "name": "umru",
+        "match": 0.38777
+      },
+      {
+        "name": "100 gecs",
+        "match": 0.364698
+      },
+      {
+        "name": "8485",
+        "match": 0.351138
+      },
+      {
+        "name": "A. G. Cook",
+        "match": 0.346671
+      },
+      {
+        "name": "gabby start",
+        "match": 0.334285
+      },
+      {
+        "name": "Slayyyter",
+        "match": 0.3303
+      },
+      {
+        "name": "Kimj",
+        "match": 0.321057
+      },
+      {
+        "name": "Saoirse Dream",
+        "match": 0.316849
+      },
+      {
+        "name": "bassvictim",
+        "match": 0.31379
+      },
+      {
+        "name": "Namasenda",
+        "match": 0.307019
+      },
+      {
+        "name": "Charli xcx",
+        "match": 0.296546
+      },
+      {
+        "name": "Food House",
+        "match": 0.292983
+      },
+      {
+        "name": "webcage",
+        "match": 0.269507
+      }
+    ],
+    "top_tracks": [
+      {
+        "name": "iPod Touch",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/7/e/0/0/7e0750d9f5530c9221391ad1408ded8a.mp3?hdnea=exp=1773653321~acl=/api/1/1/7/e/0/0/7e0750d9f5530c9221391ad1408ded8a.mp3*~data=user_id=0,application_id=42~hmac=169d5b951f7a64eb8b995a8ae46a033a810e73ea374591a263c871c31d6048bf",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Fuck My Computer",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/5/0/9/0/509beefaea4119511a810e16120ff26a.mp3?hdnea=exp=1773653321~acl=/api/1/1/5/0/9/0/509beefaea4119511a810e16120ff26a.mp3*~data=user_id=0,application_id=42~hmac=9ba2d1993dcf75251a9a41255d9315618bf7abea67be7e17e024017410d4bb99",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Delete",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/b/8/3/0/b8380f1dde244f083d0db2a80a585142.mp3?hdnea=exp=1773653321~acl=/api/1/1/b/8/3/0/b8380f1dde244f083d0db2a80a585142.mp3*~data=user_id=0,application_id=42~hmac=f3d785384fc7b6ae7cac8eac3c50e3f3bfcb1f111346f596e77310e08865aaad",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "London Song",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/7/b/b/0/7bb98e6f0adc2c700ebbfba65c453a7e.mp3?hdnea=exp=1773653321~acl=/api/1/1/7/b/b/0/7bb98e6f0adc2c700ebbfba65c453a7e.mp3*~data=user_id=0,application_id=42~hmac=815eedecc795806b1ee5b63d21e43a9ae58c8ecc1df1f9f600df71b451b46de6",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "CSIRAC",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/e/9/7/0/e976b1b40de2a5dc365502f2de7c6dce.mp3?hdnea=exp=1773653321~acl=/api/1/1/e/9/7/0/e976b1b40de2a5dc365502f2de7c6dce.mp3*~data=user_id=0,application_id=42~hmac=e2454591d846daf6e6162487a38bbbe99d94f64d2f329607d44f397ea31d849b",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "All I Am",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/5/d/e/0/5de90b5cc48b50e28764a83a9c7cdd1f.mp3?hdnea=exp=1773653321~acl=/api/1/1/5/d/e/0/5de90b5cc48b50e28764a83a9c7cdd1f.mp3*~data=user_id=0,application_id=42~hmac=2bcad3d7055a406e5b46df3e7c68fe01766a8de28628c70b24d0b1b7ae3ef706",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Infohazard",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/b/b/d/0/bbd487c5e5db6894747e5ede3be47c06.mp3?hdnea=exp=1773653321~acl=/api/1/1/b/b/d/0/bbd487c5e5db6894747e5ede3be47c06.mp3*~data=user_id=0,application_id=42~hmac=8de212a8bb098b582f4079d9b4badc547af5be00de9972452a72250e6ae5c8d1",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "It's You",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/8/4/9/0/8491affc541504f71e1be82f95dafd90.mp3?hdnea=exp=1773653321~acl=/api/1/1/8/4/9/0/8491affc541504f71e1be82f95dafd90.mp3*~data=user_id=0,application_id=42~hmac=32a6aa5734deec0bd1ec0369d2c751129df05ae1f8dc3966c4a83c3ade80d2b1",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Sing Good",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/0/2/f/0/02f2994d41b0bc6ee4e615b846c5574c.mp3?hdnea=exp=1773653321~acl=/api/1/1/0/2/f/0/02f2994d41b0bc6ee4e615b846c5574c.mp3*~data=user_id=0,application_id=42~hmac=65722ec9b8bd3d4891d372ae01c6271b95256770ea634859c3dd5efbe12170cf",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "All At Once",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/2/b/1/0/2b18e352d9d4c40d461a60a9d47e386c.mp3?hdnea=exp=1773653321~acl=/api/1/1/2/b/1/0/2b18e352d9d4c40d461a60a9d47e386c.mp3*~data=user_id=0,application_id=42~hmac=c80a0949d3e0a8919269e3d08cb7410416bd770bf7cffdae0c5fddbaa1460ea6",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "deezer_fans": 3125,
+    "genre": "Electronic",
+    "lastfm_artists": [
+      "Ninajirachi"
+    ],
+    "artist_profiles": [
+      {
+        "name": "Ninajirachi",
+        "image_url": "https://cdn-images.dzcdn.net/images/artist/c4dc2676b8b1aa0c679d614deb66bcdf/1000x1000-000000-80-0-0.jpg",
+        "bio": "Ninajirachi is the moniker of Australian DJ Nina Wilson, who is based near Sydney, New South Wales. She creates an eclectic palette of snappy and inspired electronic musings to deliver what Triple J has described as 'dance music made in an ice cave' and Indie Shuffle has described as 'Lush and ether"
+      }
+    ],
+    "stage": "",
+    "day": "",
+    "weekend": "",
+    "_created_at": 1773652421.3705878,
+    "_updated_at": "2026-03-16T02:13:41.370594"
+  },
+  "Slayyyter": {
+    "name": "Slayyyter",
+    "rank": 4,
+    "listeners": 793790,
+    "tags": [
+      "pop",
+      "hyperpop",
+      "electropop",
+      "electronic",
+      "bubblegum bass",
+      "synthpop",
+      "techno",
+      "electro",
+      "united states",
+      "american"
+    ],
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/68f4544fb01974faacb1450623a0e55e/1000x1000-000000-80-0-0.jpg",
+    "bio": "Slayyyter (born Catherine Grace Garner on September 17, 1996, in Kirkwood, Missouri) is an American singer and songwriter known for her work in pop and hyperpop, often incorporating aesthetics inspired by late 1990s and early 2000s popular culture. She attended the University of Missouri for one yea",
+    "similar_artists": [
+      {
+        "name": "Kim Petras",
+        "match": 1.0
+      },
+      {
+        "name": "That Kid",
+        "match": 0.748977
+      },
+      {
+        "name": "Chase Icon",
+        "match": 0.726728
+      },
+      {
+        "name": "Charli xcx",
+        "match": 0.724806
+      },
+      {
+        "name": "Cobrah",
+        "match": 0.687808
+      },
+      {
+        "name": "Ayesha Erotica",
+        "match": 0.598392
+      },
+      {
+        "name": "Rebecca Black",
+        "match": 0.54995
+      },
+      {
+        "name": "Rose Gray",
+        "match": 0.522284
+      },
+      {
+        "name": "AD\u00c9LA",
+        "match": 0.519451
+      },
+      {
+        "name": "Addison Rae",
+        "match": 0.507205
+      },
+      {
+        "name": "Shygirl",
+        "match": 0.494047
+      },
+      {
+        "name": "LIZ",
+        "match": 0.405564
+      },
+      {
+        "name": "Miss Madeline",
+        "match": 0.387795
+      },
+      {
+        "name": "Namasenda",
+        "match": 0.386418
+      },
+      {
+        "name": "Allie X",
+        "match": 0.376604
+      },
+      {
+        "name": "Dorian Electra",
+        "match": 0.359728
+      },
+      {
+        "name": "Ashnikko",
+        "match": 0.354365
+      },
+      {
+        "name": "Ke$ha",
+        "match": 0.345848
+      },
+      {
+        "name": "Amara ctk100",
+        "match": 0.337812
+      },
+      {
+        "name": "Sophie",
+        "match": 0.325067
+      }
+    ],
+    "top_tracks": [
+      {
+        "name": "OLD TECHNOLOGY",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/0/0/d/0/00dfc56cfa7e5c4a5d61f00b9ce1b756.mp3?hdnea=exp=1773653324~acl=/api/1/1/0/0/d/0/00dfc56cfa7e5c4a5d61f00b9ce1b756.mp3*~data=user_id=0,application_id=42~hmac=d737ad9f5b0da9982526f6d724826a2c1a8bc41e7243f65cc708813ef5107955",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/778f1f5f9e31dddf8cf264b53aab737e/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "CRANK",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/4/5/b/0/45b3d4e47469074c081afea1fb517952.mp3?hdnea=exp=1773653324~acl=/api/1/1/4/5/b/0/45b3d4e47469074c081afea1fb517952.mp3*~data=user_id=0,application_id=42~hmac=707ae8cc753da806ea8ba2b4a5ba26f81ad705680cabffb43e4f50138013329b",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de82980af32bc2f8abcf040b9a1ed63c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "BEAT UP CHANEL$",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/a/0/b/0/a0b855d2f6877e05b9995eac9e4d903c.mp3?hdnea=exp=1773653324~acl=/api/1/1/a/0/b/0/a0b855d2f6877e05b9995eac9e4d903c.mp3*~data=user_id=0,application_id=42~hmac=830ef64269d4628a7935b695ebd6f821f658b4f6474cad4652b7aa7f4a2d860e",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/0194f32a1fce32bea4663d7d088fd5f6/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "DANCE...",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/d/4/7/0/d47321e38a484b41d13201d2c0267025.mp3?hdnea=exp=1773653324~acl=/api/1/1/d/4/7/0/d47321e38a484b41d13201d2c0267025.mp3*~data=user_id=0,application_id=42~hmac=aa4b283c13330629f2e3e49c13dd911317843288a47e39a56a15d24669dd0bed",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5cc04c068d5509d5f727543036de33fe/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "CANNIBALISM!",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/4/f/7/0/4f79173b28dfbefbb6a62547016caa95.mp3?hdnea=exp=1773653324~acl=/api/1/1/4/f/7/0/4f79173b28dfbefbb6a62547016caa95.mp3*~data=user_id=0,application_id=42~hmac=ba7d95625ab5aacfd9d92975f24eb4cbf2134c2c6f7a63364c63ea2202086813",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/f1d20fcbd764ddfed99983ac913454a1/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Daddy AF",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/d/2/3/0/d23ba72f9d132d7b6df92aa8513a412a.mp3?hdnea=exp=1773653324~acl=/api/1/1/d/2/3/0/d23ba72f9d132d7b6df92aa8513a412a.mp3*~data=user_id=0,application_id=42~hmac=22201c8639680a7729cebf4a90f973861dec72275c022d83490439c172ae5ffd",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c605de3578021ea3d12b91988f158c5d/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "DANCE... (Edit)",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/1/1/5/0/1153c192432402f6d159b78c5860b63e.mp3?hdnea=exp=1773653324~acl=/api/1/1/1/1/5/0/1153c192432402f6d159b78c5860b63e.mp3*~data=user_id=0,application_id=42~hmac=70b0fb4e590b55d4c7b09a96fd69f1ce64420c18f1c45bd191720fa2150583e4",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5cc04c068d5509d5f727543036de33fe/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "I Love Hollywood!",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/8/e/1/0/8e177ad4f12882ec7cef28a10cfbf676.mp3?hdnea=exp=1773653324~acl=/api/1/1/8/e/1/0/8e177ad4f12882ec7cef28a10cfbf676.mp3*~data=user_id=0,application_id=42~hmac=12faa307c5d27c5de836b65533886d19c3679bfecdd5f45eef619ea001e4bf28",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5ebf1d29eda959151bcfa38e15ce893f/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "ATTENTION!",
+        "artist": "Ke$ha",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/e/2/2/0/e227461c9bbc3eb669ce79e20bc447f3.mp3?hdnea=exp=1773653324~acl=/api/1/1/e/2/2/0/e227461c9bbc3eb669ce79e20bc447f3.mp3*~data=user_id=0,application_id=42~hmac=2b65f510e85ddf0c8c09321deaa59c82055060ad122b35ecf4166ed1cc3fa055",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5a99b4f3105d2f53e890f286df6bba94/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Starfucker",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/2/7/0/927dfc9b9523425ecbcbc811adce48d7.mp3?hdnea=exp=1773653324~acl=/api/1/1/9/2/7/0/927dfc9b9523425ecbcbc811adce48d7.mp3*~data=user_id=0,application_id=42~hmac=9317cbf5238dc0b67730b41935b8cfe1c741ff96cf5890fe4f7197a5123a6c46",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5ebf1d29eda959151bcfa38e15ce893f/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "deezer_fans": 18367,
+    "genre": "Electronic",
+    "lastfm_artists": [
+      "Slayyyter"
+    ],
+    "artist_profiles": [
+      {
+        "name": "Slayyyter",
+        "image_url": "https://cdn-images.dzcdn.net/images/artist/68f4544fb01974faacb1450623a0e55e/1000x1000-000000-80-0-0.jpg",
+        "bio": "Slayyyter (born Catherine Grace Garner on September 17, 1996, in Kirkwood, Missouri) is an American singer and songwriter known for her work in pop and hyperpop, often incorporating aesthetics inspired by late 1990s and early 2000s popular culture. She attended the University of Missouri for one yea"
+      }
+    ],
+    "stage": "",
+    "day": "",
+    "weekend": "",
+    "_created_at": 1773652425.139123,
+    "_updated_at": "2026-03-16T02:13:45.139129"
+  },
+  "Holly Humberstone": {
+    "name": "Holly Humberstone",
+    "rank": 5,
+    "listeners": 501376,
+    "tags": [
+      "indie pop",
+      "pop",
+      "my top songs",
+      "british",
+      "indie",
+      "electronic",
+      "singer-songwriter",
+      "2020s",
+      "alternative",
+      "female vocalists"
+    ],
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/410b9d80029f0741bbc6eaed9d451840/1000x1000-000000-80-0-0.jpg",
+    "bio": "Holly Ffion Humberstone (b. December 17, 1999) is a British singer-songwriter who found breakout success when the world was in lockdown and her mind was looking to break free.\n\nBased in Grantham, the former violinist kick-started her career in 2019, drawing the attention of a BBC manager, while perf",
+    "similar_artists": [
+      {
+        "name": "Maisie Peters",
+        "match": 1.0
+      },
+      {
+        "name": "Griff",
+        "match": 0.897551
+      },
+      {
+        "name": "Maggie Rogers",
+        "match": 0.887835
+      },
+      {
+        "name": "Tommy Lefroy",
+        "match": 0.696074
+      },
+      {
+        "name": "Nieve Ella",
+        "match": 0.689032
+      },
+      {
+        "name": "Lizzy McAlpine",
+        "match": 0.646833
+      },
+      {
+        "name": "Maude Latour",
+        "match": 0.642824
+      },
+      {
+        "name": "Jensen McRae",
+        "match": 0.639008
+      },
+      {
+        "name": "Gracie Abrams",
+        "match": 0.633498
+      },
+      {
+        "name": "Del Water Gap",
+        "match": 0.605335
+      },
+      {
+        "name": "MUNA",
+        "match": 0.604841
+      },
+      {
+        "name": "Alix Page",
+        "match": 0.594637
+      },
+      {
+        "name": "Ella Jane",
+        "match": 0.590149
+      },
+      {
+        "name": "Gatlin",
+        "match": 0.554814
+      },
+      {
+        "name": "Carol Ades",
+        "match": 0.5528
+      },
+      {
+        "name": "Lennon Stella",
+        "match": 0.550973
+      },
+      {
+        "name": "Dagny",
+        "match": 0.533484
+      },
+      {
+        "name": "Matilda Mann",
+        "match": 0.509228
+      },
+      {
+        "name": "Sam Fender",
+        "match": 0.503221
+      },
+      {
+        "name": "Alessi Rose",
+        "match": 0.498173
+      }
+    ],
+    "top_tracks": [
+      {
+        "name": "Cruel World",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/3/c/5/0/3c52e9738a00a1fd12e5c856227a7f00.mp3?hdnea=exp=1773653323~acl=/api/1/1/3/c/5/0/3c52e9738a00a1fd12e5c856227a7f00.mp3*~data=user_id=0,application_id=42~hmac=58aa1d277d760d540536b2c8269c3b5b91aa18682107bfb26d22872702a24187",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/701328a2836b28f37cbbe42b5086bf62/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "To Love Somebody",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/e/b/b/0/ebbd7224b043fbe41c86dbe21ee7f8a7.mp3?hdnea=exp=1773653323~acl=/api/1/1/e/b/b/0/ebbd7224b043fbe41c86dbe21ee7f8a7.mp3*~data=user_id=0,application_id=42~hmac=cfe89fab59e3ff75151468a9ec5394182f229877965dc461f2caf42b18ccda04",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/701328a2836b28f37cbbe42b5086bf62/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Dive",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/3/7/e/0/37e561d6d418ce7ba6f359f4ffb62f10.mp3?hdnea=exp=1773653323~acl=/api/1/1/3/7/e/0/37e561d6d418ce7ba6f359f4ffb62f10.mp3*~data=user_id=0,application_id=42~hmac=eb3c0b5f994562d8f1034105ab606c92977f10491444fbd19d08c314432579d8",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/a49aaedcb1c0e6dafffdd2f969559bcd/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Deep End",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/8/7/b/0/87b354cb788d1c14aebefb94f1eae6e6.mp3?hdnea=exp=1773653323~acl=/api/1/1/8/7/b/0/87b354cb788d1c14aebefb94f1eae6e6.mp3*~data=user_id=0,application_id=42~hmac=a7f46d76ca16b843f5475a004ce24990d3fa40409870fbddd6ac18c2784e37ad",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c9972979b72bab104f746ab01c236c4d/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Paint My Bedroom Black",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/7/f/0/97fbb5f5e03caa55d4f25b2f92fa361c.mp3?hdnea=exp=1773653323~acl=/api/1/1/9/7/f/0/97fbb5f5e03caa55d4f25b2f92fa361c.mp3*~data=user_id=0,application_id=42~hmac=ec1ed98a32b6d03bd40fc2004b14d02fc5eaee969a1094482fcf7f57267367f1",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/63a38d8b1e71020b0448d43410d1801c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Falling Asleep At The Wheel",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/2/6/5/0/265a312787903c57285d5790eb09b3c9.mp3?hdnea=exp=1773653323~acl=/api/1/1/2/6/5/0/265a312787903c57285d5790eb09b3c9.mp3*~data=user_id=0,application_id=42~hmac=60e3b8cc4fe7f38fa317cc160cb565ade7e380f9b05fb5acf70e89acce8ef001",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/bb708e4bca3b6ad95ebe339de441a80c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "The Walls Are Way Too Thin",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/6/4/e/0/64ea8da1518a9464c2f3f5ee606556e4.mp3?hdnea=exp=1773653323~acl=/api/1/1/6/4/e/0/64ea8da1518a9464c2f3f5ee606556e4.mp3*~data=user_id=0,application_id=42~hmac=46d7056282f61284daef792c38ca8c26d51edccf54b389b435d89b295755b1a6",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/02bfd544d9d0b118d5fbf21904934b79/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Overkill",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/7/1/0/9718ad64cf14949248110c5f9d9e4d3f.mp3?hdnea=exp=1773653323~acl=/api/1/1/9/7/1/0/9718ad64cf14949248110c5f9d9e4d3f.mp3*~data=user_id=0,application_id=42~hmac=391161a911ba947488bb84bbaec2b0e824882c6c7740f008243a9747a42ce71b",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/099db49c8c9c203cd82d1899c82182aa/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Down Swinging",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/3/8/9/0/38973cecaab1d6bbeae828657fed7818.mp3?hdnea=exp=1773653323~acl=/api/1/1/3/8/9/0/38973cecaab1d6bbeae828657fed7818.mp3*~data=user_id=0,application_id=42~hmac=9b9c78249bb173459cbfa500bf2add828d0d2dcb13febf894e15016cbf07e7aa",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/464ce271b527b92a285448cdc43f4045/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Dive",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/7/8/5/0/785d84f61afabd7112fa86fcc04e4a7d.mp3?hdnea=exp=1773653323~acl=/api/1/1/7/8/5/0/785d84f61afabd7112fa86fcc04e4a7d.mp3*~data=user_id=0,application_id=42~hmac=d4228c6b2364d00fe23156a6fa00036c99bc68028226e7e770061506cc8fbc8c",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/464ce271b527b92a285448cdc43f4045/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "deezer_fans": 10945,
+    "genre": "Electronic",
+    "lastfm_artists": [
+      "Holly Humberstone"
+    ],
+    "artist_profiles": [
+      {
+        "name": "Holly Humberstone",
+        "image_url": "https://cdn-images.dzcdn.net/images/artist/410b9d80029f0741bbc6eaed9d451840/1000x1000-000000-80-0-0.jpg",
+        "bio": "Holly Ffion Humberstone (b. December 17, 1999) is a British singer-songwriter who found breakout success when the world was in lockdown and her mind was looking to break free.\n\nBased in Grantham, the former violinist kick-started her career in 2019, drawing the attention of a BBC manager, while perf"
+      }
+    ],
+    "stage": "",
+    "day": "",
+    "weekend": "",
+    "_created_at": 1773652423.858716,
+    "_updated_at": "2026-03-16T02:13:43.858721"
+  },
+  "Night Tapes": {
+    "name": "Night Tapes",
+    "listeners": 423642,
+    "tags": [
+      "dream pop",
+      "chillwave",
+      "trip-hop",
+      "shoegaze",
+      "electronic",
+      "ambient pop",
+      "uk",
+      "british",
+      "female vocalists",
+      "deezer"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Night Tapes started out as evening jams between housemates Max Doohan, Sam Richards and Iiris Vesik in London.\n\nNight time London, genre-blending, multi-fidelity recordings and honest reflection contribute to their atmospheric soundscapes that ultimately make for fresh and envelope pushing dream pop",
+    "_created_at": 1773652330.520258,
+    "_updated_at": "2026-03-16T02:12:10.520260"
+  },
+  "White Noise Radiance": {
+    "name": "White Noise Radiance",
+    "listeners": 126513,
+    "tags": [
+      "soundtrack",
+      "sleep",
+      "nature recordings"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": null,
+    "_created_at": 1773652331.2044082,
+    "_updated_at": "2026-03-16T02:12:11.204411"
+  },
+  "Radiohead": {
+    "name": "Radiohead",
+    "listeners": 8166952,
+    "tags": [
+      "rock",
+      "alternative",
+      "alternative rock",
+      "indie",
+      "electronic",
+      "british",
+      "experimental",
+      "indie rock",
+      "britpop",
+      "art rock"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Radiohead is an English rock band formed in Abingdon, Oxfordshire, in 1985. The band consists of Thom Yorke (vocals, guitar, piano, keyboards); brothers Jonny Greenwood (guitar, keyboards, other instruments) and Colin Greenwood (bass); Ed O'Brien (guitar, backing vocals); and Philip Selway (drums, p",
+    "_created_at": 1773652331.8145332,
+    "_updated_at": "2026-03-16T02:12:11.814536"
+  },
+  "Tame Impala": {
+    "name": "Tame Impala",
+    "listeners": 4244424,
+    "tags": [
+      "psychedelic rock",
+      "psychedelic",
+      "indie rock",
+      "australian",
+      "rock",
+      "indie",
+      "neo-psychedelia",
+      "psychedelic pop",
+      "alternative",
+      "space rock"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Tame Impala is the psychedelic music project of Australian multi-instrumentalist Kevin Parker, blending rock, pop, and electronic sounds with lush production and introspective lyrics. Their discography includes Innerspeaker (2010), Lonerism (2012), Currents (2015), The Slow Rush (2020), and Deadbeat",
+    "_created_at": 1773652332.4331121,
+    "_updated_at": "2026-03-16T02:12:12.433115"
+  },
+  "James Blake": {
+    "name": "James Blake",
+    "listeners": 1927151,
+    "tags": [
+      "dubstep",
+      "electronic",
+      "experimental",
+      "soul",
+      "downtempo",
+      "post-dubstep",
+      "british",
+      "future garage",
+      "art pop",
+      "electronica"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "James Blake (born 26 September 1988) is a Grammy-winning electronic musician and singer-songwriter from London, England, United Kingdom.  Blake is primarily considered a dubstep producer and is frequently heralded as a leading figure in the \"post-dubstep\" community, but he is also noted for his prom",
+    "_created_at": 1773652333.054077,
+    "_updated_at": "2026-03-16T02:12:13.054081"
+  },
+  "Disclosure": {
+    "name": "Disclosure",
+    "listeners": 2447979,
+    "tags": [
+      "electronic",
+      "uk garage",
+      "house",
+      "future garage",
+      "dubstep",
+      "deep house",
+      "british",
+      "uk funky",
+      "rhythmic noise",
+      "uk bass"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Disclosure are Guy Lawrence and Howard Lawrence, brothers from Surrey, United Kingdom. Crafting their own lo-fi dream-dub sound, Disclosure effortlessly combine 2-step garage rhythms and dubstep basslines with their own rich musical heritage of soul, jazz and 90s hip hop. After their debut single on",
+    "_created_at": 1773652333.683163,
+    "_updated_at": "2026-03-16T02:12:13.683165"
+  },
+  "Trent Reznor and Atticus Ross": {
+    "name": "Trent Reznor and Atticus Ross",
+    "listeners": 674580,
+    "tags": [
+      "ambient",
+      "electronic",
+      "soundtrack",
+      "industrial",
+      "trent reznor",
+      "experimental",
+      "instrumental",
+      "dark ambient",
+      "american",
+      "film score"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Trent Reznor and Atticus Ross are the Golden Globe- and Oscar-winning composers for the films \"The Social Network\", \"The Girl with the Dragon Tattoo\", \"Gone Girl\", \"Before the Flood\",  \"Patriots Day\", \"Mids90s\", \"Bird Box\", \"Waves\", \"Mank\", \"Soul\", \"Bones and All\", \"Empire of Light\", \"Teenage Mutant",
+    "_created_at": 1773652334.3013499,
+    "_updated_at": "2026-03-16T02:12:14.301352"
+  },
+  "FKA twigs": {
+    "name": "FKA twigs",
+    "listeners": 1650484,
+    "tags": [
+      "trip-hop",
+      "electronic",
+      "experimental",
+      "dream pop",
+      "alternative rnb",
+      "trip hop",
+      "glitch pop",
+      "british",
+      "female vocalists",
+      "wonky"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Tahliah Debrett Barnett (born 16 January 1988), known professionally as FKA twigs, is an English singer, songwriter, and dancer. Born and raised in Cheltenham, Gloucestershire, she became a backup dancer for numerous famous musicians after moving to London at the age of 17, and made her own musical ",
+    "_created_at": 1773652334.913622,
+    "_updated_at": "2026-03-16T02:12:14.913625"
+  },
+  "Kendrick Lamar": {
+    "name": "Kendrick Lamar",
+    "listeners": 5037696,
+    "tags": [
+      "hip-hop",
+      "rap",
+      "west coast",
+      "hip hop",
+      "compton",
+      "california",
+      "jazz rap",
+      "conscious hip hop",
+      "west coast hip hop",
+      "american"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Kendrick Lamar Duckworth (born June 17, 1987) is an American rapper. Regarded as one of the most influential hip-hop artists of his generation, he was awarded the 2018 Pulitzer Prize for Music, becoming the first musician outside of the classical and jazz genres to receive the honor.\n\nBorn in Compto",
+    "_created_at": 1773652335.5230222,
+    "_updated_at": "2026-03-16T02:12:15.523025"
+  },
+  "Anthony Willis": {
+    "name": "Anthony Willis",
+    "listeners": 86499,
+    "tags": [
+      "composer",
+      "instrumental",
+      "soundtrack",
+      "score",
+      "music",
+      "classic",
+      "classical",
+      "klassinen",
+      "united kingdom"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": null,
+    "_created_at": 1773652336.126965,
+    "_updated_at": "2026-03-16T02:12:16.126972"
+  },
+  "Jonny Greenwood": {
+    "name": "Jonny Greenwood",
+    "listeners": 620467,
+    "tags": [
+      "experimental",
+      "electronic",
+      "instrumental",
+      "avant-garde",
+      "jazz",
+      "soundtrack",
+      "british",
+      "alternative",
+      "contemporary classical",
+      "radiohead"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Jonny Greenwood (born 5 November 1971) is the lead guitarist in the British band Radiohead from Abingdon, Oxfordshire, England. He also plays piano, organ, viola, synths, Glockenspiel, harmonica and the Ondes Martenot, among a host of other devices used to enhance the soundscape of many Radiohead so",
+    "_created_at": 1773652336.7380311,
+    "_updated_at": "2026-03-16T02:12:16.738033"
+  },
+  "Oklou": {
+    "name": "Oklou",
+    "listeners": 587596,
+    "tags": [
+      "electronic",
+      "art pop",
+      "french",
+      "ambient pop",
+      "alternative rnb",
+      "pop",
+      "angelwave",
+      "ambient trance",
+      "female vocalists",
+      "downtempo"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Marylou Mayniel (born April 23, 1993), better known by her stage name Oklou, is a French producer, vocalist, and composer.\nHer popular EP, The Rite of May, was released in March 2018 on NUXXE, a London-based label. Stand-alone single \"Forever\" was released in October 2019, with singles \"SGSY\", \"Toyo",
+    "_created_at": 1773652337.4274719,
+    "_updated_at": "2026-03-16T02:12:17.427474"
+  },
+  "Cobrah": {
+    "name": "Cobrah",
+    "listeners": 444538,
+    "tags": [
+      "electronic",
+      "electroclash",
+      "hip house",
+      "electropop",
+      "sweden",
+      "swedish",
+      "noise",
+      "female vocalists",
+      "pop",
+      "industrial"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "COBRAH is the moniker of Clara Blom Christiensen,  a swedish artist born in Gothenburg in 1996. The iconic queer performer makes electronic bangers heavily influenced both by her experience in the kink, vogue, and punk communities. As such, Christiensen's music is inherently political and personal. ",
+    "_created_at": 1773652338.0394812,
+    "_updated_at": "2026-03-16T02:12:18.039487"
+  },
+  "Caroline Polachek": {
+    "name": "Caroline Polachek",
+    "listeners": 1083189,
+    "tags": [
+      "art pop",
+      "pop",
+      "electronic",
+      "synthpop",
+      "indie pop",
+      "alt-pop",
+      "downtempo",
+      "female vocalists",
+      "american",
+      "ambient pop"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Caroline Elizabeth Polachek is an American singer, songwriter and producer. Raised in Connecticut, Polachek co-founded the indie pop band Chairlift while studying at the University of Colorado. The duo emerged from the late-2000s Brooklyn music scene with the sleeper hit \"Bruises\".\n\nDuring her time ",
+    "_created_at": 1773652338.670434,
+    "_updated_at": "2026-03-16T02:12:18.670438"
+  },
+  "Daft Punk": {
+    "name": "Daft Punk",
+    "listeners": 6263453,
+    "tags": [
+      "electronic",
+      "house",
+      "dance",
+      "techno",
+      "electronica",
+      "french",
+      "electro",
+      "french house",
+      "daft punk",
+      "funk"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Daft Punk was a French electronic music duo formed in 1993 in Paris by Thomas Bangalter and Guy-Manuel de Homem-Christo. They became widely known in the late 1990s as part of the French house movement, incorporating elements of house, funk, disco, techno, rock, and synth-pop. The duo has been cited ",
+    "_created_at": 1773652339.290615,
+    "_updated_at": "2026-03-16T02:12:19.290619"
+  },
+  "PinkPantheress": {
+    "name": "PinkPantheress",
+    "listeners": 2964326,
+    "tags": [
+      "electronic",
+      "pop",
+      "rnb",
+      "2-step",
+      "dance-pop",
+      "uk garage",
+      "alt-pop",
+      "bedroom pop",
+      "british",
+      "drum and bass"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Victoria Beverley Walker (born 19 April 2001), known professionally as PinkPantheress, is a British singer-songwriter and record producer. She is recognized for her rap-singing style, personal lyrics, and a blend of genres including alternative pop, drum and bass, and UK garage, often incorporating ",
+    "_created_at": 1773652339.9061692,
+    "_updated_at": "2026-03-16T02:12:19.906192"
+  },
+  "Labrinth": {
+    "name": "Labrinth",
+    "listeners": 2516471,
+    "tags": [
+      "electronic",
+      "british",
+      "rnb",
+      "dance",
+      "r&b",
+      "pop",
+      "grime",
+      "dubstep",
+      "uk",
+      "hip-hop"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Timothy Lee McKenzie, better known by his stage name Labrinth, is a British singer, songwriter, rapper and record producer. After initially pursuing a career in music production, Simon Cowell signed him to his record label Syco Music as a recording artist, after which Labrinth became the first singe",
+    "_created_at": 1773652340.607629,
+    "_updated_at": "2026-03-16T02:12:20.607633"
+  },
+  "Nine Inch Nails": {
+    "name": "Nine Inch Nails",
+    "listeners": 3579169,
+    "tags": [
+      "industrial",
+      "industrial rock",
+      "electronic",
+      "alternative",
+      "rock",
+      "alternative rock",
+      "industrial metal",
+      "american",
+      "experimental",
+      "metal"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Nine Inch Nails, commonly abbreviated as NIN (stylized as NI\u0418), is an American industrial rock band formed in 1988 in Cleveland, Ohio. Singer, songwriter, multi-instrumentalist, and producer Trent Reznor was the only permanent member of the band until the official addition of English musician Atticu",
+    "_created_at": 1773652341.2856672,
+    "_updated_at": "2026-03-16T02:12:21.285672"
+  },
+  "Big Thief": {
+    "name": "Big Thief",
+    "listeners": 1634994,
+    "tags": [
+      "indie rock",
+      "indie folk",
+      "folk",
+      "folk rock",
+      "indie",
+      "americana",
+      "acoustic",
+      "female vocalists",
+      "usa",
+      "singer-songwriter"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "Big Thief is an American indie rock band with folk roots. The band is based in Brooklyn, New York, and comprises Adrianne Lenker, Buck Meek, and James Krivchenia.\nBig Thief's music, rooted in the songs of Adrianne Lenker, paints in vivid tones \"the process of harnessing pain, loss, and love, while s",
+    "_created_at": 1773652341.905688,
+    "_updated_at": "2026-03-16T02:12:21.905690"
+  },
+  "salute": {
+    "name": "salute",
+    "listeners": 294028,
+    "tags": [
+      "electronic",
+      "heavy metal",
+      "thrash metal",
+      "house",
+      "dance",
+      "bass",
+      "british",
+      "uk garage",
+      "chillwave",
+      "trap"
+    ],
+    "image_url": "https://lastfm.freetls.fastly.net/i/u/300x300/2a96cbd8b46e442fc41c2b86b821562f.png",
+    "bio": "There is more than one artist named 'Salute';\n\n1) salute is the name of a Manchester based, Vienna born electronic music producer Felix Nyajo. They released the Lionheart EP via Cool Kid Music in December 2013. It was followed by Silver Tides and Real cool (feat. Vanessa Elisha) on their own imprint",
+    "_created_at": 1773652342.520447,
+    "_updated_at": "2026-03-16T02:12:22.520451"
+  }
+}
