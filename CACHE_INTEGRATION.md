@@ -238,7 +238,7 @@ cat data/cache/{user_id}_cache.json | python -m json.tool
 
 ### Run Tests
 ```bash
-python backend/test_cache.py
+pytest tests/unit/test_cache.py
 ```
 
 ## Error Handling

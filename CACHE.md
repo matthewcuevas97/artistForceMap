@@ -176,7 +176,7 @@ This enables direct comparison and override logic.
 
 Run comprehensive cache tests:
 ```bash
-python backend/test_cache.py
+pytest tests/unit/test_cache.py
 ```
 
 Tests verify:

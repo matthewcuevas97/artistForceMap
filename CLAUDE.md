@@ -24,4 +24,3 @@ Run: `python app.py` or `python app_universal.py` (both on 127.0.0.1:8080).
 - `pytest -m "not e2e"` — unit + API (~1.5 s). `pytest` — also Playwright browser tests against the local Chrome (~5 min).
 - All network is blocked by `responses`; caches/user data are redirected to tmp dirs; a session guard fails the run if real `data/` files change.
 - Known bugs are strict `xfail(raises=...)` tests tagged `BUG-xx`, matching `docs/REVIEW_2026-11.md`. When a fix makes one XPASS, remove its marker.
-- Never run `backend/test_cache.py` or `backend/test_pipeline_integration.py`: they delete the real `data/cache/artists.json` (BUG-20).

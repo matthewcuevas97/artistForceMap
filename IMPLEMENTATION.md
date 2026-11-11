@@ -191,7 +191,7 @@ set_user_top_artists(user_id, spotify_artists=artists)
 
 - **Architecture**: See `CACHE.md` for detailed design
 - **Integration**: See `CACHE_INTEGRATION.md` for examples
-- **Testing**: Run `python backend/test_cache.py`
+- **Testing**: Run `pytest tests/unit/test_cache.py`
 - **Implementation**: See `CACHE_SUMMARY.md` for complete overview
 
 ---

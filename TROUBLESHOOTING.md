@@ -156,19 +156,22 @@ print(f"Valid: {stats['valid']}")
 
 ## Tests Failing
 
-### Run Integration Test
+The test suite lives in `tests/` and runs fully offline against temp dirs
+(the old `backend/test_*.py` scripts were removed because they deleted the real cache).
+
+### Run Pipeline + Cache Tests
 ```bash
-python backend/test_pipeline_integration.py
+pytest tests/unit/test_universal_pipeline.py tests/unit/test_cache.py
 ```
 
-### Run Cache Tests
+### Run Everything Except Browser Tests
 ```bash
-python backend/test_cache.py
+pytest -m "not e2e"
 ```
 
 ### Run with Verbose Output
 ```bash
-python -u backend/test_cache.py 2>&1 | head -100
+pytest -m "not e2e" -vv -s
 ```
 
 ---
@@ -251,7 +254,7 @@ du -sh data/cache/ >> debug.txt
 ls data/cache/ >> debug.txt
 
 echo "=== Test Results ===" >> debug.txt
-python backend/test_cache.py >> debug.txt 2>&1
+pytest -m "not e2e" >> debug.txt 2>&1
 
 cat debug.txt
 ```
