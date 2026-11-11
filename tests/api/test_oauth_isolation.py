@@ -162,3 +162,13 @@ def test_callback_with_bad_code_is_handled(request, http, app_fixture):
     assert r.status_code == 400 and b"try again" in r.data
     with client.session_transaction() as s:
         assert "spotify_token" not in s
+
+
+# ── SEC-01: session cookie flags ──────────────────────────────────────────────
+
+@APPS
+def test_session_cookie_is_httponly_and_samesite(request, app_fixture):
+    client = request.getfixturevalue(app_fixture).app.test_client()
+    r = client.get("/login")  # writes the oauth state into the session
+    cookie = r.headers["Set-Cookie"]
+    assert "HttpOnly" in cookie and "SameSite=Lax" in cookie

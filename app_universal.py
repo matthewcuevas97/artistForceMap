@@ -29,6 +29,14 @@ secret_key = os.getenv("FLASK_SECRET_KEY")
 if not secret_key:
     raise RuntimeError("FLASK_SECRET_KEY environment variable is not set")
 app.secret_key = secret_key
+# Session cookie carries Spotify tokens (signed, not encrypted): keep it away from JS and
+# cross-site requests. Lax still sends it on the top-level redirect back from Spotify.
+# Set SESSION_COOKIE_SECURE=1 when serving over HTTPS.
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=os.getenv("SESSION_COOKIE_SECURE", "").lower() in ("1", "true", "yes"),
+)
 
 
 DEEZER_SEARCH = "https://api.deezer.com/search"
