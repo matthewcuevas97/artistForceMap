@@ -1,12 +1,10 @@
 """HTTP API of the Coachella map (app.py)."""
 
-import re
 import time
 from urllib.parse import quote
 
 import pytest
 import requests
-from spotipy.oauth2 import SpotifyOauthError
 
 from tests.conftest import (LASTFM_URL, SPOTIFY_API, SPOTIFY_TOKEN_URL,
                             lastfm_top_artists_payload, spotify_token_payload)
@@ -105,31 +103,7 @@ def test_tracks_survive_deezer_outage(coachella_app, coachella_client, http):
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
 
-def test_login_redirects_to_spotify(coachella_client):
-    r = coachella_client.get("/login")
-    assert r.status_code == 302 and r.location.startswith("https://accounts.spotify.com/authorize")
-
-
-def test_callback_error_and_missing_code(coachella_client):
-    assert coachella_client.get("/callback?error=access_denied").status_code == 400
-    assert coachella_client.get("/callback").status_code == 400
-
-
-@pytest.mark.xfail(strict=True, raises=(AssertionError, SpotifyOauthError), reason="BUG-03: an invalid/expired ?code= makes get_token raise "
-                   "SpotifyOauthError → unhandled 500")
-def test_callback_with_bad_code_is_handled(coachella_client, http):
-    http.add("POST", SPOTIFY_TOKEN_URL, status=400, json={"error": "invalid_grant"})
-    assert coachella_client.get("/callback?code=bad").status_code < 500
-
-
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-02: OAuth `state` is never generated or verified, so "
-                   "/callback accepts any code (login CSRF)")
-def test_callback_requires_matching_state(coachella_client, http):
-    http.add("POST", SPOTIFY_TOKEN_URL, json=spotify_token_payload())
-    http.add("GET", re.compile(r"https://api\.spotify\.com/v1/me/?$"), json={"id": "attacker", "display_name": "attacker"})
-    coachella_client.get("/callback?code=attacker-code")
-    with coachella_client.session_transaction() as s:
-        assert "spotify_token" not in s
+# Spotify login/callback/state tests for both apps live in test_oauth_isolation.py.
 
 
 def test_lastfm_login_and_logout(coachella_client, http):

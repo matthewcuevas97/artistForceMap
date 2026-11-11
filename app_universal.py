@@ -19,7 +19,8 @@ from spotipy.exceptions import SpotifyException
 
 from backend.user_data import load_user_db, load_user_map, save_user_map
 from backend.pipeline import run_full_pipeline
-from spotify.auth import get_spotify_oauth, get_token
+from spotify.auth import (OAuthStateError, SpotifyOauthError, get_authorize_url, get_token,
+                          refresh_token as spotify_refresh_token, verify_state)
 from spotify.fetch import get_top_artists
 from lastfm.fetch import get_top_artists as lastfm_top
 
@@ -29,7 +30,6 @@ if not secret_key:
     raise RuntimeError("FLASK_SECRET_KEY environment variable is not set")
 app.secret_key = secret_key
 
-sp_oauth = get_spotify_oauth()
 
 DEEZER_SEARCH = "https://api.deezer.com/search"
 LASTFM_API = "http://ws.audioscrobbler.com/2.0"
@@ -69,7 +69,7 @@ def get_valid_spotify_token():
         if not refresh_token:
             return None
         try:
-            new_token = sp_oauth.refresh_access_token(refresh_token)
+            new_token = spotify_refresh_token(refresh_token)
             session["spotify_token"] = new_token["access_token"]
             session["spotify_token_expires_at"] = new_token["expires_at"]
             if new_token.get("refresh_token"):
@@ -97,21 +97,26 @@ def index():
 @app.route("/login")
 def login():
     """Redirect the user to Spotify's OAuth authorization page."""
-    oauth = get_spotify_oauth()
-    auth_url = oauth.get_authorize_url()
-    return redirect(auth_url)
+    return redirect(get_authorize_url(session))
 
 
 @app.route("/callback")
 def callback():
     """Handle the OAuth callback from Spotify."""
+    try:
+        verify_state(session, request.args.get("state"))
+    except OAuthStateError:
+        return "Login expired or was not started from this site. Please try again.", 400
     error = request.args.get("error")
     if error:
         return f"Authorization failed: {error}", 400
     code = request.args.get("code")
     if not code:
         return "Missing authorization code", 400
-    token = get_token(code)
+    try:
+        token = get_token(code)
+    except SpotifyOauthError:
+        return "Spotify login failed (the code was invalid or expired). Please try again.", 400
     session["spotify_token"] = token["access_token"]
     session["spotify_refresh_token"] = token.get("refresh_token")
     session["spotify_token_expires_at"] = token["expires_at"]
