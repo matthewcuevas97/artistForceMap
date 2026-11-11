@@ -53,7 +53,7 @@ user_db.json + user_map.json
   - `run_full_pipeline()`: Execute all steps sequentially
   - `run_pipeline_step()`: Run individual step (for debugging)
 
-- **`api_routes.py`**: Flask endpoints
+- Flask endpoints live in `app_universal.py` at the repo root
   - Auth: `/api/proto/auth/spotify`, `/api/proto/auth/lastfm`
   - Pipeline: `/api/proto/pipeline/run`, `/api/proto/pipeline/step/<step>`
   - Data: `/api/proto/user/<user_id>/db`, `/api/proto/user/<user_id>/map`

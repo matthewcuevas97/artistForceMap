@@ -43,7 +43,7 @@ This backend implements a **user-specific, on-demand graph generation pipeline**
 
 ### 1. User Ingestion Layer
 
-**Files**: `user_ingestion.py`, `api_routes.py`
+**Files**: `user_ingestion.py` (OAuth lives in `spotify/auth.py`; routes in `app_universal.py`)
 
 **Responsibility**: Authenticate user and fetch their top artists.
 
@@ -55,8 +55,6 @@ This backend implements a **user-specific, on-demand graph generation pipeline**
   - Returns: 25 top artists with URLs
 
 **Key Functions**:
-- `login_spotify(auth_code)` → auth_data
-- `login_lastfm(username)` → auth_data
 - `fetch_top_25_artists_spotify(token)` → List[artist]
 - `fetch_top_25_artists_lastfm(username)` → List[artist]
 - `ingest_user(auth_data)` → ingestion_result
@@ -236,7 +234,7 @@ Step 2-5: For each remaining slot:
 
 ## API Layer
 
-**Files**: `api_routes.py`
+**Files**: `app_universal.py`
 
 **Framework**: Flask Blueprint (`/api/proto`)
 

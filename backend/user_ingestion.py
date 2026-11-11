@@ -1,55 +1,13 @@
 """
-User ingestion: OAuth stub and fetching user's top artists from Spotify/Last.fm.
+User ingestion: fetching user's top artists from Spotify/Last.fm.
 """
 
 import time
 from typing import Dict, List, Any
 
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
 
 from backend.user_data import get_or_create_user, update_user_db, set_user_top_artists
-
-
-# OAuth configuration (stub - replace with actual credentials)
-SPOTIFY_OAUTH = SpotifyOAuth(
-    client_id="your_client_id",
-    client_secret="your_client_secret",
-    redirect_uri="http://localhost:8080/callback",
-    scope="user-top-read"
-)
-
-
-def login_spotify(auth_code: str) -> Dict[str, Any]:
-    """
-    Exchange Spotify auth code for token and return user info.
-    """
-    try:
-        token_info = SPOTIFY_OAUTH.get_access_token(auth_code)
-        sp = spotipy.Spotify(auth=token_info["access_token"])
-        user_info = sp.current_user()
-
-        user_id = user_info.get("id", "unknown")
-        return {
-            "provider": "spotify",
-            "id": user_id,
-            "name": user_info.get("display_name", user_id),
-            "token": token_info["access_token"],
-            "refresh_token": token_info.get("refresh_token"),
-        }
-    except Exception as e:
-        raise ValueError(f"Spotify login failed: {str(e)}")
-
-
-def login_lastfm(username: str) -> Dict[str, Any]:
-    """
-    Stub for Last.fm login (no OAuth, just username).
-    """
-    return {
-        "provider": "lastfm",
-        "id": username,
-        "name": username,
-    }
 
 
 def fetch_top_25_artists_spotify(access_token: str) -> List[Dict[str, Any]]:

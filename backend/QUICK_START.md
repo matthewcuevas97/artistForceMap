@@ -180,7 +180,6 @@ backend/
 ├── seed_selection.py          # MMR algorithm
 ├── graph_init.py              # Build initial graph
 ├── pipeline.py                # Orchestrator
-├── api_routes.py              # Flask endpoints
 ├── example_pipeline.py        # Usage examples
 ├── README.md                  # Full documentation
 └── QUICK_START.md            # This file
