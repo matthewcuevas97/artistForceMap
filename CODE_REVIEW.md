@@ -71,10 +71,14 @@ coachella_2026.csv → scripts/precompute.py (4 passes) → graph_static.json �
 
 **File**: `.env`
 ```
-SPOTIFY_CLIENT_ID=e36288ab18cf49429e1557dde04554a6
-SPOTIFY_CLIENT_SECRET=563acf13011c43cab8d4ce23922d0aa8
-LASTFM_API_KEY=4198e5fe296ae874b564b117bdb7b494
+SPOTIFY_CLIENT_ID=<redacted>
+SPOTIFY_CLIENT_SECRET=<redacted>
+LASTFM_API_KEY=<redacted>
 ```
+
+> **2026-11 note:** the values that were pasted here were committed and pushed to the public
+> repo. The Spotify client secret and Last.fm key have since been rotated. See
+> `docs/REVIEW_2026-11.md` (BUG-21).
 
 `.env` is in `.gitignore`, but `.cache` (which appears modified in `git status`) may contain Spotify tokens. The `.gitignore` does not cover `.cache`. These secrets should be rotated if they've ever been pushed to a remote.
 
