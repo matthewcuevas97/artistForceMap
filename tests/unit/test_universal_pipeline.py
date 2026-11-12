@@ -166,17 +166,68 @@ def _expired_preview(minutes_ago=60):
     return f"https://cdnt-preview.dzcdn.net/api/1/x.mp3?hdnea=exp={exp}~acl=/api/1/x.mp3*~hmac=abc"
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-10: Deezer preview URLs are signed with a ~15 min "
-                   "expiry (hdnea=exp=...) but cached with top_tracks for 90 days")
 def test_seed_metadata_never_serves_expired_preview_urls(monkeypatch):
+    """BUG-10 regression: signed Deezer preview URLs (~15 min) were cached for 90 days.
+    Old cache entries are stripped; tracks carry a deezer_id resolved at play time."""
     cache.set_cached_similar_artists("A", [])
     cache.set_cached_deezer_info("A", {"name": "A", "image_url": None, "fans": 1,
-                                       "top_tracks": [{"name": "Song", "preview_url": _expired_preview()}]})
+                                       "top_tracks": [{"name": "Song", "deezer_id": 7, "preview_url": _expired_preview()}]})
     monkeypatch.setattr(graph_init.time, "sleep", lambda s: None)
     meta = graph_init.fetch_seed_artist_metadata("A", {"tags": []})
-    url = meta["top_tracks"][0]["preview_url"]
-    exp = int(re.search(r"exp=(\d+)", url).group(1))
-    assert exp > time.time()
+    assert meta["top_tracks"] == [{"name": "Song", "deezer_id": 7}]
+
+
+def test_fetched_deezer_info_caches_ids_not_previews(http):
+    http.add("GET", "https://api.deezer.com/search/artist", json={"data": [{"id": 5, "name": "A", "picture_xl": "img"}]})
+    http.add("GET", "https://api.deezer.com/artist/5", json={"nb_fan": 10})
+    http.add("GET", "https://api.deezer.com/artist/5/top", json={"data": [
+        {"id": 99, "title": "Hit", "preview": _expired_preview(-10), "artist": {"name": "A"}, "album": {"cover_big": "c"}}]})
+    info = graph_init.get_deezer_info("A")
+    assert info["top_tracks"] == [{"name": "Hit", "artist": "A", "deezer_id": 99, "album_art": "c"}]
+    assert "preview" not in json.dumps(cache.get_cached_deezer_info("A"))
+
+
+def test_similar_lookup_failure_is_not_cached(http):
+    http.add("GET", LASTFM_URL, json={"error": 29, "message": "Rate limit exceeded"})
+    assert graph_init.get_similar("A") is None
+    assert cache.get_cached_similar_artists("A") is None
+
+
+# ── First ring of similar artists (BUG-17) ────────────────────────────────────
+
+def _seed_meta(name, similar, genre="Pop"):
+    return {"name": name, "tags": [], "genre": genre, "seed": True,
+            "similar_artists": [{"name": n, "match": m} for n, m in similar]}
+
+
+def test_seed_graph_adds_top_similar_artists_as_nodes():
+    meta = {"A": _seed_meta("A", [("S1", .9), ("S2", .8), ("S3", .7), ("S4", .6), ("S5", .5)]),
+            "B": _seed_meta("B", [("S1", .4), ("T1", .9)], genre="Electronic")}
+    g = build_seed_graph("u", ["A", "B"], meta)
+    names = [n["name"] for n in g["nodes"]]
+    assert names[:2] == ["A", "B"]
+    assert set(names[2:]) == {"S1", "S2", "S3", "S4", "T1"}  # 4 per seed, S1 shared
+    s1 = next(n for n in g["nodes"] if n["name"] == "S1")
+    assert s1["seed"] is False and s1["parent"] == "A" and s1["genre"] == "Pop" and s1["details_loaded"] is False
+    pairs = {tuple(sorted((e["source"], e["target"]))) for e in g["edges"]}
+    assert ("A", "S1") in pairs and ("B", "S1") in pairs, "a shared similar artist links both seeds"
+    assert ("A", "S5") not in pairs
+
+
+def test_seed_graph_uses_users_own_enrichment_for_known_artists():
+    meta = {"A": _seed_meta("A", [("Known", .9)])}
+    g = build_seed_graph("u", ["A"], meta, user_artists={"Known": {"tags": ["house"], "listeners": 77}})
+    known = next(n for n in g["nodes"] if n["name"] == "Known")
+    assert known["genre"] == "Electronic" and known["listeners"] == 77
+
+
+def test_expand_map_skips_existing_and_caps(monkeypatch):
+    monkeypatch.setattr(graph_init, "get_similar", lambda n: [{"name": f"X{i}", "match": .5} for i in range(10)] + [{"name": "A", "match": 1}])
+    m = {"nodes": [{"name": "P", "genre": "Pop"}, {"name": "X0"}], "edges": []}
+    res = graph_init.expand_map(m, "P", limit=3)
+    assert [n["name"] for n in res["added_nodes"]] == ["X1", "X2", "X3"]
+    assert {e["target"] for e in res["added_edges"]} == {"X0", "X1", "X2", "X3"}
+    assert graph_init.expand_map(m, "P")["already_expanded"] is True
 
 
 def test_initialize_user_graph_end_to_end_from_cache(monkeypatch):

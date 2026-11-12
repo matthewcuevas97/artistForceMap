@@ -7,19 +7,20 @@ import json
 import os
 import time
 import spotipy
-import requests
-from datetime import datetime
 from flask import Flask, jsonify, render_template, redirect, request, session, Response
 import queue
 import threading
 from spotipy.exceptions import SpotifyException
 
-from backend.user_data import load_user_db, load_user_map, save_user_map
+from backend.user_data import load_user_map, update_user_map
 from backend.pipeline import run_full_pipeline
 from backend.progress import progress_sink
+from backend.graph_init import SimilarUnavailable, expand_map, get_deezer_info, _derive_genre
+from backend.cache import get_cached_artist, set_cached_artist
+from backend.tag_enrichment import EnrichmentUnavailable, enrich_artist_with_lastfm
+from backend.previews import resolve_preview
 from spotify.auth import (OAuthStateError, SpotifyOauthError, get_authorize_url, get_token,
                           refresh_token as spotify_refresh_token, verify_state)
-from spotify.fetch import get_top_artists
 from lastfm.fetch import get_top_artists as lastfm_top
 
 app = Flask(__name__)
@@ -293,98 +294,38 @@ def map_init():
         return jsonify({"error": str(e)}), 500
 
 
+def _current_user_id():
+    return session.get("spotify_id") or session.get("lastfm_user")
+
+
 @app.route("/api/map/expand", methods=["POST"])
 def map_expand():
     """
-    Expand the map from a given artist node.
-    Fetches similar artists and adds them to the graph.
+    Grow the map from one artist with its Last.fm similar artists. Works for both
+    Spotify and Last.fm users (Spotify's recommendations endpoint is unavailable to
+    new apps). Returns the full map plus the delta so the client can merge in place.
     """
-    user_id = session.get("spotify_id") or session.get("lastfm_user")
+    user_id = _current_user_id()
     if not user_id:
         return jsonify({"error": "Not authenticated"}), 401
 
-    data = request.get_json()
-    artist_name = data.get("artist")
+    artist_name = (request.get_json(silent=True) or {}).get("artist")
     if not artist_name:
         return jsonify({"error": "Artist name required"}), 400
 
     try:
-        user_map = load_user_map(user_id)
-        nodes = {node["name"]: node for node in user_map.get("nodes", [])}
-        edges = user_map.get("edges", [])
+        result = update_user_map(user_id, lambda m: expand_map(m, artist_name))
+    except KeyError:
+        return jsonify({"error": "Artist is not on your map"}), 404
+    except SimilarUnavailable:
+        return jsonify({"error": "Last.fm is unavailable right now. Try again shortly."}), 502
 
-        # Skip if already expanded
-        if nodes.get(artist_name, {}).get("expanded"):
-            return jsonify({
-                "ok": True,
-                "nodes": list(nodes.values()),
-                "edges": edges,
-                "message": "Already expanded"
-            })
-
-        spotify_token = get_valid_spotify_token()
-        if spotify_token:
-            sp = spotipy.Spotify(auth=spotify_token)
-            try:
-                # Search for artist and get recommendations
-                results = sp.search(q=artist_name, type="artist", limit=5)
-                artists = results.get("artists", {}).get("items", [])
-                if not artists:
-                    return jsonify({"error": "Artist not found"}), 404
-
-                target_artist = artists[0]
-                artist_id = target_artist["id"]
-
-                # Get similar artists via recommendations
-                recs = sp.recommendations(seed_artists=[artist_id], limit=20)
-                rec_tracks = recs.get("tracks", [])
-
-                # Add new artists and edges
-                for track in rec_tracks[:10]:  # Limit to top 10 recommendations
-                    for artist in track.get("artists", []):
-                        new_artist_name = artist["name"]
-                        if new_artist_name not in nodes:
-                            nodes[new_artist_name] = {
-                                "name": new_artist_name,
-                                "popularity": artist.get("popularity", 50),
-                                "id": artist["id"],
-                                "genres": artist.get("genres", []),
-                                "expanded": False
-                            }
-                        # Add edge
-                        edge = {
-                            "source": artist_name,
-                            "target": new_artist_name,
-                            "type": "similarity",
-                            "weight": 0.8
-                        }
-                        # Avoid duplicate edges
-                        if not any(e["source"] == edge["source"] and e["target"] == edge["target"]
-                                  for e in edges):
-                            edges.append(edge)
-
-                # Mark as expanded
-                if artist_name in nodes:
-                    nodes[artist_name]["expanded"] = True
-
-                # Save updated map
-                user_map["nodes"] = list(nodes.values())
-                user_map["edges"] = edges
-                save_user_map(user_id, user_map)
-
-                return jsonify({
-                    "ok": True,
-                    "nodes": list(nodes.values()),
-                    "edges": edges
-                })
-            except SpotifyException as e:
-                return jsonify({"error": f"Spotify error: {str(e)}"}), 400
-        else:
-            return jsonify({"error": "Spotify auth required"}), 401
-
-    except Exception as e:
-        app.logger.error(f"Map expand failed: {e}")
-        return jsonify({"error": str(e)}), 500
+    user_map = load_user_map(user_id)
+    body = {"ok": True, "nodes": user_map.get("nodes", []), "edges": user_map.get("edges", []),
+            "added_nodes": result["added_nodes"], "added_edges": result["added_edges"]}
+    if result["already_expanded"]:
+        body["message"] = "Already expanded"
+    return jsonify(body)
 
 
 @app.route("/api/map/get", methods=["GET"])
@@ -406,32 +347,56 @@ def map_get():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/artist/<name>")
-def api_artist(name):
-    """Get metadata for an artist."""
-    spotify_token = get_valid_spotify_token()
-    if not spotify_token:
+@app.route("/api/artist")
+def api_artist():
+    """
+    Full details for an artist on the user's map (tags, listeners, bio, image, top
+    tracks without preview URLs), from the shared caches or Last.fm + Deezer.
+    The node is updated in the saved map so a reload keeps the details.
+    """
+    user_id = _current_user_id()
+    if not user_id:
         return jsonify({"error": "Not authenticated"}), 401
+    name = request.args.get("name", "").strip()
+    if not name:
+        return jsonify({"error": "Artist name required"}), 400
 
-    try:
-        sp = spotipy.Spotify(auth=spotify_token)
-        results = sp.search(q=name, type="artist", limit=1)
-        artists = results.get("artists", {}).get("items", [])
-        if not artists:
-            return jsonify({"error": "Not found"}), 404
+    info = get_cached_artist(name)
+    if info is None:
+        try:
+            info = enrich_artist_with_lastfm(name)
+        except EnrichmentUnavailable:
+            return jsonify({"error": "Last.fm is unavailable right now. Try again shortly."}), 502
+        set_cached_artist(name, info)
+    deezer = get_deezer_info(name)
+    details = {
+        "name": name,
+        "listeners": info.get("listeners", 0),
+        "tags": info.get("tags", []),
+        "genre": _derive_genre(info.get("tags", [])),
+        "bio": info.get("bio"),
+        "image_url": deezer.get("image_url") or info.get("image_url"),
+        "top_tracks": deezer.get("top_tracks", []),
+        "details_loaded": True,
+    }
 
-        artist = artists[0]
-        return jsonify({
-            "name": artist["name"],
-            "id": artist["id"],
-            "popularity": artist.get("popularity", 0),
-            "genres": artist.get("genres", []),
-            "followers": artist.get("followers", {}).get("total", 0),
-            "images": artist.get("images", []),
-            "external_urls": artist.get("external_urls", {})
-        })
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    def merge(user_map):
+        for node in user_map.get("nodes", []):
+            if node.get("name") == name:
+                node.update(details)
+    if any(n.get("name") == name for n in load_user_map(user_id).get("nodes", [])):
+        update_user_map(user_id, merge)
+    return jsonify(details)
+
+
+@app.route("/api/preview")
+def api_preview():
+    """A fresh Deezer preview URL for one track (by deezer_id, or artist + title)."""
+    if not _current_user_id():
+        return jsonify({"error": "Not authenticated"}), 401
+    url = resolve_preview(request.args.get("deezer_id"), request.args.get("artist", ""),
+                          request.args.get("title", ""))
+    return jsonify({"preview_url": url})
 
 
 @app.route("/api/health", methods=["GET"])

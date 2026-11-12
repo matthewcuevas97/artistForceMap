@@ -76,6 +76,15 @@ def isolated_storage(tmp_path, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _clear_preview_cache():
+    """backend.previews memoises preview URLs in memory; isolate tests from each other."""
+    from backend import previews
+    previews.clear()
+    yield
+    previews.clear()
+
+
+@pytest.fixture(autouse=True)
 def _clear_coachella_top_artists_cache():
     """app.py caches top artists in memory for 10 min; never let that leak between tests."""
     mod = sys.modules.get("app")

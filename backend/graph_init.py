@@ -84,11 +84,13 @@ def fetch_deezer_artist_info(artist_name: str) -> Dict[str, Any]:
             "name": artist.get("name", artist_name),
             "image_url": artist.get("picture_xl") or artist.get("picture_big"),
             "fans": artist_full.get("nb_fan", 0),
+            # Preview URLs are signed and expire in ~15 min, so only the track id is
+            # cached; /api/preview resolves a fresh URL at play time (BUG-10).
             "top_tracks": [
                 {
                     "name": t.get("title"),
                     "artist": t.get("artist", {}).get("name"),
-                    "preview_url": t.get("preview"),
+                    "deezer_id": t.get("id"),
                     "album_art": t.get("album", {}).get("cover_big"),
                 }
                 for t in tracks_data.get("data", [])[:10]
@@ -96,6 +98,37 @@ def fetch_deezer_artist_info(artist_name: str) -> Dict[str, Any]:
         }
     except Exception as e:
         return {"error": str(e)}
+
+
+def strip_previews(tracks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Drop (possibly expired) preview URLs, e.g. from Deezer entries cached before BUG-10."""
+    return [{k: v for k, v in t.items() if k != "preview_url"} for t in tracks or []]
+
+
+def get_similar(artist_name: str):
+    """
+    Similar artists for `artist_name`, from the 90-day cache or Last.fm.
+    Returns [] if Last.fm has none, None on a transient failure (not cached).
+    """
+    similar = get_cached_similar_artists(artist_name)
+    if similar is not None:
+        return similar
+    similar = get_similar_artists(artist_name, limit=20, threshold=0.05)
+    if similar is not None:
+        set_cached_similar_artists(artist_name, similar)
+    return similar
+
+
+def get_deezer_info(artist_name: str) -> Dict[str, Any]:
+    """Deezer image/fans/top tracks from the cache or the API; {} on failure."""
+    info = get_cached_deezer_info(artist_name)
+    if info is None:
+        info = fetch_deezer_artist_info(artist_name)
+        if info and "error" not in info:
+            set_cached_deezer_info(artist_name, info)
+    if not info or "error" in info:
+        return {}
+    return {**info, "top_tracks": strip_previews(info.get("top_tracks"))}
 
 
 def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict, idx: int = 0, total: int = 0) -> Dict[str, Any]:
@@ -159,7 +192,7 @@ def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict, idx: int = 0
         "image_url": image_url,
         "bio": lastfm_data.get("bio"),
         "similar_artists": similar,
-        "top_tracks": deezer_info.get("top_tracks", []),
+        "top_tracks": strip_previews(deezer_info.get("top_tracks", [])),
         "deezer_fans": deezer_info.get("fans", 0),
         # Normalized fields for frontend
         "genre": genre,
@@ -172,6 +205,9 @@ def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict, idx: int = 0
         "stage": "",
         "day": "",
         "weekend": "",
+        "seed": True,
+        "expanded": False,
+        "details_loaded": True,
     }
 
     return metadata
@@ -218,14 +254,55 @@ def rbo_similarity(list1: List[str], list2: List[str], p: float = 0.9) -> float:
     return (1 - p) / p * total + ((overlap - x_s) / l + x_s / s) * p ** l
 
 
+SIMILAR_PER_SEED = 4
+EXPAND_LIMIT = 6
+
+
+def stub_node(name: str, parent: Dict[str, Any], match: float, known: Dict[str, Any] = None) -> Dict[str, Any]:
+    """
+    A lightweight node for a similar artist. Full details (tags, bio, tracks) are
+    loaded on demand by /api/artist. Genre is inherited from the parent until then;
+    `known` is the user's own enrichment for that artist, if they listen to it.
+    """
+    known = known or {}
+    tags = known.get("tags") or []
+    return {
+        "name": name,
+        "seed": False,
+        "expanded": False,
+        "details_loaded": False,
+        "parent": parent["name"],
+        "match": match,
+        "listeners": known.get("listeners", 0),
+        "tags": tags,
+        "genre": _derive_genre(tags) if tags else parent.get("genre", "Unknown"),
+        "image_url": known.get("image_url"),
+        "bio": known.get("bio"),
+        "top_tracks": [],
+    }
+
+
+def _add_edge(edges, seen, a, b, **attrs):
+    key = tuple(sorted((a, b)))
+    if a == b or key in seen:
+        return False
+    seen.add(key)
+    edges.append({"source": a, "target": b, **attrs})
+    return True
+
+
 def build_seed_graph(
     user_id: str,
     seed_artists: List[str],
     all_artists_metadata: Dict[str, Dict],
+    similar_per_seed: int = SIMILAR_PER_SEED,
+    user_artists: Dict[str, Dict] = None,
 ) -> Dict[str, Any]:
     """
-    Build initial graph with seed artists as nodes and edges between them.
-    Uses Gold Standard (similar artists overlap) + RBO logic.
+    Build the initial graph: seed artists, edges between them (Gold Standard
+    similar-artist overlap, then tag RBO), plus each seed's `similar_per_seed`
+    strongest similar artists as lightweight nodes linked to every seed that
+    lists them (BUG-17: the map used to be just the 5 isolated seeds).
     """
     report(f"Building graph with {len(seed_artists)} seed artists...")
 
@@ -287,12 +364,74 @@ def build_seed_graph(
                 })
                 added_edges.add(edge_key)
 
+    # Similar artists as first-ring nodes
+    present = {n["name"] for n in nodes}
+    for seed in seed_artists:
+        meta = node_map.get(seed)
+        if not meta:
+            continue
+        added = 0
+        for s in meta.get("similar_artists") or []:
+            if added >= similar_per_seed:
+                break
+            if s["name"] in present:
+                continue
+            nodes.append(stub_node(s["name"], meta, s["match"], (user_artists or {}).get(s["name"])))
+            present.add(s["name"])
+            added += 1
+    # Link every seed to each first-ring artist it lists as similar
+    for seed in seed_artists:
+        for s in node_map.get(seed, {}).get("similar_artists") or []:
+            if s["name"] in present and s["name"] not in seed_artists:
+                _add_edge(edges, added_edges, seed, s["name"], type="similar", weight=s["match"], **{"pass": 1})
+
     report(f"  {len(nodes)} nodes, {len(edges)} edges")
 
     return {
         "nodes": nodes,
         "edges": edges,
     }
+
+
+class SimilarUnavailable(Exception):
+    """Last.fm could not be reached; nothing was changed."""
+
+
+def expand_map(user_map: Dict[str, Any], artist_name: str, limit: int = EXPAND_LIMIT) -> Dict[str, Any]:
+    """
+    Grow `user_map` in place from `artist_name` using Last.fm similar artists
+    (works for Spotify and Last.fm users alike; replaces Spotify's retired
+    recommendations endpoint, BUG-24). Adds up to `limit` new artists and links
+    the parent to any listed artist already on the map.
+
+    Returns {"added_nodes": [...], "added_edges": [...], "already_expanded": bool}.
+    Raises KeyError if the artist isn't on the map, SimilarUnavailable on failure.
+    """
+    nodes = {n["name"]: n for n in user_map.setdefault("nodes", [])}
+    edges = user_map.setdefault("edges", [])
+    parent = nodes[artist_name]
+    if parent.get("expanded"):
+        return {"added_nodes": [], "added_edges": [], "already_expanded": True}
+
+    similar = get_similar(artist_name)
+    if similar is None:
+        raise SimilarUnavailable(artist_name)
+
+    seen = {tuple(sorted((e["source"], e["target"]))) for e in edges}
+    added_nodes, added_edges = [], []
+    for s in similar:
+        name = s["name"]
+        if name not in nodes:
+            if len(added_nodes) >= limit:
+                continue
+            node = stub_node(name, parent, s["match"])
+            nodes[name] = node
+            user_map["nodes"].append(node)
+            added_nodes.append(node)
+        if _add_edge(edges, seen, artist_name, name, type="similar", weight=s["match"], **{"pass": 1}):
+            added_edges.append(edges[-1])
+    parent["expanded"] = True
+    return {"added_nodes": added_nodes, "added_edges": added_edges, "already_expanded": False}
 
 
 def initialize_user_graph(user_id: str) -> Dict[str, Any]:
@@ -320,7 +459,7 @@ def initialize_user_graph(user_id: str) -> Dict[str, Any]:
         time.sleep(0.1)
 
     # Build graph
-    graph = build_seed_graph(user_id, seed_artists, all_artists_metadata)
+    graph = build_seed_graph(user_id, seed_artists, all_artists_metadata, user_artists=all_artists)
 
     # Save to user_map.json
     user_map = {
