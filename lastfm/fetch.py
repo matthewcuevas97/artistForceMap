@@ -104,9 +104,32 @@ def get_artist_image_and_bio(artist_name):
     if summary:
         cleaned = re.sub(r'\s*<a\s[^>]*>[^<]*</a>', '', summary)
         cleaned = re.sub(r'<[^>]+>', '', cleaned).strip()
-        bio = cleaned[:300] if cleaned else None
+        bio = trim_bio(cleaned, BIO_LIMIT) if cleaned else None
 
     return image_url, bio
+
+
+BIO_LIMIT = 300
+_SENTENCE_END = re.compile(r'[.!?]["\u201d\u2019)]?(?=\s)|\n')
+
+
+def trim_bio(text, limit=BIO_LIMIT):
+    """
+    Shorten `text` to at most `limit` characters without cutting mid-sentence or mid-word.
+
+    Prefers the last sentence end (or line break) in the second half of the window; else
+    cuts at the last word boundary and appends an ellipsis. Text within the limit is
+    returned unchanged (whitespace-trimmed).
+    """
+    text = text.strip()
+    if len(text) <= limit:
+        return text
+    window = text[:limit + 1]
+    ends = [m.end() for m in _SENTENCE_END.finditer(window) if m.end() >= limit // 2]
+    if ends:
+        return window[:ends[-1]].strip()
+    cut = window[:limit - 1].rsplit(None, 1)[0] if " " in window[:limit - 1] else window[:limit - 1]
+    return cut.rstrip(" ,;:-\u2013\u2014") + "\u2026"
 
 
 def get_top_artists(username, limit=100):

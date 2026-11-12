@@ -147,6 +147,12 @@ def test_static_graph_is_in_sync_with_lastfm_cache():
     assert main(["--check"]) == 0, "run: python scripts/migrate_similar.py"
 
 
+def test_static_graph_has_no_hard_cut_bios():
+    """UX-03: bios used to be cut at exactly 300 chars mid-word. Fix with scripts/trim_bios.py."""
+    from scripts.trim_bios import main
+    assert main(["--check"]) == 0, "run: python scripts/trim_bios.py"
+
+
 def test_slim_node_keeps_similar_artists():
     from scripts.precompute import slim_node
     out = slim_node({"name": "X", "similar_artists": [{"name": "Y", "match": 0.5}]})

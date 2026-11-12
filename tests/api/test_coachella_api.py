@@ -18,6 +18,8 @@ def test_index_renders(coachella_client):
     r = coachella_client.get("/")
     assert r.status_code == 200
     assert b'id="graph"' in r.data and b"/static/js/main.js" in r.data
+    assert b'rel="icon"' in r.data  # UX-03: no more favicon 404
+    assert coachella_client.get("/static/favicon.svg").status_code == 200
 
 
 def test_graph_anonymous_shape(coachella_client):

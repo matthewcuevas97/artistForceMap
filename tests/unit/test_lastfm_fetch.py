@@ -66,3 +66,28 @@ def test_image_and_bio_strip_html_and_pick_largest(http):
 def test_artist_info_network_error_is_handled(http):
     http.add("GET", LASTFM_URL, body=requests.ConnectionError("down"))
     assert fetch.get_artist_info("X") is None
+
+
+# ── UX-03: bio trimming ───────────────────────────────────────────────────────
+
+def test_trim_bio_short_text_unchanged():
+    assert fetch.trim_bio("  Short bio.  ") == "Short bio."
+
+
+def test_trim_bio_prefers_sentence_end():
+    text = "First sentence is here. " + "Second one runs on and on " * 20
+    assert fetch.trim_bio(text, 40) == "First sentence is here."  # end lies in the 2nd half of the window
+
+
+def test_trim_bio_falls_back_to_word_boundary_with_ellipsis():
+    text = "word " * 100
+    out = fetch.trim_bio(text, 50)
+    assert out.endswith("\u2026") and len(out) <= 50
+    assert out[:-1].split() == ["word"] * len(out[:-1].split())
+
+
+def test_artist_bio_from_api_is_trimmed_cleanly(http):
+    summary = ("Band from Paris. " * 30) + '<a href="https://last.fm/x">Read more</a>'
+    http.add("GET", LASTFM_URL, json={"artist": {"image": [], "bio": {"summary": summary}}})
+    _, bio = fetch.get_artist_image_and_bio("X")
+    assert bio.endswith("Paris.") and len(bio) <= fetch.BIO_LIMIT
