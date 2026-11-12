@@ -277,7 +277,7 @@ def test_user_id_cannot_escape_data_dir(isolated_storage, uid):
 
 
 def test_normal_user_ids_keep_readable_file_names():
-    assert user_data.get_user_map_path("yfs6fgzckr3o9tikcj54rsd0f").endswith("yfs6fgzckr3o9tikcj54rsd0f_map.json")
+    assert user_data.get_user_map_path("a1b2c3d4e5f6g7h8i9j0klmno").endswith("a1b2c3d4e5f6g7h8i9j0klmno_map.json")
     assert user_data.get_user_map_path("bob_the-dj.1").endswith("bob_the-dj.1_map.json")
 
 
