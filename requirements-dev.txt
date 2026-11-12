@@ -1,5 +1,5 @@
 -r requirements.txt
 pytest==8.3.4
-playwright==1.49.1   # e2e uses the locally installed Chrome (channel="chrome"); in CI run `playwright install chromium`
+playwright==1.49.1   # e2e uses the local Chrome; PW_CHANNEL=chromium + `playwright install chromium` for CI
 responses==0.25.3
 pyflakes==3.2.0

@@ -1,6 +1,10 @@
 """
-Browser-level fixtures: live Flask servers + Playwright driving the locally
-installed Google Chrome (channel="chrome"), fully offline:
+Browser-level fixtures: live Flask servers + Playwright, fully offline.
+
+Browser: the locally installed Google Chrome by default. Set PW_CHANNEL=chromium to
+use Playwright's bundled Chromium instead (CI: `playwright install --with-deps chromium`).
+HEADED=1 shows the window.
+
 
   * d3 is served from tests/e2e/vendor instead of cdnjs
   * Google Fonts and every other third-party host are aborted / stubbed
@@ -92,12 +96,14 @@ def browser():
     if sync_playwright is None:
         pytest.skip("playwright not installed")
     pw = sync_playwright().start()
+    channel = os.getenv("PW_CHANNEL", "chrome")
     try:
-        b = pw.chromium.launch(channel="chrome", headless=os.getenv("HEADED") is None,
+        b = pw.chromium.launch(channel=None if channel == "chromium" else channel,
+                               headless=os.getenv("HEADED") is None,
                                args=["--autoplay-policy=no-user-gesture-required", "--mute-audio"])
-    except Exception as exc:  # no local Chrome
+    except Exception as exc:  # browser not installed
         pw.stop()
-        pytest.skip(f"cannot launch Chrome: {exc}")
+        pytest.skip(f"cannot launch {channel}: {exc}")
     yield b
     b.close()
     pw.stop()

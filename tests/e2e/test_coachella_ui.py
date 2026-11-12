@@ -6,6 +6,7 @@ known-broken is captured as strict xfail with a BUG-id (see docs/REVIEW_2026-11.
 """
 
 import json
+import os
 import re
 
 import pytest
@@ -42,8 +43,9 @@ def test_initial_render(coachella):
 
 LONGTASK_OBSERVER = ("window.__lt=[];new PerformanceObserver(l=>l.getEntries().forEach(e=>window.__lt.push(e.duration)))"
                      ".observe({entryTypes:['longtask']});")
-# PERF-01: 3000 synchronous pre-ticks used to block ~800 ms on load and on every slider step.
-MAIN_THREAD_BUDGET_MS = 300
+# PERF-01: 3000 synchronous pre-ticks used to block ~800 ms on load and on every slider step
+# (now ~110 ms on an M-series Mac). Slower CI runners raise the budget via PERF_BUDGET_MS.
+MAIN_THREAD_BUDGET_MS = float(os.getenv("PERF_BUDGET_MS", "300"))
 
 
 def test_initial_render_blocks_main_thread_under_budget(coachella):
