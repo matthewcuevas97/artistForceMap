@@ -189,3 +189,42 @@ def test_create_playlist_searches_and_adds(coachella_client, http):
     r = coachella_client.post("/api/spotify/create-playlist",
                               json={"tracks": [{"artist": "A", "name": "Song"}]})
     assert r.get_json() == {"ok": True, "playlist_url": "https://open.spotify.com/playlist/PL1"}
+
+
+# ── PERF-02: per-user top-artist cache ────────────────────────────────────────
+
+def _lastfm_calls(http):
+    return [c for c in http.calls if c.request.url.startswith(LASTFM_URL)]
+
+
+def test_graph_caches_top_artists_per_user(coachella_app, http):
+    http.add("GET", LASTFM_URL, json=lastfm_top_artists_payload(["The Strokes"]))
+    alice, bob = coachella_app.app.test_client(), coachella_app.app.test_client()
+    for client, user in ((alice, "alice"), (bob, "bob")):
+        with client.session_transaction() as s:
+            s["lastfm_user"] = user
+    alice.get("/api/graph")
+    alice.get("/api/graph")
+    assert len(_lastfm_calls(http)) == 1
+    bob.get("/api/graph")
+    assert len(_lastfm_calls(http)) == 2, "users must not share cached top artists"
+
+
+def test_graph_top_artist_cache_expires(coachella_app, coachella_client, http, monkeypatch):
+    http.add("GET", LASTFM_URL, json=lastfm_top_artists_payload(["The Strokes"]))
+    with coachella_client.session_transaction() as s:
+        s["lastfm_user"] = "bob"
+    coachella_client.get("/api/graph")
+    real_time = time.time
+    monkeypatch.setattr(coachella_app.time, "time", lambda: real_time() + coachella_app.TOP_ARTISTS_TTL + 1)
+    coachella_client.get("/api/graph")
+    assert len(_lastfm_calls(http)) == 2
+
+
+def test_graph_does_not_cache_failed_top_artist_fetch(coachella_client, http):
+    http.add("GET", LASTFM_URL, json={"error": 29, "message": "Rate limit exceeded"})
+    http.add("GET", LASTFM_URL, json=lastfm_top_artists_payload(["The Strokes"]))
+    with coachella_client.session_transaction() as s:
+        s["lastfm_user"] = "bob"
+    assert coachella_client.get("/api/graph").get_json()["user_seeds"] == []
+    assert coachella_client.get("/api/graph").get_json()["user_seeds"] == ["The Strokes"]

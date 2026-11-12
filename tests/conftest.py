@@ -76,6 +76,18 @@ def isolated_storage(tmp_path, monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def _clear_coachella_top_artists_cache():
+    """app.py caches top artists in memory for 10 min; never let that leak between tests."""
+    mod = sys.modules.get("app")
+    if mod is not None and hasattr(mod, "_top_artists_cache"):
+        mod._top_artists_cache.clear()
+    yield
+    mod = sys.modules.get("app")
+    if mod is not None and hasattr(mod, "_top_artists_cache"):
+        mod._top_artists_cache.clear()
+
+
+@pytest.fixture(autouse=True)
 def http(request):
     """Block real network; yield a RequestsMock tests can register responses on."""
     with responses_lib.RequestsMock(assert_all_requests_are_fired=False) as rsps:

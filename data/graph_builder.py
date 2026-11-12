@@ -1,4 +1,5 @@
 import json
+import math
 import os
 import re
 from collections import defaultdict
@@ -75,9 +76,16 @@ def build_genre_edges(nodes):
 
 
 def normalize_listeners(nodes, scores):
+    """
+    Baseline score from Last.fm listeners, square-root scaled to [0, 1].
+
+    Listener counts span 4 orders of magnitude, so a linear scale left 83/142 lineup
+    nodes below 0.1 (labels hidden, tiny grey dots). sqrt leaves ~15 there while
+    keeping headliners clearly bigger; log would flatten everything to 0.7-1.0 (UX-02).
+    """
     max_listeners = max((node.get("listeners", 0) for node in nodes), default=0)
     for node in nodes:
-        scores[node["name"]]["score"] = node.get("listeners", 0) / max_listeners if max_listeners else 0
+        scores[node["name"]]["score"] = math.sqrt(node.get("listeners", 0) / max_listeners) if max_listeners else 0
     return scores
 
 

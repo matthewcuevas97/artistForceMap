@@ -20,12 +20,20 @@ def test_norm_strips_punctuation_and_case():
     assert _norm("¥ØU$UK€") == _norm("¥øu$uk€")  # unicode-aware lowercasing
 
 
-def test_normalize_listeners_scales_to_max():
+def test_normalize_listeners_sqrt_scales_to_max():
     nodes = [{"name": "a", "listeners": 100}, {"name": "b", "listeners": 25}, {"name": "c"}]
     s = normalize_listeners(nodes, _scores(nodes))
     assert s["a"]["score"] == 1.0
-    assert s["b"]["score"] == 0.25
+    assert s["b"]["score"] == 0.5
     assert s["c"]["score"] == 0
+
+
+def test_baseline_leaves_few_lineup_labels_hidden():
+    """UX-02: labels hide below score 0.1; linear scaling hid 83/142, sqrt hides ~15."""
+    from data.graph_builder import load_static_graph
+    nodes = load_static_graph()
+    s = normalize_listeners(nodes, _scores(nodes))
+    assert sum(v["score"] < 0.1 for v in s.values()) <= 20
 
 
 def test_normalize_listeners_all_zero_does_not_divide_by_zero():

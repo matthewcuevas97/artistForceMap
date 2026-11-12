@@ -1,6 +1,8 @@
+import hashlib
 import json
 import os
 import re
+import threading
 import time
 import spotipy
 import requests
@@ -115,6 +117,33 @@ except Exception as e:
     app.logger.error("Failed to load graph_static.json: %s", e)
 
 
+# Per-user top artists, cached in memory so /api/graph doesn't call Spotify/Last.fm on
+# every page load (PERF-02). Kept server-side: 50 artists don't fit in a 4 KB cookie.
+TOP_ARTISTS_TTL = 600
+_TOP_ARTISTS_MAX = 1000
+_top_artists_cache: dict = {}
+_top_artists_lock = threading.Lock()
+
+
+def cached_top_artists(key, fetch):
+    """Return fetch() for `key`, reusing a non-empty result for TOP_ARTISTS_TTL seconds."""
+    now = time.time()
+    with _top_artists_lock:
+        hit = _top_artists_cache.get(key)
+        if hit and hit[0] > now:
+            return hit[1]
+    top = fetch()
+    if top:
+        with _top_artists_lock:
+            if len(_top_artists_cache) >= _TOP_ARTISTS_MAX:
+                for k in [k for k, (exp, _) in _top_artists_cache.items() if exp <= now]:
+                    del _top_artists_cache[k]
+                while len(_top_artists_cache) >= _TOP_ARTISTS_MAX:
+                    del _top_artists_cache[next(iter(_top_artists_cache))]
+            _top_artists_cache[key] = (now + TOP_ARTISTS_TTL, top)
+    return top
+
+
 # Fields used internally during graph building; not needed by the D3 frontend
 _INTERNAL_FIELDS = {"direct_score", "derived_score", "similar_artists"}
 
@@ -220,13 +249,16 @@ def api_graph():
 
     if lastfm_user:
         from lastfm.fetch import get_top_artists as lastfm_top
-        top = lastfm_top(lastfm_user)
+        top = cached_top_artists(("lastfm", lastfm_user.lower()),
+                                 lambda: lastfm_top(lastfm_user))
         if top:
             enrich_with_scores(_nodes, top, scores)
     elif spotify_token:
         try:
-            sp = spotipy.Spotify(auth=spotify_token)
-            top_artists = get_top_artists(sp)
+            # Keyed by a hash of the access token: it is per-user and rotates on refresh.
+            key = ("spotify", hashlib.sha256(spotify_token.encode()).hexdigest())
+            top_artists = cached_top_artists(
+                key, lambda: get_top_artists(spotipy.Spotify(auth=spotify_token)))
             enrich_with_scores(_nodes, top_artists, scores)
         except SpotifyException:
             pass
