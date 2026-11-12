@@ -9,6 +9,7 @@ from typing import Dict, List, Any
 from lastfm.fetch import get_artist_info, get_artist_top_tags, get_artist_image_and_bio
 from backend.cache import get_cached_artist, set_cached_artist
 from backend.user_data import load_user_db, update_user_db
+from backend.progress import report
 
 
 class EnrichmentUnavailable(Exception):
@@ -54,7 +55,7 @@ def enrich_top_25_artists(user_id: str) -> Dict[str, Any]:
 
     all_artists = {}
 
-    print(f"Fetching top {len(top_artists)} artists")
+    report(f"Fetching top {len(top_artists)} artists")
 
     # Animation frames for loading indicator
     frames = ["-", "\\", "|", "/"]
@@ -73,7 +74,7 @@ def enrich_top_25_artists(user_id: str) -> Dict[str, Any]:
                 enriched = cached
                 was_cached = True
                 status = "MONEY!" if i <= 5 else "✓"
-                print(f"[{i}/{len(top_artists)}] Gathering {artist_name} - Cache {status}")
+                report(f"[{i}/{len(top_artists)}] Gathering {artist_name} - Cache {status}")
             else:
                 # Not in cache, fetch from API
                 enriched = enrich_artist_with_lastfm(artist_name)
@@ -81,14 +82,14 @@ def enrich_top_25_artists(user_id: str) -> Dict[str, Any]:
                 set_cached_artist(artist_name, enriched)
                 frame = frames[frame_idx % len(frames)]
                 frame_idx += 1
-                print(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* LOADING")
+                report(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* LOADING")
 
             enriched["rank"] = artist.get("rank", i)  # Preserve original rank
             all_artists[artist_name] = enriched
         except Exception as e:
             frame = frames[frame_idx % len(frames)]
             frame_idx += 1
-            print(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* ERROR")
+            report(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* ERROR")
             # Still add minimal data
             all_artists[artist_name] = {
                 "name": artist_name,

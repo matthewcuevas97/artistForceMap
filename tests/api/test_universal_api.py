@@ -7,6 +7,7 @@ import time
 import pytest
 
 from backend import user_data
+from backend.progress import report
 from tests.conftest import LASTFM_URL, SPOTIFY_API, lastfm_top_artists_payload
 
 
@@ -42,9 +43,9 @@ def test_map_get_returns_saved_map(universal_client):
 
 def test_stream_emits_progress_then_complete(universal_app, universal_client, monkeypatch):
     def fake_pipeline(auth):
-        print("STEP 1: User Ingestion")
-        print("")  # blank lines are dropped
-        print("✓ Fetched 25 top artists")
+        report("STEP 1: User Ingestion")
+        report("")  # blank lines are dropped
+        report("✓ Fetched 25 top artists")
         user_data.save_user_map(auth["id"], {"nodes": [{"name": "A"}, {"name": "B"}],
                                              "edges": [{"source": "A", "target": "B"}]})
     monkeypatch.setattr(universal_app, "run_full_pipeline", fake_pipeline)
@@ -56,7 +57,7 @@ def test_stream_emits_progress_then_complete(universal_app, universal_client, mo
 
 def test_stream_reports_pipeline_errors(universal_app, universal_client, monkeypatch):
     def failing(auth):
-        print("STEP 1")
+        report("STEP 1")
         raise ValueError("No enriched artists found")
     monkeypatch.setattr(universal_app, "run_full_pipeline", failing)
     _login_lastfm(universal_client)
@@ -64,9 +65,8 @@ def test_stream_reports_pipeline_errors(universal_app, universal_client, monkeyp
     assert events[-1] == {"error": "No enriched artists found"}
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-12: the SSE endpoint swaps the process-global "
-                   "sys.stdout, so prints from other threads/requests leak into this user's stream")
 def test_stream_does_not_capture_other_threads_output(universal_app, universal_client, monkeypatch):
+    """BUG-12 regression: the stream swapped the global sys.stdout and relayed other requests' output."""
     started, release = threading.Event(), threading.Event()
 
     def slow_pipeline(auth):
@@ -80,6 +80,7 @@ def test_stream_does_not_capture_other_threads_output(universal_app, universal_c
     def other_request():
         started.wait(5)
         print("OTHER USER'S PRIVATE OUTPUT")
+        report("OTHER USER'S PIPELINE PROGRESS")  # no sink in this thread -> stdout, not the stream
         release.set()
     t = threading.Thread(target=other_request)
     t.start()
@@ -88,30 +89,32 @@ def test_stream_does_not_capture_other_threads_output(universal_app, universal_c
     assert not any("OTHER USER" in e.get("message", "") for e in events)
 
 
-@pytest.mark.slow
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-13: the SSE generator gives up after 30 s without a "
-                   "progress line, reporting 'Pipeline timeout' while the pipeline keeps running")
-def test_stream_tolerates_slow_silent_step(universal_app, universal_client, monkeypatch):
-    import queue as queue_mod
-    real_get = queue_mod.Queue.get
-
-    def fast_timeout_get(self, block=True, timeout=None):
-        return real_get(self, block, 0.2 if timeout == 30 else timeout)
-    monkeypatch.setattr(queue_mod.Queue, "get", fast_timeout_get)
-
+def test_stream_keeps_alive_through_slow_silent_step(universal_app, universal_client, monkeypatch):
+    """BUG-13 regression: a step silent for >30 s used to end the stream with 'Pipeline timeout'."""
+    monkeypatch.setattr(universal_app, "SSE_KEEPALIVE_SECONDS", 0.1)
     done = threading.Event()
 
     def slow(auth):
         try:
-            time.sleep(0.5)  # a silent step "longer than the timeout" (scaled down 30s → 0.2s)
-            user_data.save_user_map(auth["id"], {"nodes": [], "edges": []})
+            time.sleep(0.5)  # silent for 5 keepalive periods
+            user_data.save_user_map(auth["id"], {"nodes": [{"name": "A"}], "edges": []})
         finally:
             done.set()
     monkeypatch.setattr(universal_app, "run_full_pipeline", slow)
     _login_lastfm(universal_client)
-    events = _sse_events(universal_client.post("/api/map/init/stream"))
-    done.wait(5)  # the orphaned pipeline thread must finish while storage is still isolated
-    assert events[-1].get("complete") is True
+    body = universal_client.post("/api/map/init/stream").get_data(as_text=True)
+    done.wait(5)
+    assert ": keepalive" in body
+    events = [json.loads(l[6:]) for l in body.splitlines() if l.startswith("data: ")]
+    assert events[-1]["complete"] is True and events[-1]["nodes"] == [{"name": "A"}]
+
+
+def test_stream_sets_no_cache_headers(universal_app, universal_client, monkeypatch):
+    monkeypatch.setattr(universal_app, "run_full_pipeline",
+                        lambda auth: user_data.save_user_map(auth["id"], {"nodes": [], "edges": []}))
+    _login_lastfm(universal_client)
+    r = universal_client.post("/api/map/init/stream")
+    assert r.mimetype == "text/event-stream" and r.headers["Cache-Control"] == "no-cache"
 
 
 def test_expand_requires_spotify_for_lastfm_users(universal_client):

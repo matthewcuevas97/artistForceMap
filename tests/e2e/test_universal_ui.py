@@ -7,6 +7,7 @@ import pytest
 from playwright.sync_api import TimeoutError as PWTimeout
 
 from backend import user_data
+from backend.progress import report
 
 pytestmark = pytest.mark.e2e
 
@@ -30,8 +31,8 @@ def fake_backend(monkeypatch, universal_server, media_server):
     state = {"nodes": nodes, "fail": None}
 
     def fake_pipeline(auth):
-        print("STEP 1: User Ingestion")
-        print("✓ Fetched 25 top artists")
+        report("STEP 1: User Ingestion")
+        report("✓ Fetched 25 top artists")
         time.sleep(0.4)  # let the browser paint progress before completion replaces it
         if state["fail"]:
             raise ValueError(state["fail"])

@@ -5,6 +5,7 @@ Uses Maximal Marginal Relevance: maximize rank while minimizing tag overlap.
 
 from typing import Dict, List, Set, Tuple
 from backend.user_data import load_user_db, update_user_db
+from backend.progress import report
 
 
 def jaccard_similarity(tags_a: Set[str], tags_b: Set[str]) -> float:
@@ -105,8 +106,8 @@ def select_seed_artists(user_id: str, num_seeds: int = 5, lambda_param: float = 
         }
     ]
 
-    print(f"Selecting {num_seeds} seed artists for user {user_id}...")
-    print(f"  [1/{num_seeds}] {rank_1_artist} (auto-selected, rank #1)")
+    report(f"Selecting {num_seeds} seed artists for user {user_id}...")
+    report(f"  [1/{num_seeds}] {rank_1_artist} (auto-selected, rank #1)")
 
     # Step 2: Greedy selection for remaining slots
     for slot in range(2, num_seeds + 1):
@@ -134,7 +135,7 @@ def select_seed_artists(user_id: str, num_seeds: int = 5, lambda_param: float = 
                 best_candidate = artist_name
 
         if not best_candidate:
-            print(f"  Warning: Could not find {num_seeds} diverse artists")
+            report(f"  Warning: Could not find {num_seeds} diverse artists")
             break
 
         selected_artists.append(best_candidate)
@@ -145,7 +146,7 @@ def select_seed_artists(user_id: str, num_seeds: int = 5, lambda_param: float = 
             "rank": all_artists[best_candidate].get("rank"),
         })
 
-        print(f"  [{slot}/{num_seeds}] {best_candidate} (score: {best_score:.3f})")
+        report(f"  [{slot}/{num_seeds}] {best_candidate} (score: {best_score:.3f})")
 
     # Save seed artists to database
     db["seed_artists"] = selected_artists

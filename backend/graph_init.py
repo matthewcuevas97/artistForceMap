@@ -13,6 +13,7 @@ from backend.cache import (
     get_cached_deezer_info, set_cached_deezer_info
 )
 from backend.user_data import load_user_db, load_user_map, save_user_map, update_user_db
+from backend.progress import report
 
 
 def _derive_genre(tags: List[str]) -> str:
@@ -115,7 +116,7 @@ def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict, idx: int = 0
     if similar is None:
         # Not in cache, fetch from API
         if idx > 0 and total > 0:
-            print(f"[{idx}/{total}] Gathering {artist_name} -{frame}*-{frame}* LOADING")
+            report(f"[{idx}/{total}] Gathering {artist_name} -{frame}*-{frame}* LOADING")
         similar = get_similar_artists(artist_name, limit=20, threshold=0.05)
         # Cache it for 90 days, but never cache a transient failure (None)
         if similar is not None:
@@ -124,7 +125,7 @@ def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict, idx: int = 0
     else:
         # Found in cache
         if idx > 0 and total > 0:
-            print(f"[{idx}/{total}] Gathering {artist_name} - Cache ✓")
+            report(f"[{idx}/{total}] Gathering {artist_name} - Cache ✓")
 
     # Rate limiting only for API calls (cached data doesn't need rate limiting)
     if not was_cached_similar:
@@ -226,7 +227,7 @@ def build_seed_graph(
     Build initial graph with seed artists as nodes and edges between them.
     Uses Gold Standard (similar artists overlap) + RBO logic.
     """
-    print(f"Building graph with {len(seed_artists)} seed artists...")
+    report(f"Building graph with {len(seed_artists)} seed artists...")
 
     nodes = []
     node_map = {name: metadata for name, metadata in all_artists_metadata.items()}
@@ -240,7 +241,7 @@ def build_seed_graph(
     edges = []
     added_edges = set()
 
-    print("  Building edges...")
+    report("  Building edges...")
 
     # Gold Standard: similar artists that are both in seed set
     for i, artist1 in enumerate(seed_artists):
@@ -286,7 +287,7 @@ def build_seed_graph(
                 })
                 added_edges.add(edge_key)
 
-    print(f"  {len(nodes)} nodes, {len(edges)} edges")
+    report(f"  {len(nodes)} nodes, {len(edges)} edges")
 
     return {
         "nodes": nodes,
@@ -308,7 +309,7 @@ def initialize_user_graph(user_id: str) -> Dict[str, Any]:
     if not seed_artists:
         raise ValueError(f"No seed artists found for user {user_id}")
 
-    print(f"Gathering related artists")
+    report(f"Gathering related artists")
 
     # Fetch metadata for each seed artist
     all_artists_metadata = {}

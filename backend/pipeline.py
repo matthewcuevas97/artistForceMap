@@ -9,6 +9,7 @@ from backend.user_ingestion import ingest_user
 from backend.tag_enrichment import enrich_top_25_artists
 from backend.seed_selection import select_seed_artists
 from backend.graph_init import initialize_user_graph
+from backend.progress import report
 
 
 def run_full_pipeline(auth_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -28,57 +29,57 @@ def run_full_pipeline(auth_data: Dict[str, Any]) -> Dict[str, Any]:
         Pipeline result with all outputs
     """
     user_id = auth_data.get("id")
-    print(f"\n{'='*60}")
-    print(f"STARTING PIPELINE FOR USER: {user_id}")
-    print(f"{'='*60}\n")
+    report(f"\n{'='*60}")
+    report(f"STARTING PIPELINE FOR USER: {user_id}")
+    report(f"{'='*60}\n")
 
     # Step 1: User Ingestion
-    print("STEP 1: User Ingestion")
-    print("-" * 60)
+    report("STEP 1: User Ingestion")
+    report("-" * 60)
     try:
         ingestion_result = ingest_user(auth_data)
-        print(f"✓ Fetched {ingestion_result['top_artists_count']} top artists\n")
+        report(f"✓ Fetched {ingestion_result['top_artists_count']} top artists\n")
     except Exception as e:
-        print(f"✗ Ingestion failed: {str(e)}\n")
+        report(f"✗ Ingestion failed: {str(e)}\n")
         raise
 
     # Step 2: Tag Enrichment
-    print("STEP 2: Tag Enrichment")
-    print("-" * 60)
+    report("STEP 2: Tag Enrichment")
+    report("-" * 60)
     try:
         enrichment_result = enrich_top_25_artists(user_id)
-        print(f"✓ Enriched {enrichment_result['enriched_count']} artists\n")
+        report(f"✓ Enriched {enrichment_result['enriched_count']} artists\n")
     except Exception as e:
-        print(f"✗ Enrichment failed: {str(e)}\n")
+        report(f"✗ Enrichment failed: {str(e)}\n")
         raise
 
     # Step 3: Seed Selection
-    print("STEP 3: Seed Artist Selection (Maximal Marginal Relevance)")
-    print("-" * 60)
+    report("STEP 3: Seed Artist Selection (Maximal Marginal Relevance)")
+    report("-" * 60)
     try:
         selection_result = select_seed_artists(user_id, num_seeds=5, lambda_param=0.7)
-        print(f"✓ Selected {len(selection_result['seed_artists'])} seed artists")
+        report(f"✓ Selected {len(selection_result['seed_artists'])} seed artists")
         for item in selection_result['selection_log']:
-            print(f"  - {item['artist']} (score: {item.get('score', 'N/A')})\n")
+            report(f"  - {item['artist']} (score: {item.get('score', 'N/A')})\n")
     except Exception as e:
-        print(f"✗ Seed selection failed: {str(e)}\n")
+        report(f"✗ Seed selection failed: {str(e)}\n")
         raise
 
     # Step 4: Graph Initialization
-    print("STEP 4: Graph Initialization")
-    print("-" * 60)
+    report("STEP 4: Graph Initialization")
+    report("-" * 60)
     try:
         graph_result = initialize_user_graph(user_id)
-        print(f"✓ Graph initialized with {len(graph_result['graph']['nodes'])} nodes")
-        print(f"✓ Edges: {len(graph_result['graph']['edges'])}")
-        print(f"✓ Saved to user_map.json\n")
+        report(f"✓ Graph initialized with {len(graph_result['graph']['nodes'])} nodes")
+        report(f"✓ Edges: {len(graph_result['graph']['edges'])}")
+        report(f"✓ Saved to user_map.json\n")
     except Exception as e:
-        print(f"✗ Graph init failed: {str(e)}\n")
+        report(f"✗ Graph init failed: {str(e)}\n")
         raise
 
-    print(f"{'='*60}")
-    print(f"PIPELINE COMPLETE FOR USER: {user_id}")
-    print(f"{'='*60}\n")
+    report(f"{'='*60}")
+    report(f"PIPELINE COMPLETE FOR USER: {user_id}")
+    report(f"{'='*60}\n")
 
     return {
         "user_id": user_id,
@@ -119,5 +120,5 @@ def run_pipeline_step(
     if step not in step_functions:
         raise ValueError(f"Unknown step: {step}. Must be one of {list(step_functions.keys())}")
 
-    print(f"Running step: {step} for user: {user_id}")
+    report(f"Running step: {step} for user: {user_id}")
     return step_functions[step]()

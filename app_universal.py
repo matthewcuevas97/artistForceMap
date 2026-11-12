@@ -10,15 +10,13 @@ import spotipy
 import requests
 from datetime import datetime
 from flask import Flask, jsonify, render_template, redirect, request, session, Response
-import sys
-import io
 import queue
 import threading
-from contextlib import redirect_stdout
 from spotipy.exceptions import SpotifyException
 
 from backend.user_data import load_user_db, load_user_map, save_user_map
 from backend.pipeline import run_full_pipeline
+from backend.progress import progress_sink
 from spotify.auth import (OAuthStateError, SpotifyOauthError, get_authorize_url, get_token,
                           refresh_token as spotify_refresh_token, verify_state)
 from spotify.fetch import get_top_artists
@@ -47,23 +45,14 @@ LASTFM_API = "http://ws.audioscrobbler.com/2.0"
 # Real-time Progress Streaming
 # ============================================================================
 
-class StreamingStringIO(io.StringIO):
-    """StringIO that queues lines as they're written for real-time streaming."""
-    def __init__(self, queue_obj=None):
-        super().__init__()
-        self.queue = queue_obj
-        self.line_buffer = ""
+# Idle seconds between SSE keepalive comments while the pipeline is still running.
+# There is no overall deadline: a slow silent step (rate-limited API calls) is fine
+# as long as the pipeline thread is alive (BUG-13).
+SSE_KEEPALIVE_SECONDS = 15
 
-    def write(self, s):
-        super().write(s)
-        if self.queue:
-            self.line_buffer += s
-            # Process complete lines
-            while '\n' in self.line_buffer:
-                line, self.line_buffer = self.line_buffer.split('\n', 1)
-                if line.strip():
-                    self.queue.put(('message', line.strip()))
-        return len(s)
+
+def _sse(payload):
+    return f"data: {json.dumps(payload)}\n\n"
 
 
 def get_valid_spotify_token():
@@ -215,45 +204,44 @@ def map_init_stream():
     progress_queue = queue.Queue()
 
     def run_pipeline_thread():
-        """Run the pipeline in a thread, sending progress to queue."""
+        """Run the pipeline, sending only *this run's* progress to the queue."""
         try:
-            streaming_output = StreamingStringIO(queue_obj=progress_queue)
-            with redirect_stdout(streaming_output):
+            with progress_sink(lambda line: progress_queue.put(("message", line))):
                 run_full_pipeline(auth_data)
-            progress_queue.put(('complete', None))
+            progress_queue.put(("complete", None))
         except Exception as e:
-            progress_queue.put(('error', str(e)))
+            app.logger.warning("Pipeline failed for %s: %s", user_id, e)
+            progress_queue.put(("error", str(e) or e.__class__.__name__))
 
-    # Start pipeline in background thread
-    thread = threading.Thread(target=run_pipeline_thread)
-    thread.daemon = True
+    thread = threading.Thread(target=run_pipeline_thread, daemon=True)
     thread.start()
 
     def generate_progress():
-        """Generate SSE events from the progress queue."""
-        try:
-            while True:
-                try:
-                    msg_type, msg_data = progress_queue.get(timeout=30)
-                except queue.Empty:
-                    yield f"data: {json.dumps({'error': 'Pipeline timeout'})}\n\n"
-                    break
+        """Relay queue items as SSE events; keep the connection alive while the run lasts."""
+        while True:
+            try:
+                msg_type, msg_data = progress_queue.get(timeout=SSE_KEEPALIVE_SECONDS)
+            except queue.Empty:
+                if thread.is_alive():
+                    yield ": keepalive\n\n"
+                    continue
+                # Thread ended without reporting (shouldn't happen, but never hang).
+                yield _sse({"error": "Map generation stopped unexpectedly"})
+                return
 
-                if msg_type == 'message':
-                    yield f"data: {json.dumps({'message': msg_data})}\n\n"
-                elif msg_type == 'error':
-                    yield f"data: {json.dumps({'error': msg_data})}\n\n"
-                    break
-                elif msg_type == 'complete':
-                    # Load the generated map
-                    user_map = load_user_map(user_id)
-                    yield f"data: {json.dumps({'complete': True, 'nodes': user_map.get('nodes', []), 'edges': user_map.get('edges', [])})}\n\n"
-                    break
-        except Exception as e:
-            print(f"SSE error: {e}", file=sys.stderr)
-            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            if msg_type == "message":
+                yield _sse({"message": msg_data})
+            elif msg_type == "error":
+                yield _sse({"error": msg_data})
+                return
+            elif msg_type == "complete":
+                user_map = load_user_map(user_id)
+                yield _sse({"complete": True, "nodes": user_map.get("nodes", []),
+                            "edges": user_map.get("edges", [])})
+                return
 
-    return Response(generate_progress(), mimetype="text/event-stream")
+    return Response(generate_progress(), mimetype="text/event-stream",
+                    headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.route("/api/map/init", methods=["POST"])
