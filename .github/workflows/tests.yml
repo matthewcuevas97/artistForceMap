@@ -10,7 +10,7 @@ permissions:
 jobs:
   unit-api:
     name: unit + API
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # ubuntu-latest (26.04) has no Python 3.9 builds
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -26,7 +26,7 @@ jobs:
 
   e2e:
     name: browser (Playwright)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # ubuntu-latest (26.04) has no Python 3.9 builds
     needs: unit-api
     steps:
       - uses: actions/checkout@v4
