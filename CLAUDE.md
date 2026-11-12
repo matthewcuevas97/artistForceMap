@@ -15,7 +15,7 @@ Two Flask apps sharing `spotify/`, `lastfm/` and `backend/`:
 
 - `app.py` — Coachella 2026 lineup force graph. Serves `templates/index.html` + ES modules in `static/js/` (`main.js` entry). Graph data is precomputed in `data/graph_static.json`. `static/graph.js` is dead legacy code.
 - `app_universal.py` — prototype "universal map" built from the user's own top artists via `backend/pipeline.py` (ingestion → tag enrichment → MMR seed selection → graph init), streamed over SSE. Frontend: `templates/index_universal.html` + `static/js/universal_map.js`. Uses file-backed JSON caches in `data/cache/` and `data/users/`.
-- `scripts/` — offline data pipeline (`precompute.py` etc.). Rerunning `precompute.py` wipes enrichment fields; see docs/REVIEW_2026-11.md BUG-34.
+- `scripts/` — offline data pipeline (`precompute.py` etc.). Rerunning `precompute.py` wipes enrichment fields (BUG-34). To refresh `similar_artists` in `graph_static.json` from the Last.fm cache, run `python scripts/migrate_similar.py` (a test fails if they drift).
 
 Run: `python app.py` or `python app_universal.py` (both on 127.0.0.1:8080).
 
