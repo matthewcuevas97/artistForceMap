@@ -1,16 +1,14 @@
 """
-Universal map Flask app - infinite/expandable map based on user's initial nodes.
-Mirrors the Coachella force map but dynamically generates nodes as the user explores.
+Universal map Flask app: a personal artist map seeded from the user's top artists
+(Spotify or Last.fm) and grown on demand with Last.fm similar artists.
+Auth routes come from web_auth; map generation lives in backend/.
 """
 
 import json
-import os
-import time
-import spotipy
-from flask import Flask, jsonify, render_template, redirect, request, session, Response
 import queue
 import threading
-from spotipy.exceptions import SpotifyException
+
+from flask import Flask, Response, jsonify, render_template, request, session
 
 from backend.user_data import load_user_map, update_user_map
 from backend.pipeline import run_full_pipeline
@@ -19,27 +17,13 @@ from backend.graph_init import SimilarUnavailable, expand_map, get_deezer_info, 
 from backend.cache import get_cached_artist, set_cached_artist
 from backend.tag_enrichment import EnrichmentUnavailable, enrich_artist_with_lastfm
 from backend.previews import resolve_preview
-from spotify.auth import (OAuthStateError, SpotifyOauthError, get_authorize_url, get_token,
-                          refresh_token as spotify_refresh_token, verify_state)
+from web_auth import configure_session, create_auth_blueprint, get_valid_spotify_token
 from lastfm.fetch import get_top_artists as lastfm_top
 
 app = Flask(__name__)
-secret_key = os.getenv("FLASK_SECRET_KEY")
-if not secret_key:
-    raise RuntimeError("FLASK_SECRET_KEY environment variable is not set")
-app.secret_key = secret_key
-# Session cookie carries Spotify tokens (signed, not encrypted): keep it away from JS and
-# cross-site requests. Lax still sends it on the top-level redirect back from Spotify.
-# Set SESSION_COOKIE_SECURE=1 when serving over HTTPS.
-app.config.update(
-    SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SAMESITE="Lax",
-    SESSION_COOKIE_SECURE=os.getenv("SESSION_COOKIE_SECURE", "").lower() in ("1", "true", "yes"),
-)
+configure_session(app)
+app.register_blueprint(create_auth_blueprint(lambda user: bool(lastfm_top(user))))
 
-
-DEEZER_SEARCH = "https://api.deezer.com/search"
-LASTFM_API = "http://ws.audioscrobbler.com/2.0"
 
 
 # ============================================================================
@@ -56,28 +40,6 @@ def _sse(payload):
     return f"data: {json.dumps(payload)}\n\n"
 
 
-def get_valid_spotify_token():
-    """Return a valid Spotify access token, refreshing if needed."""
-    token = session.get("spotify_token")
-    if not token:
-        return None
-    expires_at = session.get("spotify_token_expires_at", 0)
-    if time.time() > expires_at - 60:
-        refresh_token = session.get("spotify_refresh_token")
-        if not refresh_token:
-            return None
-        try:
-            new_token = spotify_refresh_token(refresh_token)
-            session["spotify_token"] = new_token["access_token"]
-            session["spotify_token_expires_at"] = new_token["expires_at"]
-            if new_token.get("refresh_token"):
-                session["spotify_refresh_token"] = new_token["refresh_token"]
-            return new_token["access_token"]
-        except Exception:
-            return None
-    return token
-
-
 # ============================================================================
 # Routes
 # ============================================================================
@@ -86,84 +48,6 @@ def get_valid_spotify_token():
 def index():
     """Render the main single-page application shell."""
     return render_template("index_universal.html")
-
-
-# ============================================================================
-# Authentication Routes
-# ============================================================================
-
-@app.route("/login")
-def login():
-    """Redirect the user to Spotify's OAuth authorization page."""
-    return redirect(get_authorize_url(session))
-
-
-@app.route("/callback")
-def callback():
-    """Handle the OAuth callback from Spotify."""
-    try:
-        verify_state(session, request.args.get("state"))
-    except OAuthStateError:
-        return "Login expired or was not started from this site. Please try again.", 400
-    error = request.args.get("error")
-    if error:
-        return f"Authorization failed: {error}", 400
-    code = request.args.get("code")
-    if not code:
-        return "Missing authorization code", 400
-    try:
-        token = get_token(code)
-    except SpotifyOauthError:
-        return "Spotify login failed (the code was invalid or expired). Please try again.", 400
-    session["spotify_token"] = token["access_token"]
-    session["spotify_refresh_token"] = token.get("refresh_token")
-    session["spotify_token_expires_at"] = token["expires_at"]
-    session.pop("lastfm_user", None)
-    try:
-        sp = spotipy.Spotify(auth=token["access_token"])
-        user = sp.current_user()
-        session["spotify_display_name"] = user.get("display_name") or user.get("id", "")
-        session["spotify_id"] = user.get("id")
-    except SpotifyException:
-        pass
-    return redirect("/")
-
-
-@app.route("/api/spotify/logout", methods=["POST"])
-def spotify_logout():
-    """Logout from Spotify."""
-    session.pop("spotify_token", None)
-    session.pop("spotify_refresh_token", None)
-    session.pop("spotify_token_expires_at", None)
-    session.pop("spotify_display_name", None)
-    session.pop("spotify_id", None)
-    return jsonify({"ok": True})
-
-
-@app.route("/api/lastfm/login", methods=["POST"])
-def lastfm_login():
-    """Login with Last.fm username."""
-    data = request.get_json(force=True)
-    username = (data or {}).get("username", "").strip()
-    if not username:
-        return jsonify({"ok": False, "error": "User not found"}), 400
-    top = lastfm_top(username)
-    if not top:
-        return jsonify({"ok": False, "error": "User not found"}), 400
-    session["lastfm_user"] = username
-    session.pop("spotify_token", None)
-    session.pop("spotify_refresh_token", None)
-    session.pop("spotify_token_expires_at", None)
-    session.pop("spotify_display_name", None)
-    session.pop("spotify_id", None)
-    return jsonify({"ok": True})
-
-
-@app.route("/api/lastfm/logout", methods=["POST"])
-def lastfm_logout():
-    """Logout from Last.fm."""
-    session.pop("lastfm_user", None)
-    return jsonify({"ok": True})
 
 
 # ============================================================================

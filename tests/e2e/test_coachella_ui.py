@@ -360,8 +360,8 @@ def test_discovery_click_fringe_then_listen_discovers_it(coachella):
 # ── Auth ──────────────────────────────────────────────────────────────────────
 
 def test_lastfm_login_personalizes_graph(coachella, monkeypatch):
-    import lastfm.fetch
-    monkeypatch.setattr(lastfm.fetch, "get_top_artists",
+    import app as coachella_app
+    monkeypatch.setattr(coachella_app, "lastfm_top",
                         lambda user, limit=100: [{"name": "Laufey", "score": 1.0}] if user == "bob" else [])
     _open(coachella)
     p = coachella.page
