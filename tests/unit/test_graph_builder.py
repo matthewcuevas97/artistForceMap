@@ -56,24 +56,43 @@ def test_derived_score_takes_max_over_contributors():
     assert scores["X"]["derived_score"] == pytest.approx(max(0.5 * 0.9, 1.0 * 0.2) * 0.6)
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-05: a top artist with score 0.0 (last rank) is "
-                   "indistinguishable from 'not a match' and gets its baseline wiped to 0")
 def test_last_ranked_top_artist_still_counts_as_direct_match():
+    """BUG-05 regression: the last of N top artists used to score 0.0 and be treated as 'no match'."""
+    from unittest.mock import Mock
+    from spotify.fetch import get_top_artists
+    sp = Mock()
+    sp.current_user_top_artists.return_value = {"items": [{"id": "1", "name": "Big"}, {"id": "2", "name": "Deep Cut"}]}
     nodes = [{"name": "Deep Cut", "listeners": 50}, {"name": "Big", "listeners": 100}]
     scores = _scores(nodes)
     normalize_listeners(nodes, scores)
-    # spotify/fetch.get_top_artists gives the last of N artists score == 0.0
-    enrich_with_scores(nodes, [{"name": "Big", "score": 1.0}, {"name": "Deep Cut", "score": 0.0}], scores)
-    assert scores["Deep Cut"]["direct_score"] > 0 or scores["Deep Cut"]["score"] >= 0.5
+    enrich_with_scores(nodes, get_top_artists(sp), scores)
+    assert scores["Deep Cut"]["direct_score"] > 0
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-06: multi-artist lineup nodes (B2Bs, aliases) only "
-                   "match on the display name, not their lastfm_artists members")
+def test_direct_match_with_zero_score_suppresses_derived():
+    """Membership, not score > 0, decides 'direct match'."""
+    nodes = [{"name": "A", "similar_artists": [{"name": "Off Lineup", "match": 1.0}]}]
+    scores = _scores(nodes)
+    enrich_with_scores(nodes, [{"name": "A", "score": 0.0}, {"name": "Off Lineup", "score": 1.0}], scores)
+    assert scores["A"]["derived_score"] == 0
+
+
 def test_multi_artist_node_matches_member_artist():
+    """BUG-06 regression: B2B/alias nodes only matched on their display name."""
     nodes = [{"name": "Nine Inch Noize", "lastfm_artists": ["Nine Inch Nails", "Boys Noize"]}]
     scores = _scores(nodes)
     enrich_with_scores(nodes, [{"name": "Nine Inch Nails", "score": 1.0}], scores)
     assert scores["Nine Inch Noize"]["direct_score"] > 0
+
+
+def test_lineup_member_does_not_count_as_derived_source():
+    """A top artist who plays the lineup (even as a B2B member) scores directly, not via similarity."""
+    nodes = [{"name": "A x B", "lastfm_artists": ["A", "B"]},
+             {"name": "C", "similar_artists": [{"name": "B", "match": 1.0}]}]
+    scores = _scores(nodes)
+    enrich_with_scores(nodes, [{"name": "B", "score": 1.0}], scores)
+    assert scores["A x B"]["direct_score"] == 1.0
+    assert scores["C"]["derived_score"] == 0
 
 
 # ── Static data contract ──────────────────────────────────────────────────────
@@ -107,7 +126,20 @@ def test_static_graph_nodes_have_frontend_fields(static_graph):
         assert n["day"] in {"Friday", "Saturday", "Sunday"}
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-04: scripts/precompute.py slim_node() drops "
-                   "similar_artists, so enrich_with_scores' derived scoring never fires in prod")
 def test_static_graph_carries_similar_artists_for_derived_scoring(static_graph):
-    assert any(n.get("similar_artists") for n in static_graph["nodes"])
+    """BUG-04 regression: slim_node() dropped similar_artists. scripts/migrate_similar.py restores them."""
+    with_similar = [n for n in static_graph["nodes"] if n.get("similar_artists")]
+    assert len(with_similar) >= len(static_graph["nodes"]) - 2
+    for n in with_similar:
+        assert all(set(s) == {"name", "match"} and 0 < s["match"] <= 1 for s in n["similar_artists"])
+
+
+def test_static_graph_is_in_sync_with_lastfm_cache():
+    from scripts.migrate_similar import main
+    assert main(["--check"]) == 0, "run: python scripts/migrate_similar.py"
+
+
+def test_slim_node_keeps_similar_artists():
+    from scripts.precompute import slim_node
+    out = slim_node({"name": "X", "similar_artists": [{"name": "Y", "match": 0.5}]})
+    assert out["similar_artists"] == [{"name": "Y", "match": 0.5}]

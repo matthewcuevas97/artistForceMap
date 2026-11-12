@@ -60,6 +60,25 @@ def test_graph_lastfm_user_personalization(coachella_app, coachella_client, http
     assert data["user_seeds"] == [smallest]
 
 
+def test_graph_derived_personalization_from_similar_artist(coachella_app, coachella_client, http):
+    """BUG-04: a user who only listens to an off-lineup artist lights up the lineup acts similar to it."""
+    from data.graph_builder import _norm
+    lineup = {_norm(m) for n in coachella_app._nodes for m in [n["name"], *(n.get("lastfm_artists") or [])]}
+    # Lowest-listener node with a strong off-lineup similar artist, so the derived score beats its baseline.
+    target, fave = next(
+        (n, s["name"]) for n in sorted(coachella_app._nodes, key=lambda n: n.get("listeners", 0))
+        for s in n.get("similar_artists") or []
+        if s["match"] >= 0.9 and _norm(s["name"]) not in lineup)
+    http.add("GET", LASTFM_URL, json=lastfm_top_artists_payload([fave]))
+    with coachella_client.session_transaction() as s:
+        s["lastfm_user"] = "bob"
+    data = coachella_client.get("/api/graph").get_json()
+    node = next(n for n in data["nodes"] if n["name"] == target["name"])
+    assert target["name"] in data["user_seeds"]
+    assert node["score"] >= 0.9 * 0.6 - 1e-9
+    assert "similar_artists" not in node  # server-side only; keeps the payload small
+
+
 def test_graph_spotify_failure_degrades_to_baseline(coachella_client, http):
     http.add("GET", f"{SPOTIFY_API}/me/top/artists", status=401, json={"error": {"status": 401, "message": "expired"}})
     with coachella_client.session_transaction() as s:

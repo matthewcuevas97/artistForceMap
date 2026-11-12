@@ -114,7 +114,7 @@ def get_top_artists(username, limit=100):
     Fetch user's top artists from Last.fm.
     Returns list of {name, score} dicts sorted by rank,
     same format as spotify/fetch.py get_top_artists().
-    Score: rank 1 = 1.0, rank 50 = 0.0, linear interpolation.
+    Score: rank 1 = 1.0, last of n returned = 1/n (never 0), linear.
     """
     params = {
         "method": "user.getTopArtists",
@@ -131,9 +131,9 @@ def get_top_artists(username, limit=100):
             return []
         artists = data.get("topartists", {}).get("artist", [])
         result = []
+        n = len(artists)
         for i, a in enumerate(artists):
-            score = 1.0 - (i / max(limit - 1, 1))
-            result.append({"name": a["name"], "score": score})
+            result.append({"name": a["name"], "score": 1 - i / n})
         return result
     except Exception:
         return []

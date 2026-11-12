@@ -11,7 +11,7 @@ def test_top_artists_rank_scores(http):
     http.add("GET", LASTFM_URL, json=lastfm_top_artists_payload(["A", "B", "C"]))
     out = fetch.get_top_artists("user", limit=3)
     assert [a["name"] for a in out] == ["A", "B", "C"]
-    assert [a["score"] for a in out] == [1.0, 0.5, 0.0]
+    assert [a["score"] for a in out] == pytest.approx([1.0, 2 / 3, 1 / 3])
 
 
 def test_top_artists_unknown_user_returns_empty(http):
@@ -24,12 +24,21 @@ def test_top_artists_network_error_returns_empty(http):
     assert fetch.get_top_artists("user") == []
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-31: Last.fm scores are normalized by the requested "
-                   "`limit`, not the number returned, unlike spotify/fetch.py")
-def test_top_artists_score_spans_full_range_when_fewer_than_limit(http):
+def test_top_artists_scored_by_number_returned_not_limit(http):
+    """BUG-31 regression: scores were normalized by `limit`, so a short history was squashed near 1.0."""
     http.add("GET", LASTFM_URL, json=lastfm_top_artists_payload(["A", "B"]))
     out = fetch.get_top_artists("user", limit=100)
-    assert out[-1]["score"] == 0.0
+    assert [a["score"] for a in out] == [1.0, 0.5]
+
+
+def test_spotify_and_lastfm_rank_scores_agree(http):
+    from unittest.mock import Mock
+    from spotify.fetch import get_top_artists as spotify_top
+    http.add("GET", LASTFM_URL, json=lastfm_top_artists_payload(["A", "B", "C", "D"]))
+    sp = Mock()
+    sp.current_user_top_artists.return_value = {"items": [{"id": c, "name": c} for c in "ABCD"]}
+    assert [a["score"] for a in spotify_top(sp)] == [a["score"] for a in fetch.get_top_artists("u")]
+    assert min(a["score"] for a in spotify_top(sp)) > 0
 
 
 def test_similar_artists_threshold(http):

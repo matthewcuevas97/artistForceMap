@@ -81,36 +81,56 @@ def normalize_listeners(nodes, scores):
     return scores
 
 
+def _member_keys(node):
+    """Normalised names a lineup node answers to: its display name plus its Last.fm members."""
+    return {_norm(n) for n in [node["name"], *(node.get("lastfm_artists") or [])]}
+
+
 def enrich_with_scores(nodes, top_artists, scores):
-    top_lookup = {_norm(a["name"]): a["score"] for a in top_artists}
+    """
+    Overlay a user's top artists onto the per-node scores.
 
-    node_norm = {node["name"]: _norm(node["name"]) for node in nodes}
-    similar_lookup = {
-        node["name"]: {_norm(s["name"]): s["match"] for s in node.get("similar_artists", [])}
-        for node in nodes
-    }
-    normed_node_names = set(node_norm.values())
+    Direct match: the user listens to the node's artist (by display name or any
+    `lastfm_artists` member, e.g. one half of a B2B). The node's score becomes the
+    best rank score among matching top artists.
 
+    Derived match: for nodes with no direct match, a top artist that isn't on the
+    lineup but appears in the node's `similar_artists` gives
+    rank score * similarity * 0.6; the best one wins.
+
+    Matching is by membership, never by `score > 0`.
+    """
+    top_lookup = {}
+    for a in top_artists:
+        key = _norm(a["name"])
+        top_lookup[key] = max(top_lookup.get(key, 0), a["score"])
+
+    node_keys = {node["name"]: _member_keys(node) for node in nodes}
+    lineup_keys = set().union(*node_keys.values()) if node_keys else set()
+
+    direct = set()
     for node in nodes:
         name = node["name"]
-        if node_norm[name] in top_lookup:
-            scores[name]["direct_score"] = top_lookup[node_norm[name]]
-            scores[name]["score"] = top_lookup[node_norm[name]]
+        hits = [top_lookup[k] for k in node_keys[name] if k in top_lookup]
+        if hits:
+            direct.add(name)
+            scores[name]["direct_score"] = max(hits)
+            scores[name]["score"] = max(hits)
         else:
             scores[name]["direct_score"] = 0
 
-    for artist in top_artists:
-        artist_key = _norm(artist["name"])
-        if artist_key in normed_node_names:
+    off_lineup = [(k, sc) for k, sc in top_lookup.items() if k not in lineup_keys]
+    if not off_lineup:
+        return scores
+
+    for node in nodes:
+        name = node["name"]
+        if name in direct:
             continue
-        for node in nodes:
-            name = node["name"]
-            if scores[name]["direct_score"] > 0:
-                continue
-            match = similar_lookup[name].get(artist_key)
-            if match is not None:
-                derived = artist["score"] * match * 0.6
-                scores[name]["derived_score"] = max(scores[name]["derived_score"], derived)
-                scores[name]["score"] = max(scores[name]["score"], scores[name]["derived_score"])
+        similar = {_norm(s["name"]): s["match"] for s in node.get("similar_artists") or []}
+        derived = max((sc * similar[k] * 0.6 for k, sc in off_lineup if k in similar), default=0)
+        if derived > 0:
+            scores[name]["derived_score"] = max(scores[name]["derived_score"], derived)
+            scores[name]["score"] = max(scores[name]["score"], derived)
 
     return scores

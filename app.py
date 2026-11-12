@@ -116,7 +116,7 @@ except Exception as e:
 
 
 # Fields used internally during graph building; not needed by the D3 frontend
-_INTERNAL_FIELDS = {"direct_score", "derived_score"}
+_INTERNAL_FIELDS = {"direct_score", "derived_score", "similar_artists"}
 
 
 @app.route("/")
