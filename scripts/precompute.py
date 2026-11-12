@@ -1,18 +1,16 @@
 import argparse
 import json
 import os
-import re
 import sys
 import time
 from collections import defaultdict
 from itertools import combinations
 
-import requests
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from data.lineup import load_lineup
-from lastfm.fetch import get_similar_artists, get_artist_info, get_artist_image_and_bio, get_artist_top_tags
+from lastfm.fetch import get_similar_artists, get_artist_info, get_artist_top_tags
 
 # --- Constants ---
 EDGE_CAP = 6
@@ -179,7 +177,8 @@ def build_graph_edges(nodes):
 
 def slim_node(node):
     # ... (implementation unchanged)
-    keep_fields = {"name", "genre", "listeners", "day", "weekend", "stage", "image_url", "bio", "lastfm_artists", "artist_profiles"}
+    keep_fields = {"name", "genre", "listeners", "day", "weekend", "stage", "image_url", "bio", "lastfm_artists", "artist_profiles",
+                   "similar_artists"}  # needed server-side for derived scoring (BUG-04)
     slimmed_node = {k: node.get(k) for k in keep_fields}
     slimmed_node["tags"] = (node.get("tags") or [])[:3]
     slimmed_node["top_tracks"] = [

@@ -62,10 +62,17 @@ let boostNodeName = null;
 // ── Subgraph viewport ─────────────────────────────────────────────────────────
 
 export function getSubgraphViewport() {
-  if (!S.isMobile) return { top: 0, bottom: S.H, left: 0, right: S.W };
+  if (!S.isMobile) {
+    // Keep fitted nodes clear of the expanded controls panel (bottom-left).
+    const controls = document.getElementById("controls");
+    const left = controls && !controls.classList.contains("minimized")
+      ? controls.getBoundingClientRect().right + 8 : 0;
+    return { top: 0, bottom: S.H, left: left < S.W / 2 ? left : 0, right: S.W };
+  }
   return {
     top:    S.controlsCollapsedBottom,
-    bottom: window.innerHeight - S.drawerCollapsedH(),
+    // Only reserve room for the artist drawer when it is actually showing.
+    bottom: window.innerHeight - (S.drawerState === "hidden" ? 0 : S.drawerCollapsedH()),
     left:   0,
     right:  window.innerWidth,
   };
@@ -143,7 +150,6 @@ export function applyDayFilter() {
 function onNodeEnter(event, d) {
   edgeEl.attr("opacity", e => {
     if (e.type === "similarity" && !S.showSimilarity) return 0;
-    if (e.type === "genre"      && !S.showGenre)      return 0;
     if (e.source === d || e.target === d) return edgeBaseOpacity(e);
     if (S.discoveryMode && S.lastDiscovered) {
       const sn = nodeName(e.source), tn = nodeName(e.target);
@@ -198,15 +204,20 @@ export function clearHover() {
 
 // ── Subgraph highlight with edge-strength boost ───────────────────────────────
 
+function neighborhoodOf(name) {
+  const neighborhood = new Set([name]);
+  S.simEdges.forEach(e => {
+    const sn = nodeName(e.source), tn = nodeName(e.target);
+    if (sn === name) neighborhood.add(tn);
+    if (tn === name) neighborhood.add(sn);
+  });
+  return neighborhood;
+}
+
 export function enterSubgraphHighlight(datum) {
   if (!nodeEl || !edgeEl || !labelEl) return;
 
-  const neighborhood = new Set([datum.name]);
-  S.simEdges.forEach(e => {
-    const sn = nodeName(e.source), tn = nodeName(e.target);
-    if (sn === datum.name) neighborhood.add(tn);
-    if (tn === datum.name) neighborhood.add(sn);
-  });
+  const neighborhood = neighborhoodOf(datum.name);
 
   S.setIsSubgraphHighlight(true);
   S.setHighlightNeighborhood(neighborhood);
@@ -252,7 +263,12 @@ export function zoomToSubgraph() {
   zoomToNodes(S.simNodes.filter(n => S.subgraph.has(n.name)));
 }
 
-function zoomToNodes(nodes) {
+/** Fit every node into the usable viewport. duration 0 = jump (used on first load). */
+export function zoomToFit(duration = 700) {
+  zoomToNodes(S.simNodes, duration);
+}
+
+function zoomToNodes(nodes, duration = 700) {
   if (!nodes.length) return;
   const vp     = getSubgraphViewport();
   const availW = vp.right - vp.left;
@@ -269,8 +285,9 @@ function zoomToNodes(nodes) {
   const tx    = (vp.left + availW / 2) - scale * ((minX + maxX) / 2);
   const ty    = (vp.top  + availH / 2) - scale * ((minY + maxY) / 2);
 
-  svg.transition().duration(700)
-    .call(zoomBehavior.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+  const t = d3.zoomIdentity.translate(tx, ty).scale(scale);
+  if (duration > 0) svg.transition().duration(duration).call(zoomBehavior.transform, t);
+  else svg.call(zoomBehavior.transform, t);
 }
 
 // ── Drag ──────────────────────────────────────────────────────────────────────
@@ -309,17 +326,18 @@ export function buildGraph(onNodeClick, onBgClick) {
     .force("charge",  d3.forceManyBody().strength(-800))
     .force("center",  d3.forceCenter(S.W / 2, S.H / 2))
     .force("collide", d3.forceCollide().radius(d => nodeRadius(d) + 2))
-    .force("x",       d3.forceX(S.W / 2).strength(0.15))
-    .force("y",       d3.forceY(S.H / 2).strength(0.3))
+    .force("x",       d3.forceX(S.W / 2))
+    .force("y",       d3.forceY(S.H / 2))
     .stop();
+  applyAspectForces();
 
-  for (let i = 0; i < 3000; ++i) simulation.tick();
+  // Pre-settle synchronously only until alpha drops below alphaMin (~300 ticks with d3's
+  // default decay). The old fixed 3000 ticks blocked the main thread ~0.8 s for a layout
+  // that had stopped changing after the first ~10% (PERF-01).
+  const preTicks = Math.ceil(Math.log(simulation.alphaMin()) / Math.log(1 - simulation.alphaDecay()));
+  simulation.tick(preTicks);
 
-  edgeEl = gEdges.selectAll("line")
-    .data(newEdges).enter().append("line")
-    .attr("stroke",       "#ffffff")
-    .attr("stroke-width", e => (2 + e.weight * 2).toFixed(2))
-    .attr("opacity",      e => edgeBaseOpacity(e));
+  edgeEl = joinEdges(newEdges);
 
   nodeEl = gNodes.selectAll("circle")
     .data(newNodes).enter().append("circle")
@@ -348,8 +366,62 @@ export function buildGraph(onNodeClick, onBgClick) {
   ticked();
   applyDayFilter();
   applyEdgeFilter();
+  zoomToFit(0);  // UX-01: start with the whole lineup in view
 
   simulation.on("tick", ticked).alpha(0.1).restart();
+}
+
+function joinEdges(edges) {
+  return gEdges.selectAll("line")
+    .data(edges)
+    .join("line")
+    .attr("stroke",       "#ffffff")
+    .attr("stroke-width", e => (2 + e.weight * 2).toFixed(2))
+    .attr("opacity",      e => edgeBaseOpacity(e));
+}
+
+/**
+ * Swap the edge set (threshold slider) without rebuilding the simulation: nodes keep
+ * their positions, pins and selection; only the link force and <line>s change.
+ */
+export function updateEdges() {
+  if (!simulation) return;
+  const newEdges = S.rawEdges.map(e => ({ source: e.source, target: e.target, weight: e.weight, type: e.type }));
+  S.setSimEdges(newEdges);
+  simulation.force("link").links(newEdges);  // resolves names → node objects
+  edgeEl = joinEdges(newEdges);
+
+  if (S.isSubgraphHighlight && S.pinnedDatum) {
+    const neighborhood = neighborhoodOf(S.pinnedDatum.name);
+    S.setHighlightNeighborhood(neighborhood);
+    nodeEl .attr("opacity", d => neighborhood.has(d.name) ? 1.0 : 0.15);
+    labelEl.attr("opacity", d => neighborhood.has(d.name) ? 1.0 : 0);
+  }
+  ticked();
+  applyDayFilter();
+  applyEdgeFilter();
+  simulation.alpha(0.3).restart();
+}
+
+/** Track the window size (BUG-09): resize the SVG and re-centre the layout forces. */
+export function resizeViewport(w, h) {
+  S.setViewport(w, h);
+  svg.attr("width", w).attr("height", h);
+  bgRect.attr("width", w).attr("height", h);
+  if (!simulation) return;
+  simulation.force("center").x(w / 2).y(h / 2);
+  simulation.force("x").x(w / 2);
+  simulation.force("y").y(h / 2);
+  applyAspectForces();
+  simulation.alpha(0.1).restart();
+}
+
+// Pull harder along the short axis so the layout's shape follows the screen: wide on
+// landscape (the original 0.15 / 0.3), tall on a portrait phone.
+function applyAspectForces() {
+  const portrait = S.H > S.W;
+  simulation.force("x").strength(portrait ? 0.3 : 0.15);
+  simulation.force("y").strength(portrait ? 0.15 : 0.3);
 }
 
 export function rebuildNodeSizes() {

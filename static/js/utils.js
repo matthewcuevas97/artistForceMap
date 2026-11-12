@@ -1,5 +1,5 @@
 import { GENRE_HUE, SPOTIFY_SVG, YOUTUBE_SVG, APPLE_SVG } from './constants.js';
-import { nodeScale, showSimilarity, showGenre } from './state.js';
+import { nodeScale, showSimilarity } from './state.js';
 
 export function escapeHtml(str) {
   return String(str ?? "")
@@ -28,7 +28,6 @@ export function labelOpacity(d) {
 
 export function edgeBaseOpacity(e) {
   if (e.type === "similarity" && !showSimilarity) return 0;
-  if (e.type === "genre"      && !showGenre)      return 0;
   return 0.08;
 }
 

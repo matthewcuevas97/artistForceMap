@@ -1,0 +1,347 @@
+{
+  "Magdalena Bay": {
+    "name": "Magdalena Bay",
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/d997d33abc84ad8158e6379c84eeb761/1000x1000-000000-80-0-0.jpg",
+    "fans": 15672,
+    "top_tracks": [
+      {
+        "name": "Killshot",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/c/8/a/0/c8aa04a2227e4f4ae23b79e7622bf978.mp3?hdnea=exp=1773653769~acl=/api/1/1/c/8/a/0/c8aa04a2227e4f4ae23b79e7622bf978.mp3*~data=user_id=0,application_id=42~hmac=66907f09154e820f4cf1aab54c1d6d12d0970acff318dd081f251ba74dde9de6",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/bfe8069fbbf5226c9c6e589c8a7504b4/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Death & Romance",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/b/7/d/0/b7dd5c43cb2beae7cb6771ebaa52b2a5.mp3?hdnea=exp=1773653769~acl=/api/1/1/b/7/d/0/b7dd5c43cb2beae7cb6771ebaa52b2a5.mp3*~data=user_id=0,application_id=42~hmac=3fe71da67cf3868234d556103876cce6c4ecd599b85ac5c05c54098ba4bc9904",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c73ab49a506127eace6cd7dddd39fbda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Image",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/3/1/0/0/310e5c1192a6371e4b84c0ccb050c6be.mp3?hdnea=exp=1773653769~acl=/api/1/1/3/1/0/0/310e5c1192a6371e4b84c0ccb050c6be.mp3*~data=user_id=0,application_id=42~hmac=44d1a2a0ad7196401ec4ef4d946ff5df6d1554ec9c9bdb1b7da71235361bc467",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/a1e2df90b6ac6e57bfadb965d9aa503a/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Human Happens",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/0/4/d/0/04d53eb89ee97870de5f28aacd7095c9.mp3?hdnea=exp=1773653769~acl=/api/1/1/0/4/d/0/04d53eb89ee97870de5f28aacd7095c9.mp3*~data=user_id=0,application_id=42~hmac=c1b76068e88c6038eebe2fe6f15dd1f8776ea555bdc8411a215be64fceee0fee",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/571ad948e3c47c02a14d049cfa2ad9b2/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Killshot (Slowed + Reverb)",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/5/c/0/95cb8b7e267210bb3ec785f7a3a481f6.mp3?hdnea=exp=1773653769~acl=/api/1/1/9/5/c/0/95cb8b7e267210bb3ec785f7a3a481f6.mp3*~data=user_id=0,application_id=42~hmac=2c9e5eae8de10d9cddfe7d39aede69194c70b5bbee701bf82c9d01c504dd1e52",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/23b8217031ed6b93d2a8068ed247625b/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Watching T.V.",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/8/e/4/0/8e4b8b0ed630c941c7c0688253d27c04.mp3?hdnea=exp=1773653769~acl=/api/1/1/8/e/4/0/8e4b8b0ed630c941c7c0688253d27c04.mp3*~data=user_id=0,application_id=42~hmac=fc5892034b12fcf61053f0c62625e52fd9ab2dccf0570518cb3431746b06ba32",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c73ab49a506127eace6cd7dddd39fbda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Killing Time",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/2/2/6/0/226403edea1357ebbaba4f116384ee2f.mp3?hdnea=exp=1773653769~acl=/api/1/1/2/2/6/0/226403edea1357ebbaba4f116384ee2f.mp3*~data=user_id=0,application_id=42~hmac=553870c71b3154ad302b4567c2673e32426ba055ed218bac309c77758024af10",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c73ab49a506127eace6cd7dddd39fbda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Dreamcatching",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/7/6/8/0/768cfbef3c211bcecdc0310025647fbe.mp3?hdnea=exp=1773653769~acl=/api/1/1/7/6/8/0/768cfbef3c211bcecdc0310025647fbe.mp3*~data=user_id=0,application_id=42~hmac=60982e3318e3f42adf3a0e3845f8662695bb4c507049c241db0b339b0d1ac3e8",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/87dd7911f7c37b2a90ce9dd2b9ff7d82/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Fear, Sex",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/e/8/7/0/e875c865be0c5ca0f1ff3578857232e5.mp3?hdnea=exp=1773653769~acl=/api/1/1/e/8/7/0/e875c865be0c5ca0f1ff3578857232e5.mp3*~data=user_id=0,application_id=42~hmac=1bb3d8aaa4dac0c8abc4bbe9147f43ab7c5c089bc1c48388289c3bba2db9d2ed",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c73ab49a506127eace6cd7dddd39fbda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "You Lose!",
+        "artist": "Magdalena Bay",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/f/3/0/9f383fe9ff5f6e133735ad7d2faac7ec.mp3?hdnea=exp=1773653769~acl=/api/1/1/9/f/3/0/9f383fe9ff5f6e133735ad7d2faac7ec.mp3*~data=user_id=0,application_id=42~hmac=ece0746d27cf722067a16da5fbea98e83f42c9ffb75fc6a0fc108157353e78fb",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/87dd7911f7c37b2a90ce9dd2b9ff7d82/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "_created_at": 1773652869.6746051,
+    "_updated_at": "2026-03-16T02:21:09.674608"
+  },
+  "Ninajirachi": {
+    "name": "Ninajirachi",
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/c4dc2676b8b1aa0c679d614deb66bcdf/1000x1000-000000-80-0-0.jpg",
+    "fans": 3125,
+    "top_tracks": [
+      {
+        "name": "iPod Touch",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/7/e/0/0/7e0750d9f5530c9221391ad1408ded8a.mp3?hdnea=exp=1773653770~acl=/api/1/1/7/e/0/0/7e0750d9f5530c9221391ad1408ded8a.mp3*~data=user_id=0,application_id=42~hmac=f33a0fa44cbb955bd2df808824527c8254dec6641823092aac965cea55b71adb",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Fuck My Computer",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/5/0/9/0/509beefaea4119511a810e16120ff26a.mp3?hdnea=exp=1773653770~acl=/api/1/1/5/0/9/0/509beefaea4119511a810e16120ff26a.mp3*~data=user_id=0,application_id=42~hmac=36872f8cc64f31442b317741f0d0b9321a443b4095102c2288ebdf7c2e301f1f",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Delete",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/b/8/3/0/b8380f1dde244f083d0db2a80a585142.mp3?hdnea=exp=1773653770~acl=/api/1/1/b/8/3/0/b8380f1dde244f083d0db2a80a585142.mp3*~data=user_id=0,application_id=42~hmac=8db5fc74514b752e912c64dc76e7c6cb93c9be49d8377141518b6f98f93c8019",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "London Song",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/7/b/b/0/7bb98e6f0adc2c700ebbfba65c453a7e.mp3?hdnea=exp=1773653770~acl=/api/1/1/7/b/b/0/7bb98e6f0adc2c700ebbfba65c453a7e.mp3*~data=user_id=0,application_id=42~hmac=e40f809f83529409a06b1130b00b9dde95977bb4df22174c4445a2ee64c68ac6",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "CSIRAC",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/e/9/7/0/e976b1b40de2a5dc365502f2de7c6dce.mp3?hdnea=exp=1773653770~acl=/api/1/1/e/9/7/0/e976b1b40de2a5dc365502f2de7c6dce.mp3*~data=user_id=0,application_id=42~hmac=9b0acab2a8295e060bbe3e6a20536669a157ab2260f68c1ece1b347b0174cefa",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "All I Am",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/5/d/e/0/5de90b5cc48b50e28764a83a9c7cdd1f.mp3?hdnea=exp=1773653770~acl=/api/1/1/5/d/e/0/5de90b5cc48b50e28764a83a9c7cdd1f.mp3*~data=user_id=0,application_id=42~hmac=55bc1116fd1b92797d8ddc739b19a804238027c619ef9ce913f40f8131247b15",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Infohazard",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/b/b/d/0/bbd487c5e5db6894747e5ede3be47c06.mp3?hdnea=exp=1773653770~acl=/api/1/1/b/b/d/0/bbd487c5e5db6894747e5ede3be47c06.mp3*~data=user_id=0,application_id=42~hmac=0c95190ae3bb0dd874a6aeee755a81e118e9e315783dbae33fe70c27374ea293",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "It's You",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/8/4/9/0/8491affc541504f71e1be82f95dafd90.mp3?hdnea=exp=1773653770~acl=/api/1/1/8/4/9/0/8491affc541504f71e1be82f95dafd90.mp3*~data=user_id=0,application_id=42~hmac=4535114f6a2b81da8635b18afedfbd8a840cb6b0a0f3467fd55973e4311c51a3",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Sing Good",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/0/2/f/0/02f2994d41b0bc6ee4e615b846c5574c.mp3?hdnea=exp=1773653770~acl=/api/1/1/0/2/f/0/02f2994d41b0bc6ee4e615b846c5574c.mp3*~data=user_id=0,application_id=42~hmac=d6e8fe367a79b8a6edda65716446d94bc6f50c2f56ae418eb44fcc5d123cfd9d",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "All At Once",
+        "artist": "Ninajirachi",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/2/b/1/0/2b18e352d9d4c40d461a60a9d47e386c.mp3?hdnea=exp=1773653770~acl=/api/1/1/2/b/1/0/2b18e352d9d4c40d461a60a9d47e386c.mp3*~data=user_id=0,application_id=42~hmac=ed5a751937df71064bb1ae5425549bcec925c153bc962ab5dd8da5d2450402b4",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/04dc7549927b479188a1af4092dc1e86/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "_created_at": 1773652870.749366,
+    "_updated_at": "2026-03-16T02:21:10.749374"
+  },
+  "Charli xcx": {
+    "name": "Charli xcx",
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/89d204250a4e968f9be7171ba8efde00/1000x1000-000000-80-0-0.jpg",
+    "fans": 1845964,
+    "top_tracks": [
+      {
+        "name": "party 4 u",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/6/d/a/0/6da39aaf032e150e0b56294db24019ca.mp3?hdnea=exp=1773653771~acl=/api/1/1/6/d/a/0/6da39aaf032e150e0b56294db24019ca.mp3*~data=user_id=0,application_id=42~hmac=8500869b339528785afe07f0239d9d8a29238db243061f73f851ff2c79f703d8",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/f2315bc78a1049916d387cd23feeb3ee/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Guess featuring billie eilish",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/d/5/5/0/d5562cc6f099b3d6d0f3eea6258f0928.mp3?hdnea=exp=1773653771~acl=/api/1/1/d/5/5/0/d5562cc6f099b3d6d0f3eea6258f0928.mp3*~data=user_id=0,application_id=42~hmac=6631d0ad5482ba691aa8271da56699f3e83c39b5a09ec1048add6fadcda3dccc",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/a6a00854b95f19a50772e50bdd2c4a0e/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Dying for You",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/5/7/7/0/5777081a473702a3c583d37d2f6c3f7b.mp3?hdnea=exp=1773653771~acl=/api/1/1/5/7/7/0/5777081a473702a3c583d37d2f6c3f7b.mp3*~data=user_id=0,application_id=42~hmac=224945344fa6e4e5318b22a22ac4e6c5beb9a32915a2999977f9862bb00c3692",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/06024a909553e0f2ec76c0da1628cdda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Von dutch",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/5/7/a/0/57adc1a4c05fa745f9939adcc9c892b2.mp3?hdnea=exp=1773653771~acl=/api/1/1/5/7/a/0/57adc1a4c05fa745f9939adcc9c892b2.mp3*~data=user_id=0,application_id=42~hmac=edfdb8724baca09602dda1059e2496d6543ac5941d09a1bef832e3a0e2eff2da",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de9e79511cda59914de9add50946e43c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "360",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/6/d/f/0/6df461a2309db820e650158cee4f0b70.mp3?hdnea=exp=1773653771~acl=/api/1/1/6/d/f/0/6df461a2309db820e650158cee4f0b70.mp3*~data=user_id=0,application_id=42~hmac=a280d6865283c58a8fb93e4e613b994dc76e0f72c9ee4dfa87780f46d6891ca5",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de9e79511cda59914de9add50946e43c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Always Everywhere",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/4/b/8/0/4b84426deb906d5ec62e52d275613a54.mp3?hdnea=exp=1773653771~acl=/api/1/1/4/b/8/0/4b84426deb906d5ec62e52d275613a54.mp3*~data=user_id=0,application_id=42~hmac=3c9fb815ce9e05cd7088f8b1d9f949bd41c6e2dea62b394ccaaf4946503e718b",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/06024a909553e0f2ec76c0da1628cdda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Apple",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/d/8/6/0/d863ea5f62d2c02d615fc0553835802a.mp3?hdnea=exp=1773653771~acl=/api/1/1/d/8/6/0/d863ea5f62d2c02d615fc0553835802a.mp3*~data=user_id=0,application_id=42~hmac=9bf5d8a25ae8bdf3c735244b21187334d0905bc259020984576637f57f43ea9a",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de9e79511cda59914de9add50946e43c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Chains of Love",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/0/1/0/901adfdf64b4f5a67cb7d89e9b00ea8e.mp3?hdnea=exp=1773653771~acl=/api/1/1/9/0/1/0/901adfdf64b4f5a67cb7d89e9b00ea8e.mp3*~data=user_id=0,application_id=42~hmac=664f54282f2a9df2122d57aa124f76317df52644d9556bdf02f7c736b2ac22c4",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/06024a909553e0f2ec76c0da1628cdda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Out of Myself",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/b/9/5/0/b9575dae9c81c3bac1b3b48ed3bf9624.mp3?hdnea=exp=1773653771~acl=/api/1/1/b/9/5/0/b9575dae9c81c3bac1b3b48ed3bf9624.mp3*~data=user_id=0,application_id=42~hmac=5b473bdda3f5c367209c9af28d5048d78297561c11422f076d48e3f093056232",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/06024a909553e0f2ec76c0da1628cdda/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "365",
+        "artist": "Charli xcx",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/2/a/2/0/2a2937c5c088cd18c7e7cb062ea0494c.mp3?hdnea=exp=1773653771~acl=/api/1/1/2/a/2/0/2a2937c5c088cd18c7e7cb062ea0494c.mp3*~data=user_id=0,application_id=42~hmac=70f223f12cc1fa0955ec698bfa624e84ce70cd2bc59047fcddf14f162261aa6d",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de9e79511cda59914de9add50946e43c/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "_created_at": 1773652871.929665,
+    "_updated_at": "2026-03-16T02:21:11.929668"
+  },
+  "Holly Humberstone": {
+    "name": "Holly Humberstone",
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/410b9d80029f0741bbc6eaed9d451840/1000x1000-000000-80-0-0.jpg",
+    "fans": 10946,
+    "top_tracks": [
+      {
+        "name": "Cruel World",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/3/c/5/0/3c52e9738a00a1fd12e5c856227a7f00.mp3?hdnea=exp=1773653772~acl=/api/1/1/3/c/5/0/3c52e9738a00a1fd12e5c856227a7f00.mp3*~data=user_id=0,application_id=42~hmac=742555bc5c3e1f89477bd58995a3829d86936fcca024c50228cd3958e7229084",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/701328a2836b28f37cbbe42b5086bf62/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "To Love Somebody",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/e/b/b/0/ebbd7224b043fbe41c86dbe21ee7f8a7.mp3?hdnea=exp=1773653772~acl=/api/1/1/e/b/b/0/ebbd7224b043fbe41c86dbe21ee7f8a7.mp3*~data=user_id=0,application_id=42~hmac=99a31e1c8f276f0b152346b1aa5918c62cc05447475d10189030b416813615c5",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/701328a2836b28f37cbbe42b5086bf62/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Dive",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/3/7/e/0/37e561d6d418ce7ba6f359f4ffb62f10.mp3?hdnea=exp=1773653772~acl=/api/1/1/3/7/e/0/37e561d6d418ce7ba6f359f4ffb62f10.mp3*~data=user_id=0,application_id=42~hmac=f8c0e77af24d7d5e1bbddc551b9ae683825fbbdc1666a0c51d5ed6bc32491d2b",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/a49aaedcb1c0e6dafffdd2f969559bcd/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Deep End",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/8/7/b/0/87b354cb788d1c14aebefb94f1eae6e6.mp3?hdnea=exp=1773653772~acl=/api/1/1/8/7/b/0/87b354cb788d1c14aebefb94f1eae6e6.mp3*~data=user_id=0,application_id=42~hmac=ef4b0891d02138a52c10103b316ed51756a09999ee2174cdf34cf7b92c19bc4c",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c9972979b72bab104f746ab01c236c4d/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Paint My Bedroom Black",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/7/f/0/97fbb5f5e03caa55d4f25b2f92fa361c.mp3?hdnea=exp=1773653772~acl=/api/1/1/9/7/f/0/97fbb5f5e03caa55d4f25b2f92fa361c.mp3*~data=user_id=0,application_id=42~hmac=a7658ef264dcc9cb99ca003795f44b2a79870276c89efdc95a6e441ba7fc5121",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/63a38d8b1e71020b0448d43410d1801c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Falling Asleep At The Wheel",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/2/6/5/0/265a312787903c57285d5790eb09b3c9.mp3?hdnea=exp=1773653772~acl=/api/1/1/2/6/5/0/265a312787903c57285d5790eb09b3c9.mp3*~data=user_id=0,application_id=42~hmac=32426229466b2068c337870afb5928536fbb5734f9fc0c975c729af6ecf634ff",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/bb708e4bca3b6ad95ebe339de441a80c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "The Walls Are Way Too Thin",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/6/4/e/0/64ea8da1518a9464c2f3f5ee606556e4.mp3?hdnea=exp=1773653772~acl=/api/1/1/6/4/e/0/64ea8da1518a9464c2f3f5ee606556e4.mp3*~data=user_id=0,application_id=42~hmac=b88eef8a41b61decee3c6d8a5f8dfaaefea72ef9f9e913c2790db8034fee9f6f",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/02bfd544d9d0b118d5fbf21904934b79/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Overkill",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/7/1/0/9718ad64cf14949248110c5f9d9e4d3f.mp3?hdnea=exp=1773653772~acl=/api/1/1/9/7/1/0/9718ad64cf14949248110c5f9d9e4d3f.mp3*~data=user_id=0,application_id=42~hmac=8aaf17cb532f91ae6fb4aac4bf5ca185534ecb9288e42838fe8cec2931097a99",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/099db49c8c9c203cd82d1899c82182aa/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Down Swinging",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/3/8/9/0/38973cecaab1d6bbeae828657fed7818.mp3?hdnea=exp=1773653772~acl=/api/1/1/3/8/9/0/38973cecaab1d6bbeae828657fed7818.mp3*~data=user_id=0,application_id=42~hmac=0ca6840b2d3e9b597b944c4de8a5543d8017da5ee4ad7551856d3654cad04b50",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/464ce271b527b92a285448cdc43f4045/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Dive",
+        "artist": "Holly Humberstone",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/7/8/5/0/785d84f61afabd7112fa86fcc04e4a7d.mp3?hdnea=exp=1773653772~acl=/api/1/1/7/8/5/0/785d84f61afabd7112fa86fcc04e4a7d.mp3*~data=user_id=0,application_id=42~hmac=205756e8b0e495d72433295601198575af40274f149371f3c3db95f58b21fd8c",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/464ce271b527b92a285448cdc43f4045/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "_created_at": 1773652873.068097,
+    "_updated_at": "2026-03-16T02:21:13.068099"
+  },
+  "Slayyyter": {
+    "name": "Slayyyter",
+    "image_url": "https://cdn-images.dzcdn.net/images/artist/68f4544fb01974faacb1450623a0e55e/1000x1000-000000-80-0-0.jpg",
+    "fans": 18367,
+    "top_tracks": [
+      {
+        "name": "OLD TECHNOLOGY",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/0/0/d/0/00dfc56cfa7e5c4a5d61f00b9ce1b756.mp3?hdnea=exp=1773653774~acl=/api/1/1/0/0/d/0/00dfc56cfa7e5c4a5d61f00b9ce1b756.mp3*~data=user_id=0,application_id=42~hmac=f9ce87776b829fa9159996a51a2c422a730b1899e86343c2634cad81d722c6bd",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/778f1f5f9e31dddf8cf264b53aab737e/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "CRANK",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/4/5/b/0/45b3d4e47469074c081afea1fb517952.mp3?hdnea=exp=1773653774~acl=/api/1/1/4/5/b/0/45b3d4e47469074c081afea1fb517952.mp3*~data=user_id=0,application_id=42~hmac=b8ec8e59c3ee949495713846b66f1abbbd32891dd10f24059d0357f68e4c53bf",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/de82980af32bc2f8abcf040b9a1ed63c/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "BEAT UP CHANEL$",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/a/0/b/0/a0b855d2f6877e05b9995eac9e4d903c.mp3?hdnea=exp=1773653774~acl=/api/1/1/a/0/b/0/a0b855d2f6877e05b9995eac9e4d903c.mp3*~data=user_id=0,application_id=42~hmac=4119de5834ad58bc7de6ee8d393fd44560042fffee99cab46fe95bc3f6f8488c",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/0194f32a1fce32bea4663d7d088fd5f6/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "DANCE...",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/d/4/7/0/d47321e38a484b41d13201d2c0267025.mp3?hdnea=exp=1773653774~acl=/api/1/1/d/4/7/0/d47321e38a484b41d13201d2c0267025.mp3*~data=user_id=0,application_id=42~hmac=e7c5569ac8ccf7365741e523f48be7df8761cd564ea0a5cdaa7cd1d121e5fe28",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5cc04c068d5509d5f727543036de33fe/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "CANNIBALISM!",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/4/f/7/0/4f79173b28dfbefbb6a62547016caa95.mp3?hdnea=exp=1773653774~acl=/api/1/1/4/f/7/0/4f79173b28dfbefbb6a62547016caa95.mp3*~data=user_id=0,application_id=42~hmac=e122bd4c160c283ee2d402d0a19bf37ed6199b89d334d3b570eeacfe5d6f00b8",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/f1d20fcbd764ddfed99983ac913454a1/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Daddy AF",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/d/2/3/0/d23ba72f9d132d7b6df92aa8513a412a.mp3?hdnea=exp=1773653774~acl=/api/1/1/d/2/3/0/d23ba72f9d132d7b6df92aa8513a412a.mp3*~data=user_id=0,application_id=42~hmac=08f980ca45025a60244a9df7558e9d793fb9c93529f959f06959653390801f40",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/c605de3578021ea3d12b91988f158c5d/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "DANCE... (Edit)",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/1/1/5/0/1153c192432402f6d159b78c5860b63e.mp3?hdnea=exp=1773653774~acl=/api/1/1/1/1/5/0/1153c192432402f6d159b78c5860b63e.mp3*~data=user_id=0,application_id=42~hmac=ef9111400df10d74f620ba58360d2734688c4f8514300d66ee625c8b46cff07c",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5cc04c068d5509d5f727543036de33fe/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "I Love Hollywood!",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/8/e/1/0/8e177ad4f12882ec7cef28a10cfbf676.mp3?hdnea=exp=1773653774~acl=/api/1/1/8/e/1/0/8e177ad4f12882ec7cef28a10cfbf676.mp3*~data=user_id=0,application_id=42~hmac=e14438b759e6530b351feabdb411fe663273985a7435f23b9c4296e5eece9e0c",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5ebf1d29eda959151bcfa38e15ce893f/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "ATTENTION!",
+        "artist": "Ke$ha",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/e/2/2/0/e227461c9bbc3eb669ce79e20bc447f3.mp3?hdnea=exp=1773653774~acl=/api/1/1/e/2/2/0/e227461c9bbc3eb669ce79e20bc447f3.mp3*~data=user_id=0,application_id=42~hmac=1edad1a01cb5135f0c0f603108b3155e4387540eb3d1ebb088b67bf85c2439aa",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5a99b4f3105d2f53e890f286df6bba94/500x500-000000-80-0-0.jpg"
+      },
+      {
+        "name": "Starfucker",
+        "artist": "Slayyyter",
+        "preview_url": "https://cdnt-preview.dzcdn.net/api/1/1/9/2/7/0/927dfc9b9523425ecbcbc811adce48d7.mp3?hdnea=exp=1773653774~acl=/api/1/1/9/2/7/0/927dfc9b9523425ecbcbc811adce48d7.mp3*~data=user_id=0,application_id=42~hmac=5f527d096b056b315945b8e33ccb32f1fac52f571bb422fb924e019ecbe57ff0",
+        "album_art": "https://cdn-images.dzcdn.net/images/cover/5ebf1d29eda959151bcfa38e15ce893f/500x500-000000-80-0-0.jpg"
+      }
+    ],
+    "_created_at": 1773652874.285011,
+    "_updated_at": "2026-03-16T02:21:14.285014"
+  }
+}

@@ -6,7 +6,7 @@
 import { escapeHtml, buildServiceLinks } from './utils.js';
 import { PLACEHOLDER_HASH, DRAWER_PLAY_SVG, DRAWER_PAUSE_SVG, DRAWER_PEEK_H } from './constants.js';
 import * as S from './state.js';
-import { addToPlaylist } from './playlist.js';
+import { addToPlaylist, closeExportPanel } from './playlist.js';
 import { updateDiscoveryVisuals, updateAmbassadors, triggerDiscovery } from './discovery.js';
 import { exitSubgraphHighlight } from './simulation.js';
 import { minimizeMenu, expandMenu } from './ui.js';
@@ -100,13 +100,7 @@ export function openDrawer(artistName) {
 export function closeAllPanels(except) {
   if (except !== 'controls' && S.isMobile) minimizeMenu();
   if (except !== 'drawer'   && S.isMobile) setDrawerState('hidden');
-  if (except !== 'export') {
-    const panel = document.getElementById("exportPanel");
-    if (panel) {
-      panel.classList.remove("open");
-      setTimeout(() => { panel.style.display = "none"; }, 260);
-    }
-  }
+  if (except !== 'export') closeExportPanel();
 }
 
 // ── Populate ──────────────────────────────────────────────────────────────────
@@ -195,7 +189,7 @@ export async function populateDrawer(d) {
 
   // Fetch tracks
   try {
-    const r = await fetch("/api/artist/" + encodeURIComponent(d.name) + "/tracks");
+    const r = await fetch("/api/artist/tracks?name=" + encodeURIComponent(d.name));
     if (myId !== S.drawerRequestId) return;
     const data = r.ok ? await r.json() : { tracks: [] };
     if (myId !== S.drawerRequestId) return;

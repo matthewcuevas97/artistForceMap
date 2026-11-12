@@ -16,7 +16,6 @@ export let simEdges = [];
 export let nodeScale      = 1.0;
 export let edgeThreshold  = THRESHOLD_LEVELS[0];
 export let showSimilarity = true;
-export let showGenre      = true;
 export let dayFilter      = "ALL";
 
 // ── Discovery mode ────────────────────────────────────────────────────────────
@@ -54,8 +53,10 @@ export let thresholdDebounce = null;
 export let controlsCollapsedBottom = 0;
 
 // ── Viewport ──────────────────────────────────────────────────────────────────
-export const W = window.innerWidth;
-export const H = window.innerHeight;
+// Live bindings: importers see updates made by setViewport() on window resize.
+export let W = window.innerWidth;
+export let H = window.innerHeight;
+export function setViewport(w, h) { W = w; H = h; }
 
 export const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
 
@@ -74,7 +75,6 @@ export function setUserSeeds(v)             { userSeeds = v; }
 export function setNodeScale(v)             { nodeScale = v; }
 export function setEdgeThreshold(v)         { edgeThreshold = v; }
 export function setShowSimilarity(v)        { showSimilarity = v; }
-export function setShowGenre(v)             { showGenre = v; }
 export function setDayFilter(v)             { dayFilter = v; }
 export function setDiscoveryMode(v)         { discoveryMode = v; }
 export function setLastDiscovered(v)        { lastDiscovered = v; }

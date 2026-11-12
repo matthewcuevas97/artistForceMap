@@ -1,0 +1,118 @@
+"""
+Tag enrichment: fetch Last.fm artist info and tags for all top 25 artists.
+Uses global artist cache (90 days) to avoid redundant API calls.
+"""
+
+import logging
+import time
+from typing import Dict, Any
+
+from lastfm.fetch import get_artist_info, get_artist_top_tags, get_artist_image_and_bio
+from backend.cache import get_cached_artist, set_cached_artist
+from backend.user_data import load_user_db, update_user_db
+from backend.progress import report
+
+logger = logging.getLogger(__name__)
+
+
+class EnrichmentUnavailable(Exception):
+    """Last.fm failed transiently; the result must not be cached."""
+
+
+def enrich_artist_with_lastfm(artist_name: str) -> Dict[str, Any]:
+    """
+    Fetch enriched data from Last.fm for a single artist.
+    Returns {name, listeners, tags, image_url, bio}.
+    Raises EnrichmentUnavailable if the tag lookup failed (rate limit, network),
+    so a temporary outage is never cached as "this artist has no tags" (BUG-23).
+    """
+    # Get top tags first: they drive genre, seed diversity and edges.
+    tags = get_artist_top_tags(artist_name, limit=10)
+    if tags is None:
+        raise EnrichmentUnavailable(artist_name)
+
+    # Get basic info
+    info = get_artist_info(artist_name)
+    listeners = info.get("listeners", 0) if info else 0
+
+    # Get image and bio
+    image_url, bio = get_artist_image_and_bio(artist_name)
+
+    return {
+        "name": artist_name,
+        "listeners": listeners,
+        "tags": tags,
+        "image_url": image_url,
+        "bio": bio,
+    }
+
+
+def enrich_top_25_artists(user_id: str) -> Dict[str, Any]:
+    """
+    Enrich all top 25 artists with Last.fm data.
+    Uses global cache (90 days) to avoid redundant API calls.
+    Saves to user_db.json under all_artists key.
+    """
+    db = load_user_db(user_id)
+    top_artists = db.get("top_artists", [])
+
+    all_artists = {}
+
+    report(f"Fetching top {len(top_artists)} artists")
+
+    # Animation frames for loading indicator
+    frames = ["-", "\\", "|", "/"]
+    frame_idx = 0
+
+    for i, artist in enumerate(top_artists, 1):
+        artist_name = artist.get("name")
+        frame = frames[frame_idx % len(frames)]
+        frame_idx += 1
+        was_cached = False
+
+        try:
+            # Check cache first
+            cached = get_cached_artist(artist_name)
+            if cached:
+                enriched = cached
+                was_cached = True
+                status = "MONEY!" if i <= 5 else "✓"
+                report(f"[{i}/{len(top_artists)}] Gathering {artist_name} - Cache {status}")
+            else:
+                # Not in cache, fetch from API
+                enriched = enrich_artist_with_lastfm(artist_name)
+                # Save to cache
+                set_cached_artist(artist_name, enriched)
+                frame = frames[frame_idx % len(frames)]
+                frame_idx += 1
+                report(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* LOADING")
+
+            enriched["rank"] = artist.get("rank", i)  # Preserve original rank
+            all_artists[artist_name] = enriched
+        except Exception as e:
+            frame = frames[frame_idx % len(frames)]
+            frame_idx += 1
+            report(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* ERROR")
+            # Make the cause visible in server logs (the user stream only shows ERROR).
+            logger.warning("Enrichment failed for %r: %s: %s", artist_name, e.__class__.__name__, e)
+            # Still add minimal data
+            all_artists[artist_name] = {
+                "name": artist_name,
+                "rank": artist.get("rank", i),
+                "tags": [],
+                "listeners": 0,
+            }
+
+        # Rate limiting only for API calls (cached data doesn't need rate limiting)
+        if not was_cached:
+            time.sleep(0.05)
+
+    # Save enriched data
+    db["all_artists"] = all_artists
+    update_user_db(user_id, {"all_artists": all_artists})
+
+    return {
+        "user_id": user_id,
+        "enriched_count": len(all_artists),
+        "all_artists": all_artists,
+    }

@@ -114,9 +114,9 @@ export function renderTrackList(tracks) {
     return (
       `<div class="track-row" data-track-index="${idx}" style="display:flex;align-items:center;padding:8px 16px;gap:10px;cursor:pointer"` +
       ` onmouseenter="this.style.background='rgba(255,255,255,0.04)'" onmouseleave="this.style.background=''">` +
-      `<img src="${art}" style="width:40px;height:40px;object-fit:cover" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
+      `<img src="${escapeHtml(art)}" style="width:40px;height:40px;object-fit:cover" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
       `<span style="font-size:10px;flex:1;color:rgba(255,255,255,0.72)">${escapeHtml(track.name)}</span>` +
-      `<button class="play-btn" data-preview="${preview}" style="font-size:12px;color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer${disabledStyle}">▶</button>` +
+      `<button class="play-btn" data-preview="${escapeHtml(preview)}" style="font-size:12px;color:rgba(255,255,255,0.4);background:none;border:none;cursor:pointer${disabledStyle}">▶</button>` +
       `</div>`
     );
   }).join("");
@@ -128,9 +128,23 @@ export async function openPanel(artistName) {
   S.setPanelRequestId(myId);
   S.setOpenArtistName(artistName);
 
-  const resp = await fetch("/api/artist/" + encodeURIComponent(artistName));
-  if (!resp.ok) return;
-  const d = await resp.json();
+  // Every await is a point where a newer click may have taken over the panel:
+  // bail out if so, rather than painting a stale artist over the current one.
+  let d;
+  try {
+    const resp = await fetch("/api/artist?name=" + encodeURIComponent(artistName));
+    if (myId !== S.panelRequestId) return;
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    d = await resp.json();
+  } catch (_) {
+    if (myId !== S.panelRequestId) return;
+    document.getElementById("panelContent").innerHTML =
+      `<div style="font-size:15px;font-weight:bold;color:white;margin:16px 16px 4px">${escapeHtml(artistName)}</div>` +
+      `<div class="panel-error" style="font-size:10px;color:rgba(255,255,255,0.45);margin:0 16px 16px">Couldn't load this artist. Try again.</div>`;
+    document.getElementById("artistPanel").classList.add("open");
+    return;
+  }
+  if (myId !== S.panelRequestId) return;
 
   const artistProfiles = d.artist_profiles || [];
   let activeProfileIdx = 0;
@@ -174,11 +188,11 @@ export async function openPanel(artistName) {
   // Build carousel HTML if multiple profiles
   const carouselHtml = artistProfiles.length > 1
     ? `<div class="hero-carousel" id="panelCarousel">` +
-      `<img id="panelHeroImg" src="${imgSrc}" style="width:100%;object-fit:cover;max-height:280px;display:block" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
+      `<img id="panelHeroImg" src="${escapeHtml(imgSrc)}" style="width:100%;object-fit:cover;max-height:280px;display:block" onerror="this.src='/static/placeholder_artist.jpeg'" />` +
       `<button class="carousel-arrow carousel-arrow-left" id="panelArrowLeft">‹</button>` +
       `<button class="carousel-arrow carousel-arrow-right" id="panelArrowRight">›</button>` +
       `</div>`
-    : `<img id="panelHeroImg" src="${imgSrc}" style="width:100%;object-fit:cover;max-height:280px;display:block" onerror="this.src='/static/placeholder_artist.jpeg'" />`;
+    : `<img id="panelHeroImg" src="${escapeHtml(imgSrc)}" style="width:100%;object-fit:cover;max-height:280px;display:block" onerror="this.src='/static/placeholder_artist.jpeg'" />`;
 
   document.getElementById("panelContent").innerHTML =
     carouselHtml +
@@ -211,7 +225,7 @@ export async function openPanel(artistName) {
   document.getElementById("artistPanel").classList.add("open");
 
   try {
-    const tr = await fetch("/api/artist/" + encodeURIComponent(artistName) + "/tracks");
+    const tr = await fetch("/api/artist/tracks?name=" + encodeURIComponent(artistName));
     if (myId !== S.panelRequestId) return;
     const td = tr.ok ? await tr.json() : { tracks: [] };
     if (myId !== S.panelRequestId) return;

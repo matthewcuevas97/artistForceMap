@@ -56,6 +56,10 @@ export function syncHamburgerColor() {
   btn.style.color = S.playlist.length > 0 ? "#1db954" : "";
 }
 
+// Pending "display:none after the slide-out animation" timer. It must be cancelled when the
+// panel is reopened, or a close followed quickly by an open hides the panel 260 ms later.
+let _hideTimer = null;
+
 export function openExportPanel() {
   renderExportPanel();
   closeExportPanel_internal(false);
@@ -71,8 +75,15 @@ export function closeExportPanel() {
 function closeExportPanel_internal(animate) {
   const panel = document.getElementById("exportPanel");
   if (!panel) return;
+  clearTimeout(_hideTimer);
+  _hideTimer = null;
   panel.classList.remove("open");
-  if (animate) setTimeout(() => { panel.style.display = "none"; }, 260);
+  if (animate) {
+    _hideTimer = setTimeout(() => {
+      _hideTimer = null;
+      panel.style.display = "none";
+    }, 260);
+  }
 }
 
 export function renderExportPanel() {

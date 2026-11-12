@@ -4,7 +4,7 @@
 
 import * as S from './state.js';
 import {
-  buildGraph, nodeEl, simulation,
+  buildGraph, updateEdges, resizeViewport, nodeEl, simulation,
   enterSubgraphHighlight, exitSubgraphHighlight,
   clearHover, zoomToSubgraph,
 } from './simulation.js';
@@ -38,6 +38,7 @@ registerUnpinCallback(unpinCurrentNode);
 
 // Register with controls.js: opening the controls hamburger closes artist bio
 registerCloseArtistCallback(() => {
+  exitSubgraphHighlight();
   unpinCurrentNode();
   S.setOpenArtistName(null);
   closePanel();
@@ -133,6 +134,7 @@ function onBgClick() {
 // ── Panel close button ────────────────────────────────────────────────────────
 
 function onPanelClose() {
+  exitSubgraphHighlight();
   unpinCurrentNode();
   S.setOpenArtistName(null);
   closePanel();
@@ -142,8 +144,16 @@ function onPanelClose() {
 
 function onThresholdChange() {
   S.setRawEdges(S.edgesByLevel[S.edgeThreshold.toFixed(2)] || []);
-  buildGraph(onNodeClick, onBgClick);
+  updateEdges();
 }
+
+// ── Window resize ─────────────────────────────────────────────────────────────
+
+let _resizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => resizeViewport(window.innerWidth, window.innerHeight), 150);
+});
 
 // ── Graph loading ─────────────────────────────────────────────────────────────
 

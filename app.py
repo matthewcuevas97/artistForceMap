@@ -1,24 +1,24 @@
+import hashlib
 import json
 import os
 import re
+import threading
 import time
 import spotipy
 import requests
 from datetime import datetime
-from flask import Flask, jsonify, render_template, redirect, request, session
+from flask import Flask, jsonify, render_template, request, session
 from spotipy.exceptions import SpotifyException
 
 from data.graph_builder import enrich_with_scores, normalize_listeners
-from spotify.auth import get_spotify_oauth, get_token
+from lastfm.fetch import get_top_artists as lastfm_top
+from web_auth import configure_session, create_auth_blueprint, get_valid_spotify_token
 from spotify.fetch import get_top_artists
 
 app = Flask(__name__)
-secret_key = os.getenv("FLASK_SECRET_KEY")
-if not secret_key:
-    raise RuntimeError("FLASK_SECRET_KEY environment variable is not set")
-app.secret_key = secret_key
+configure_session(app)
+app.register_blueprint(create_auth_blueprint(lambda user: bool(lastfm_top(user))))
 
-sp_oauth = get_spotify_oauth()
 
 THRESHOLDS = [0.30, 0.32, 0.34, 0.36, 0.38, 0.40]
 
@@ -27,32 +27,6 @@ DEEZER_SEARCH = "https://api.deezer.com/search"
 
 def _norm_simple(s):
     return re.sub(r'[^\w]', '', s.lower())
-
-
-def get_valid_spotify_token():
-    """Return a valid Spotify access token from the session, refreshing if needed.
-
-    Returns the access token string, or None if the session has no token or
-    the refresh attempt fails.
-    """
-    token = session.get("spotify_token")
-    if not token:
-        return None
-    expires_at = session.get("spotify_token_expires_at", 0)
-    if time.time() > expires_at - 60:
-        refresh_token = session.get("spotify_refresh_token")
-        if not refresh_token:
-            return None
-        try:
-            new_token = sp_oauth.refresh_access_token(refresh_token)
-            session["spotify_token"] = new_token["access_token"]
-            session["spotify_token_expires_at"] = new_token["expires_at"]
-            if new_token.get("refresh_token"):
-                session["spotify_refresh_token"] = new_token["refresh_token"]
-            return new_token["access_token"]
-        except Exception:
-            return None
-    return token
 
 
 def refresh_track_previews(tracks, artist_names):
@@ -107,78 +81,41 @@ except Exception as e:
     app.logger.error("Failed to load graph_static.json: %s", e)
 
 
+# Per-user top artists, cached in memory so /api/graph doesn't call Spotify/Last.fm on
+# every page load (PERF-02). Kept server-side: 50 artists don't fit in a 4 KB cookie.
+TOP_ARTISTS_TTL = 600
+_TOP_ARTISTS_MAX = 1000
+_top_artists_cache: dict = {}
+_top_artists_lock = threading.Lock()
+
+
+def cached_top_artists(key, fetch):
+    """Return fetch() for `key`, reusing a non-empty result for TOP_ARTISTS_TTL seconds."""
+    now = time.time()
+    with _top_artists_lock:
+        hit = _top_artists_cache.get(key)
+        if hit and hit[0] > now:
+            return hit[1]
+    top = fetch()
+    if top:
+        with _top_artists_lock:
+            if len(_top_artists_cache) >= _TOP_ARTISTS_MAX:
+                for k in [k for k, (exp, _) in _top_artists_cache.items() if exp <= now]:
+                    del _top_artists_cache[k]
+                while len(_top_artists_cache) >= _TOP_ARTISTS_MAX:
+                    del _top_artists_cache[next(iter(_top_artists_cache))]
+            _top_artists_cache[key] = (now + TOP_ARTISTS_TTL, top)
+    return top
+
+
 # Fields used internally during graph building; not needed by the D3 frontend
-_INTERNAL_FIELDS = {"direct_score", "derived_score"}
+_INTERNAL_FIELDS = {"direct_score", "derived_score", "similar_artists"}
 
 
 @app.route("/")
 def index():
     """Render the main single-page application shell."""
     return render_template("index.html")
-
-
-@app.route("/login")
-def login():
-    """Redirect the user to Spotify's OAuth authorization page."""
-    oauth = get_spotify_oauth()
-    auth_url = oauth.get_authorize_url()
-    return redirect(auth_url)
-
-
-@app.route("/callback")
-def callback():
-    """Handle the OAuth callback from Spotify."""
-    error = request.args.get("error")
-    if error:
-        return f"Authorization failed: {error}", 400
-    code = request.args.get("code")
-    if not code:
-        return "Missing authorization code", 400
-    token = get_token(code)
-    session["spotify_token"] = token["access_token"]
-    session["spotify_refresh_token"] = token.get("refresh_token")
-    session["spotify_token_expires_at"] = token["expires_at"]
-    session.pop("lastfm_user", None)
-    try:
-        sp = spotipy.Spotify(auth=token["access_token"])
-        user = sp.current_user()
-        session["spotify_display_name"] = user.get("display_name") or user.get("id", "")
-    except SpotifyException:
-        pass
-    return redirect("/")
-
-
-@app.route("/api/spotify/logout", methods=["POST"])
-def spotify_logout():
-    session.pop("spotify_token", None)
-    session.pop("spotify_refresh_token", None)
-    session.pop("spotify_token_expires_at", None)
-    session.pop("spotify_display_name", None)
-    return jsonify({"ok": True})
-
-
-@app.route("/api/lastfm/login", methods=["POST"])
-def lastfm_login():
-    from lastfm.fetch import get_top_artists as lastfm_top
-    data = request.get_json(force=True)
-    username = (data or {}).get("username", "").strip()
-    if not username:
-        return jsonify({"ok": False, "error": "User not found"}), 400
-    top = lastfm_top(username)
-    if not top:
-        return jsonify({"ok": False, "error": "User not found"}), 400
-    session["lastfm_user"] = username
-    session.pop("spotify_token", None)
-    session.pop("spotify_refresh_token", None)
-    session.pop("spotify_token_expires_at", None)
-    session.pop("spotify_display_name", None)
-    return jsonify({"ok": True})
-
-
-@app.route("/api/lastfm/logout", methods=["POST"])
-def lastfm_logout():
-    session.pop("lastfm_user", None)
-    return jsonify({"ok": True})
 
 
 @app.route("/api/graph")
@@ -206,14 +143,16 @@ def api_graph():
     spotify_token = get_valid_spotify_token()
 
     if lastfm_user:
-        from lastfm.fetch import get_top_artists as lastfm_top
-        top = lastfm_top(lastfm_user)
+        top = cached_top_artists(("lastfm", lastfm_user.lower()),
+                                 lambda: lastfm_top(lastfm_user))
         if top:
             enrich_with_scores(_nodes, top, scores)
     elif spotify_token:
         try:
-            sp = spotipy.Spotify(auth=spotify_token)
-            top_artists = get_top_artists(sp)
+            # Keyed by a hash of the access token: it is per-user and rotates on refresh.
+            key = ("spotify", hashlib.sha256(spotify_token.encode()).hexdigest())
+            top_artists = cached_top_artists(
+                key, lambda: get_top_artists(spotipy.Spotify(auth=spotify_token)))
             enrich_with_scores(_nodes, top_artists, scores)
         except SpotifyException:
             pass
@@ -264,17 +203,20 @@ def api_graph():
     return jsonify({"nodes": nodes_out, "edges_by_level": edges_by_level, "user_seeds": user_seeds})
 
 
-@app.route("/api/artist/<name>")
-def api_artist(name):
-    node = _nodes_by_name.get(name)
+# Artist names are passed as ?name= rather than in the path: names like "Model/Actriz"
+# contain '/', which Flask decodes before routing, so a path segment can't carry them.
+@app.route("/api/artist")
+def api_artist():
+    node = _nodes_by_name.get(request.args.get("name", ""))
     if node is None:
         return jsonify({"error": "Not found"}), 404
     result = {k: v for k, v in node.items() if k not in _INTERNAL_FIELDS}
     return jsonify(result)
 
 
-@app.route("/api/artist/<name>/tracks")
-def api_artist_tracks(name):
+@app.route("/api/artist/tracks")
+def api_artist_tracks():
+    name = request.args.get("name", "")
     node = _nodes_by_name.get(name)
     if node is None:
         return jsonify({"error": "Not found"}), 404

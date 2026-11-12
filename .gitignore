@@ -3,3 +3,13 @@ venv/
 __pycache__/
 .DS_Store
 .cache
+
+# Spotify token caches (spotipy default cache path)
+.cache*
+
+# Per-user data and per-user caches (personal listening history)
+data/users/
+data/cache/*_cache.json
+
+# Local test / tool artifacts
+.pytest_cache/

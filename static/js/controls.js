@@ -140,7 +140,8 @@ export function initControls(fetchAndBuild, onThresholdChange, getUserSeeds, onP
     const idx = parseInt(thresholdSlider.value, 10);
     S.setEdgeThreshold(THRESHOLD_LEVELS[idx]);
     thresholdValue.textContent = S.edgeThreshold.toFixed(2);
-    onThresholdChange();
+    clearTimeout(S.thresholdDebounce);
+    S.setThresholdDebounce(setTimeout(onThresholdChange, 60));
   });
 
   // Node size slider
@@ -155,12 +156,6 @@ export function initControls(fetchAndBuild, onThresholdChange, getUserSeeds, onP
   // Similarity edges checkbox
   document.getElementById("similarityCheck").addEventListener("change", e => {
     S.setShowSimilarity(e.target.checked);
-    applyEdgeFilter();
-  });
-
-  // Genre edges checkbox
-  document.getElementById("genreCheck").addEventListener("change", e => {
-    S.setShowGenre(e.target.checked);
     applyEdgeFilter();
   });
 
@@ -188,15 +183,14 @@ export function initControls(fetchAndBuild, onThresholdChange, getUserSeeds, onP
     }, { passive: true });
   }
 
-  // Measure controls height in minimized state
+  // On mobile, start minimised (expanded controls cover half the screen, UX-01) and
+  // measure the collapsed height so zoom-to-fit can keep nodes clear of it.
   if (S.isMobile) {
     const controlsEl = document.getElementById("controls");
     if (controlsEl) {
-      const was = controlsEl.classList.contains("minimized");
-      if (!was) controlsEl.classList.add("minimized");
+      minimizeMenu();
       void controlsEl.offsetHeight;
       S.setControlsCollapsedBottom(controlsEl.getBoundingClientRect().bottom);
-      if (!was) controlsEl.classList.remove("minimized");
     }
   }
 }
