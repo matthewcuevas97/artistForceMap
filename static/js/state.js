@@ -16,7 +16,6 @@ export let simEdges = [];
 export let nodeScale      = 1.0;
 export let edgeThreshold  = THRESHOLD_LEVELS[0];
 export let showSimilarity = true;
-export let showGenre      = true;
 export let dayFilter      = "ALL";
 
 // ── Discovery mode ────────────────────────────────────────────────────────────
@@ -74,7 +73,6 @@ export function setUserSeeds(v)             { userSeeds = v; }
 export function setNodeScale(v)             { nodeScale = v; }
 export function setEdgeThreshold(v)         { edgeThreshold = v; }
 export function setShowSimilarity(v)        { showSimilarity = v; }
-export function setShowGenre(v)             { showGenre = v; }
 export function setDayFilter(v)             { dayFilter = v; }
 export function setDiscoveryMode(v)         { discoveryMode = v; }
 export function setLastDiscovered(v)        { lastDiscovered = v; }

@@ -158,12 +158,6 @@ export function initControls(fetchAndBuild, onThresholdChange, getUserSeeds, onP
     applyEdgeFilter();
   });
 
-  // Genre edges checkbox
-  document.getElementById("genreCheck").addEventListener("change", e => {
-    S.setShowGenre(e.target.checked);
-    applyEdgeFilter();
-  });
-
   // Discovery mode toggle
   document.getElementById("discoveryToggle").addEventListener("change", function() {
     S.setDiscoveryMode(this.checked);

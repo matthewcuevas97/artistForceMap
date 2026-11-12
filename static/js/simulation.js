@@ -143,7 +143,6 @@ export function applyDayFilter() {
 function onNodeEnter(event, d) {
   edgeEl.attr("opacity", e => {
     if (e.type === "similarity" && !S.showSimilarity) return 0;
-    if (e.type === "genre"      && !S.showGenre)      return 0;
     if (e.source === d || e.target === d) return edgeBaseOpacity(e);
     if (S.discoveryMode && S.lastDiscovered) {
       const sn = nodeName(e.source), tn = nodeName(e.target);

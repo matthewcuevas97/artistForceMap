@@ -277,17 +277,20 @@ def api_graph():
     return jsonify({"nodes": nodes_out, "edges_by_level": edges_by_level, "user_seeds": user_seeds})
 
 
-@app.route("/api/artist/<name>")
-def api_artist(name):
-    node = _nodes_by_name.get(name)
+# Artist names are passed as ?name= rather than in the path: names like "Model/Actriz"
+# contain '/', which Flask decodes before routing, so a path segment can't carry them.
+@app.route("/api/artist")
+def api_artist():
+    node = _nodes_by_name.get(request.args.get("name", ""))
     if node is None:
         return jsonify({"error": "Not found"}), 404
     result = {k: v for k, v in node.items() if k not in _INTERNAL_FIELDS}
     return jsonify(result)
 
 
-@app.route("/api/artist/<name>/tracks")
-def api_artist_tracks(name):
+@app.route("/api/artist/tracks")
+def api_artist_tracks():
+    name = request.args.get("name", "")
     node = _nodes_by_name.get(name)
     if node is None:
         return jsonify({"error": "Not found"}), 404

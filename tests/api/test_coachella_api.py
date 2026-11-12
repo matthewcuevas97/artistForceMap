@@ -91,16 +91,23 @@ def test_graph_spotify_failure_degrades_to_baseline(coachella_client, http):
 # ── /api/artist ───────────────────────────────────────────────────────────────
 
 def test_artist_lookup_and_404(coachella_client):
-    assert coachella_client.get("/api/artist/Definitely%20Not%20Playing").status_code == 404
+    assert coachella_client.get("/api/artist?name=Definitely%20Not%20Playing").status_code == 404
+    assert coachella_client.get("/api/artist").status_code == 404
     name = coachella_client.get("/api/graph").get_json()["nodes"][0]["name"]
-    r = coachella_client.get("/api/artist/" + quote(name))
+    r = coachella_client.get("/api/artist?name=" + quote(name))
     assert r.status_code == 200 and r.get_json()["name"] == name
+    assert "similar_artists" not in r.get_json()
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-07: artist names containing '/' (e.g. 'Model/Actriz') "
-                   "404 because the route uses the default <name> converter; %2F is decoded first")
-def test_artist_with_slash_in_name(coachella_client):
-    assert coachella_client.get("/api/artist/" + quote("Model/Actriz", safe="")).status_code == 200
+@pytest.mark.parametrize("name", ["Model/Actriz", "¥ØU$UK€ ¥UK1MAT$U", "Cachirula & Loojan", "Chloé Caillet x Rossi."])
+def test_artist_with_special_characters_in_name(coachella_app, coachella_client, name):
+    """BUG-07 regression: '/' in a name used to 404 because the name was a path segment."""
+    if name not in coachella_app._nodes_by_name:
+        pytest.skip(f"{name!r} not in lineup")
+    r = coachella_client.get("/api/artist?name=" + quote(name, safe=""))
+    assert r.status_code == 200 and r.get_json()["name"] == name
+    r = coachella_client.get("/api/artist/tracks?name=" + quote(name, safe=""))
+    assert r.status_code == 200 and "tracks" in r.get_json()
 
 
 def test_tracks_refresh_previews_from_deezer(coachella_app, coachella_client, http):
@@ -108,14 +115,14 @@ def test_tracks_refresh_previews_from_deezer(coachella_app, coachella_client, ht
     first = node["top_tracks"][0]["name"]
     http.add("GET", DEEZER, json={"data": [{"title": first, "preview": "https://cdn/p.mp3",
                                             "album": {"cover_big": "https://cdn/c.jpg"}}]})
-    tracks = coachella_client.get("/api/artist/" + quote(node["name"], safe="") + "/tracks").get_json()["tracks"]
+    tracks = coachella_client.get("/api/artist/tracks?name=" + quote(node["name"], safe="")).get_json()["tracks"]
     assert tracks[0]["preview_url"] == "https://cdn/p.mp3"
 
 
 def test_tracks_survive_deezer_outage(coachella_app, coachella_client, http):
     node = next(n for n in coachella_app._nodes if n.get("top_tracks"))
     http.add("GET", DEEZER, body=requests.ConnectionError("down"))
-    r = coachella_client.get("/api/artist/" + quote(node["name"], safe="") + "/tracks")
+    r = coachella_client.get("/api/artist/tracks?name=" + quote(node["name"], safe=""))
     assert r.status_code == 200
     assert all(t["preview_url"] == "" for t in r.get_json()["tracks"])
 

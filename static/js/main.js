@@ -38,6 +38,7 @@ registerUnpinCallback(unpinCurrentNode);
 
 // Register with controls.js: opening the controls hamburger closes artist bio
 registerCloseArtistCallback(() => {
+  exitSubgraphHighlight();
   unpinCurrentNode();
   S.setOpenArtistName(null);
   closePanel();
@@ -133,6 +134,7 @@ function onBgClick() {
 // ── Panel close button ────────────────────────────────────────────────────────
 
 function onPanelClose() {
+  exitSubgraphHighlight();
   unpinCurrentNode();
   S.setOpenArtistName(null);
   closePanel();

@@ -90,7 +90,7 @@ def test_untrusted_names_are_escaped(coachella):
             {"name": payload, "genre": payload, "tags": [payload], "artist_profiles": [{"bio": payload}]}))
 
     coachella.page.route("**/api/graph", poison_graph)
-    coachella.page.route("**/api/artist/%3Cimg*", poison_artist)
+    coachella.page.route(re.compile(r"/api/artist\?name=%3Cimg"), poison_artist)
     _open(coachella)
     coachella.page.evaluate("() => d3.selectAll('#graph circle').attr('data-name', d => d.name === '%s' ? 'XSS' : d.name)"
                             % payload.replace("'", "\\'"))
@@ -115,10 +115,8 @@ def test_click_node_opens_panel_and_highlights_neighbourhood(coachella):
     assert p.locator("#controls").evaluate("e => e.classList.contains('minimized')")
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="BUG-37: the panel ✕ handler (onPanelClose) never calls exitSubgraphHighlight, "
-                          "so the graph stays dimmed to the old neighbourhood after closing")
 def test_panel_close_restores_graph(coachella):
+    """BUG-37 regression: closing with ✕ left the graph dimmed to the old neighbourhood."""
     _open(coachella)
     p = coachella.page
     coachella.click_node("The Strokes")
@@ -168,7 +166,6 @@ def test_playlist_add_view_remove(coachella):
     p.locator(".add-playlist-btn").click()
     p.locator(".track-submenu", has_text="Added").wait_for()
     p.locator("#menuToggle").click()  # reopen controls (closes the artist panel)
-    p.wait_for_timeout(400)           # see BUG-36 for what happens without this pause
     export = p.locator("#exportBtn")
     export.wait_for()
     assert export.inner_text() == "MY PLAYLIST (1)"
@@ -180,10 +177,8 @@ def test_playlist_add_view_remove(coachella):
     assert p.locator("#exportRow").is_hidden()
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="BUG-36: closeExportPanel() schedules display:none 260 ms later and never cancels it; "
-                          "opening the playlist within that window shows it, then it vanishes")
 def test_playlist_opened_quickly_after_controls_stays_open(coachella):
+    """BUG-36 regression: a pending 260 ms hide timer from closing used to hide the reopened panel."""
     _open(coachella)
     p = coachella.page
     coachella.click_node("The Strokes")
@@ -195,21 +190,28 @@ def test_playlist_opened_quickly_after_controls_stays_open(coachella):
     assert p.locator("#exportPanel").is_visible()
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="BUG-07: clicking 'Model/Actriz' requests /api/artist/Model%2FActriz → 404, panel never opens")
 def test_artist_with_slash_opens_panel(coachella):
+    """BUG-07 regression: 'Model/Actriz' 404'd because the name was a URL path segment."""
     _open(coachella)
     coachella.click_node("Model/Actriz")
     coachella.page.wait_for_timeout(1500)
     assert coachella.page.locator("#artistPanel.open").count() == 1
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="BUG-08: openPanel only checks panelRequestId after the *tracks* fetch, so a slow "
-                          "/api/artist response for an earlier click overwrites the newer artist")
-def test_rapid_clicks_show_last_clicked_artist(coachella):
+def test_artist_load_failure_shows_error(coachella):
+    """BUG-08: a failed /api/artist used to leave the panel closed with no feedback."""
     p = coachella.page
-    p.route("**/api/artist/The%20Strokes", lambda r: (p.wait_for_timeout(1200), r.continue_()))
+    p.route(re.compile(r"/api/artist\?name=The%20Strokes$"), lambda r: r.fulfill(status=500, body="boom"))
+    _open(coachella)
+    coachella.click_node("The Strokes")
+    p.locator("#artistPanel.open .panel-error").wait_for(timeout=3000)
+    assert "The Strokes" in p.locator("#panelContent").inner_text()
+
+
+def test_rapid_clicks_show_last_clicked_artist(coachella):
+    """BUG-08 regression: a slow response for an earlier click overwrote the newer artist."""
+    p = coachella.page
+    p.route(re.compile(r"/api/artist\?name=The%20Strokes$"), lambda r: (p.wait_for_timeout(1200), r.continue_()))
     _open(coachella)
     coachella.click_node("The Strokes")
     p.wait_for_timeout(100)
@@ -274,15 +276,15 @@ def test_similarity_toggle_hides_edges(coachella):
     assert p.evaluate("() => Array.from(document.querySelectorAll('#graph line')).every(l => l.getAttribute('opacity') !== '0')")
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="BUG-29: /api/graph tags every edge type='similarity'; the GENRE EDGES toggle is a no-op")
-def test_genre_toggle_has_an_effect(coachella):
+def test_no_dead_edge_toggles(coachella):
+    """BUG-29 regression: the GENRE EDGES toggle did nothing (no edge had type 'genre'), so it was removed.
+    Every remaining edge toggle must match at least one edge type the API actually serves."""
     _open(coachella)
     p = coachella.page
-    before = p.evaluate("() => Array.from(document.querySelectorAll('#graph line')).map(l => l.getAttribute('opacity')).join()")
-    p.locator("#genreCheck").uncheck()
-    after = p.evaluate("() => Array.from(document.querySelectorAll('#graph line')).map(l => l.getAttribute('opacity')).join()")
-    assert before != after
+    assert p.locator("#genreCheck").count() == 0
+    types = {e["type"] for lvl in _graph_json(p)["edges_by_level"].values() for e in lvl}
+    assert types == {"similarity"}
+    assert coachella.page_errors == []
 
 
 def test_discovery_mode_reveals_subset_then_restores(coachella):
