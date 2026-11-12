@@ -1,614 +1,537 @@
 /**
- * Universal Artist Map - D3 force graph visualization
- * Allows infinite exploration from user's initial seed nodes
+ * Universal Artist Map: a D3 force graph of the user's seed artists and their
+ * similar artists, grown on demand with the panel's EXPAND button.
+ *
+ * Data flow
+ *   load        GET  /api/map/get          → render the saved map (if any)
+ *   generate    POST /api/map/init/stream  → SSE progress, then the new map
+ *   details     GET  /api/artist?name=     → tags/bio/tracks for a stub node
+ *   expand      POST /api/map/expand       → merge new nodes/edges in place
+ *   play        GET  /api/preview?...      → fresh Deezer preview URL
+ *
+ * Everything that reaches innerHTML goes through escapeHtml()/safeUrl(): artist
+ * names, tags, bios and track titles are user-generated content on Last.fm/Deezer.
  */
+(function () {
+  "use strict";
 
-// ============================================================================
-// Utility Functions
-// ============================================================================
+  // ── Helpers ──────────────────────────────────────────────────────────────────
 
-const GENRE_HUE = {
-  "Electronic": 195,
-  "Indie/Alt": 135,
-  "Hip-Hop": 45,
-  "R&B/Soul": 25,
-  "Pop": 330,
-  "Punk/Metal": 0,
-  "Latin/Afro": 275,
-  "Singer-Songwriter/Jazz": 30,
-  "Unknown": 220,
-};
+  const GENRE_HUE = {
+    "Electronic": 195, "Indie/Alt": 135, "Hip-Hop": 45, "R&B/Soul": 25, "Pop": 330,
+    "Punk/Metal": 0, "Latin/Afro": 275, "Singer-Songwriter/Jazz": 30, "Unknown": 220,
+  };
 
-function getGenreColor(genre) {
-  const hue = GENRE_HUE[genre] || GENRE_HUE["Unknown"];
-  return `hsl(${hue}, 70%, 55%)`;
-}
-
-// ============================================================================
-// State Management
-// ============================================================================
-
-const state = {
-  authenticated: false,
-  authProvider: null,
-  username: null,
-  initialized: false,
-  graph: {
-    nodes: [],
-    edges: []
-  },
-  nodeMap: {},
-  selectedArtist: null,
-  simulation: null,
-  nodeSize: 1,
-  charge: -50,
-  showLabels: true,
-  currentAudio: null,
-  currentTrackEl: null
-};
-
-// ============================================================================
-// UI Elements
-// ============================================================================
-
-const elements = {
-  graph: document.getElementById("graph"),
-  controls: document.getElementById("controls"),
-  menuToggle: document.getElementById("menuToggle"),
-
-  // Auth
-  spotifyBtn: document.getElementById("spotifyBtn"),
-  spotifyCol: document.getElementById("spotifyCol"),
-  spotifyConnected: document.getElementById("spotifyConnected"),
-  spotifyUserLabel: document.getElementById("spotifyUserLabel"),
-  spotifyDisconnect: document.getElementById("spotifyDisconnect"),
-
-  lastfmCol: document.getElementById("lastfmCol"),
-  lastfmConnected: document.getElementById("lastfmConnected"),
-  lastfmUserLabel: document.getElementById("lastfmUserLabel"),
-  lastfmDisconnect: document.getElementById("lastfmDisconnect"),
-  lastfmInput: document.getElementById("lastfmInput"),
-  lastfmUsername: document.getElementById("lastfmUsername"),
-  lastfmGo: document.getElementById("lastfmGo"),
-  lastfmError: document.getElementById("lastfmError"),
-
-  // Map init
-  initRow: document.getElementById("initRow"),
-  initBtn: document.getElementById("initBtn"),
-  initStatus: document.getElementById("initStatus"),
-
-  // Sliders
-  sep1: document.getElementById("sep1"),
-  sizeRow: document.getElementById("sizeRow"),
-  nodeSizeSlider: document.getElementById("nodeSizeSlider"),
-  nodeSizeValue: document.getElementById("nodeSizeValue"),
-  chargeRow: document.getElementById("chargeRow"),
-  chargeSlider: document.getElementById("chargeSlider"),
-  chargeValue: document.getElementById("chargeValue"),
-
-  // Options
-  sep2: document.getElementById("sep2"),
-  optionsRow: document.getElementById("optionsRow"),
-  labelsCheck: document.getElementById("labelsCheck"),
-
-  // Panel
-  artistPanel: document.getElementById("artistPanel"),
-  panelClose: document.getElementById("panelClose"),
-  panelContent: document.getElementById("panelContent")
-};
-
-// ============================================================================
-// Authentication
-// ============================================================================
-
-function updateAuthUI() {
-  if (window.SPOTIFY_DISPLAY_NAME) {
-    state.authenticated = true;
-    state.authProvider = "spotify";
-    state.username = window.SPOTIFY_DISPLAY_NAME;
-    showSpotifyConnected(state.username);
-    showMapControls();
-  } else if (window.LASTFM_USER) {
-    state.authenticated = true;
-    state.authProvider = "lastfm";
-    state.username = window.LASTFM_USER;
-    showLastfmConnected(state.username);
-    showMapControls();
+  function genreColor(genre) {
+    const hue = GENRE_HUE[genre] ?? GENRE_HUE.Unknown;
+    return `hsl(${hue}, 70%, 55%)`;
   }
-}
 
-function showSpotifyConnected(username) {
-  elements.spotifyBtn.style.display = "none";
-  elements.spotifyConnected.style.display = "block";
-  elements.spotifyUserLabel.textContent = username;
-}
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
 
-function showLastfmConnected(username) {
-  elements.lastfmInput.style.display = "none";
-  elements.lastfmConnected.style.display = "block";
-  elements.lastfmUserLabel.textContent = username;
-}
+  /** Only absolute http(s) URLs may be used as src attributes (images come from
+   *  Last.fm/Deezer CDNs). Returns the escaped URL, or "" for anything else. */
+  function safeUrl(url) {
+    if (!/^https?:\/\//i.test(String(url || ""))) return "";
+    try {
+      return escapeHtml(new URL(url).href);
+    } catch (_) {
+      return "";
+    }
+  }
 
-function showMapControls() {
-  elements.initRow.style.display = "block";
-  elements.sep1.style.display = "block";
-  elements.sizeRow.style.display = "block";
-  elements.chargeRow.style.display = "block";
-  elements.sep2.style.display = "block";
-  elements.optionsRow.style.display = "block";
-}
+  async function getJson(url, options) {
+    const res = await fetch(url, options);
+    let body = null;
+    try { body = await res.json(); } catch (_) { /* non-JSON error page */ }
+    if (!res.ok) throw new Error((body && body.error) || `HTTP ${res.status}`);
+    return body;
+  }
 
-function hideMapControls() {
-  elements.initRow.style.display = "none";
-  elements.sep1.style.display = "none";
-  elements.sizeRow.style.display = "none";
-  elements.chargeRow.style.display = "none";
-  elements.sep2.style.display = "none";
-  elements.optionsRow.style.display = "none";
-}
+  // ── State ────────────────────────────────────────────────────────────────────
 
-// ============================================================================
-// Event Listeners
-// ============================================================================
+  const state = {
+    authenticated: false,
+    nodes: [],            // simulation node objects (keep x/y across merges)
+    edges: [],
+    nodeByName: new Map(),
+    selected: null,
+    panelRequest: 0,
+    nodeSize: 1,
+    charge: -50,
+    showLabels: true,
+    audio: null,
+    audioBtn: null,
+  };
 
-elements.spotifyBtn.addEventListener("click", () => {
-  window.location.href = "/login";
-});
+  const $ = id => document.getElementById(id);
+  const el = {
+    controls: $("controls"), menuToggle: $("menuToggle"),
+    spotifyBtn: $("spotifyBtn"), spotifyConnected: $("spotifyConnected"),
+    spotifyUserLabel: $("spotifyUserLabel"), spotifyDisconnect: $("spotifyDisconnect"),
+    lastfmConnected: $("lastfmConnected"), lastfmUserLabel: $("lastfmUserLabel"),
+    lastfmDisconnect: $("lastfmDisconnect"), lastfmInput: $("lastfmInput"),
+    lastfmUsername: $("lastfmUsername"), lastfmGo: $("lastfmGo"), lastfmError: $("lastfmError"),
+    initRow: $("initRow"), initBtn: $("initBtn"), initStatus: $("initStatus"),
+    sep1: $("sep1"), sizeRow: $("sizeRow"), nodeSizeSlider: $("nodeSizeSlider"),
+    nodeSizeValue: $("nodeSizeValue"), chargeRow: $("chargeRow"), chargeSlider: $("chargeSlider"),
+    chargeValue: $("chargeValue"), sep2: $("sep2"), optionsRow: $("optionsRow"),
+    labelsCheck: $("labelsCheck"), artistPanel: $("artistPanel"), panelClose: $("panelClose"),
+    panelContent: $("panelContent"),
+  };
 
-elements.spotifyDisconnect.addEventListener("click", async () => {
-  await fetch("/api/spotify/logout", { method: "POST" });
-  location.reload();
-});
+  // ── Auth UI ──────────────────────────────────────────────────────────────────
 
-elements.lastfmGo.addEventListener("click", async () => {
-  const username = elements.lastfmUsername.value.trim();
-  if (!username) return;
+  function updateAuthUI() {
+    if (window.SPOTIFY_DISPLAY_NAME) {
+      state.authenticated = true;
+      el.spotifyBtn.style.display = "none";
+      el.spotifyConnected.style.display = "block";
+      el.spotifyUserLabel.textContent = window.SPOTIFY_DISPLAY_NAME;
+    } else if (window.LASTFM_USER) {
+      state.authenticated = true;
+      el.lastfmInput.style.display = "none";
+      el.lastfmConnected.style.display = "block";
+      el.lastfmUserLabel.textContent = window.LASTFM_USER;
+    }
+    const show = state.authenticated ? "block" : "none";
+    [el.initRow, el.sep1, el.sizeRow, el.chargeRow, el.sep2, el.optionsRow]
+      .forEach(e => { e.style.display = show; });
+  }
 
-  try {
-    const res = await fetch("/api/lastfm/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username })
-    });
-    if (res.ok) {
+  el.spotifyBtn.addEventListener("click", () => { window.location.href = "/login"; });
+  el.spotifyDisconnect.addEventListener("click", async () => {
+    await fetch("/api/spotify/logout", { method: "POST" });
+    location.reload();
+  });
+  el.lastfmDisconnect.addEventListener("click", async () => {
+    await fetch("/api/lastfm/logout", { method: "POST" });
+    location.reload();
+  });
+
+  async function lastfmLogin() {
+    const username = el.lastfmUsername.value.trim();
+    if (!username) return;
+    el.lastfmError.style.display = "none";
+    try {
+      await getJson("/api/lastfm/login", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      });
       location.reload();
-    } else {
-      elements.lastfmError.style.display = "block";
+    } catch (_) {
+      el.lastfmError.style.display = "block";
     }
-  } catch (e) {
-    elements.lastfmError.style.display = "block";
   }
-});
+  el.lastfmGo.addEventListener("click", lastfmLogin);
+  el.lastfmUsername.addEventListener("keydown", e => { if (e.key === "Enter") lastfmLogin(); });
 
-elements.lastfmDisconnect.addEventListener("click", async () => {
-  await fetch("/api/lastfm/logout", { method: "POST" });
-  location.reload();
-});
+  // ── Controls ─────────────────────────────────────────────────────────────────
 
-elements.initBtn.addEventListener("click", initializeMap);
-elements.panelClose.addEventListener("click", closePanel);
-elements.menuToggle.addEventListener("click", () => {
-  elements.controls.classList.toggle("minimized");
-});
+  el.menuToggle.addEventListener("click", () => el.controls.classList.toggle("minimized"));
+  el.panelClose.addEventListener("click", () => { select(null); closePanel(); });
 
-elements.nodeSizeSlider.addEventListener("input", (e) => {
-  state.nodeSize = parseFloat(e.target.value);
-  elements.nodeSizeValue.textContent = state.nodeSize.toFixed(2);
-  updateNodeSizes();
-});
+  el.nodeSizeSlider.addEventListener("input", e => {
+    state.nodeSize = parseFloat(e.target.value);
+    el.nodeSizeValue.textContent = state.nodeSize.toFixed(2);
+    graph.restyle();
+  });
+  el.chargeSlider.addEventListener("input", e => {
+    state.charge = parseInt(e.target.value, 10);
+    el.chargeValue.textContent = state.charge;
+    graph.setCharge(state.charge);
+  });
+  el.labelsCheck.addEventListener("change", e => {
+    state.showLabels = e.target.checked;
+    graph.restyle();
+  });
 
-elements.chargeSlider.addEventListener("input", (e) => {
-  state.charge = parseInt(e.target.value);
-  elements.chargeValue.textContent = state.charge;
-  if (state.simulation) {
-    state.simulation.force("charge").strength(state.charge);
-    state.simulation.alpha(0.3).restart();
-  }
-});
+  // ── Status box ───────────────────────────────────────────────────────────────
 
-elements.labelsCheck.addEventListener("change", (e) => {
-  state.showLabels = e.target.checked;
-  updateLabels();
-});
-
-// ============================================================================
-// Map Initialization
-// ============================================================================
-
-async function initializeMap() {
-  if (!state.authenticated) {
-    alert("Please authenticate first");
-    return;
+  function statusLine(text, kind) {
+    const div = document.createElement("div");
+    div.className = "status-line" + (kind ? ` status-${kind}` : "");
+    div.textContent = text;
+    return div;
   }
 
-  elements.initBtn.disabled = true;
-  elements.initBtn.classList.add("loading");
+  function setStatus(text, kind) {
+    el.initStatus.style.display = "block";
+    el.initStatus.replaceChildren(statusLine(text, kind));
+  }
 
-  try {
-    // Show status panel
-    elements.initStatus.style.display = "block";
-    elements.initStatus.innerHTML = '';
-    elements.initStatus.classList.add("auth-status");
+  // ── Map generation (SSE) ─────────────────────────────────────────────────────
 
-    let firstMessage = true;
-
-    // Use streaming endpoint for progress updates
-    const response = await fetch("/api/map/init/stream", { method: "POST" });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to initialize map");
-    }
-
-    // Process Server-Sent Events
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = "";
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-
-      // Process complete lines
-      for (let i = 0; i < lines.length - 1; i++) {
-        const line = lines[i];
-        if (line.startsWith("data: ")) {
+  async function generateMap() {
+    el.initBtn.disabled = true;
+    el.initBtn.classList.add("loading");
+    el.initStatus.style.display = "block";
+    el.initStatus.replaceChildren();
+    try {
+      const res = await fetch("/api/map/init/stream", { method: "POST" });
+      if (!res.ok || !res.body) {
+        let msg = `HTTP ${res.status}`;
+        try { msg = (await res.json()).error || msg; } catch (_) { /* keep status */ }
+        throw new Error(msg);
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      for (;;) {
+        const { done, value } = await reader.read();
+        buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+        const lines = buffer.split("\n");
+        buffer = done ? "" : lines.pop();
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;   // ": keepalive" comments, blank lines
+          let event;
           try {
-            const event = JSON.parse(line.slice(6));
-
-            if (event.error) {
-              throw new Error(event.error);
-            }
-
-            if (event.message) {
-              // Clear initial content on first message
-              if (firstMessage) {
-                elements.initStatus.innerHTML = '';
-                firstMessage = false;
-              }
-
-              // Update status with progress message
-              const messageDiv = document.createElement("div");
-              messageDiv.style.cssText = "font-size: 9px; color: rgba(255,255,255,0.7); margin: 3px 0; font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;";
-              messageDiv.textContent = event.message.trim();
-
-              // Append to status, keeping latest messages
-              elements.initStatus.appendChild(messageDiv);
-
-              // Scroll to bottom
-              elements.initStatus.scrollTop = elements.initStatus.scrollHeight;
-            }
-
-            if (event.complete) {
-              // Map generation complete
-              state.graph = {
-                nodes: event.nodes || [],
-                edges: event.edges || []
-              };
-
-              state.nodeMap = {};
-              state.graph.nodes.forEach(node => {
-                state.nodeMap[node.name] = node;
-              });
-
-              state.initialized = true;
-
-              // Show final success message
-              elements.initStatus.innerHTML = `<div style="color: rgba(100, 200, 100, 0.8);">✓ Map ready! ${state.graph.nodes.length} nodes, ${state.graph.edges.length} connections</div>`;
-              setTimeout(() => {
-                elements.initStatus.style.display = "none";
-              }, 3000);
-
-              renderGraph();
-              return;
-            }
-          } catch (e) {
-            console.error("Error parsing event:", e);
+            event = JSON.parse(line.slice(6));
+          } catch (_) {
+            console.warn("Ignoring malformed progress event:", line);
+            continue;
+          }
+          // Handled outside the parse try/catch so the error reaches the user (BUG-14).
+          if (event.error) throw new Error(event.error);
+          if (event.message) {
+            el.initStatus.appendChild(statusLine(event.message));
+            el.initStatus.scrollTop = el.initStatus.scrollHeight;
+          }
+          if (event.complete) {
+            graph.replace(event.nodes || [], event.edges || []);
+            setStatus(`✓ Map ready! ${state.nodes.length} nodes, ${state.edges.length} connections`, "ok");
+            el.initBtn.textContent = "REGENERATE MY MAP";
+            setTimeout(() => { el.initStatus.style.display = "none"; }, 3000);
+            return;
           }
         }
+        if (done) throw new Error("The connection closed before the map was ready.");
       }
-
-      // Keep incomplete line in buffer
-      buffer = lines[lines.length - 1];
+    } catch (e) {
+      setStatus(`Error: ${e.message}`, "error");
+    } finally {
+      el.initBtn.disabled = false;
+      el.initBtn.classList.remove("loading");
     }
-  } catch (e) {
-    elements.initStatus.style.display = "block";
-    elements.initStatus.innerHTML = `<div style="color: rgba(255, 100, 100, 0.8);">Error: ${e.message}</div>`;
-  } finally {
-    elements.initBtn.disabled = false;
-    elements.initBtn.classList.remove("loading");
   }
-}
+  el.initBtn.addEventListener("click", generateMap);
 
-// ============================================================================
-// Graph Rendering (D3)
-// ============================================================================
-
-function renderGraph() {
-  // Clear previous
-  d3.select("#graph").selectAll("*").remove();
-
-  if (!state.graph.nodes.length) {
-    return;
-  }
-
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-
-  const svg = d3.select("#graph")
-    .attr("width", width)
-    .attr("height", height);
-
-  // Create container group
-  const g = svg.append("g");
-
-  // Add zoom/pan behavior
-  const zoom = d3.zoom()
-    .on("zoom", (event) => {
-      g.attr("transform", event.transform);
-    });
-  svg.call(zoom);
-
-  // Create simulation
-  state.simulation = d3.forceSimulation(state.graph.nodes)
-    .force("link", d3.forceLink(state.graph.edges)
-      .id(d => d.name)
-      .distance(100)
-      .strength(0.5))
-    .force("charge", d3.forceManyBody().strength(state.charge))
-    .force("center", d3.forceCenter(width / 2, height / 2))
-    .force("collide", d3.forceCollide().radius(20));
-
-  // Render edges
-  const edges = g.selectAll(".link")
-    .data(state.graph.edges)
-    .enter()
-    .append("line")
-    .attr("class", "link")
-    .attr("stroke", "rgba(255, 255, 255, 0.1)")
-    .attr("stroke-width", 1);
-
-  // Render nodes
-  const nodes = g.selectAll(".node")
-    .data(state.graph.nodes, d => d.name)
-    .enter()
-    .append("circle")
-    .attr("class", "node")
-    .attr("r", d => {
-      // Size by listener count (log-normalized)
-      const listeners = d.listeners || 0;
-      const logListeners = Math.log1p(listeners);
-      return Math.max(4, Math.min(12, 3 + logListeners / 1000000)) * state.nodeSize;
-    })
-    .attr("fill", d => {
-      const genre = d.genre || "Unknown";
-      return getGenreColor(genre);
-    })
-    .attr("stroke", "rgba(255, 255, 255, 0.3)")
-    .attr("stroke-width", 1.5)
-    .attr("cursor", "pointer")
-    .on("click", (event, d) => {
-      event.stopPropagation();
-      selectArtist(d.name);
-      showPanel(d);
-    })
-    .on("mouseover", function(event, d) {
-      const genre = d.genre || "Unknown";
-      const baseColor = getGenreColor(genre);
-      d3.select(this)
-        .attr("fill", baseColor)
-        .attr("opacity", 0.7)
-        .attr("r", d => {
-          const listeners = d.listeners || 0;
-          const logListeners = Math.log1p(listeners);
-          return Math.max(4, Math.min(12, 3 + logListeners / 1000000)) * state.nodeSize * 1.3;
-        });
-    })
-    .on("mouseout", function() {
-      d3.select(this)
-        .attr("opacity", 1)
-        .attr("r", d => {
-          const listeners = d.listeners || 0;
-          const logListeners = Math.log1p(listeners);
-          return Math.max(4, Math.min(12, 3 + logListeners / 1000000)) * state.nodeSize;
-        });
-    });
-
-  // Render labels
-  const labels = g.selectAll(".label")
-    .data(state.graph.nodes, d => d.name)
-    .enter()
-    .append("text")
-    .attr("class", "label")
-    .attr("font-size", 10)
-    .attr("fill", "rgba(255, 255, 255, 0.5)")
-    .attr("text-anchor", "middle")
-    .attr("pointer-events", "none")
-    .attr("opacity", state.showLabels ? 1 : 0)
-    .text(d => d.name);
-
-  // Update positions on simulation tick
-  state.simulation.on("tick", () => {
-    edges
-      .attr("x1", d => d.source.x)
-      .attr("y1", d => d.source.y)
-      .attr("x2", d => d.target.x)
-      .attr("y2", d => d.target.y);
-
-    nodes
-      .attr("cx", d => d.x)
-      .attr("cy", d => d.y);
-
-    labels
-      .attr("x", d => d.x)
-      .attr("y", d => d.y + 15);
-  });
-
-  // Click on background to deselect
-  svg.on("click", () => {
-    selectArtist(null);
-    closePanel();
-  });
-}
-
-function updateNodeSizes() {
-  d3.selectAll(".node")
-    .transition()
-    .duration(300)
-    .attr("r", d => 5 * state.nodeSize);
-
-  d3.selectAll(".label")
-    .transition()
-    .duration(300)
-    .attr("y", d => d.y + (15 * state.nodeSize));
-}
-
-function updateLabels() {
-  d3.selectAll(".label")
-    .transition()
-    .duration(200)
-    .attr("opacity", state.showLabels ? 1 : 0);
-}
-
-function selectArtist(name) {
-  state.selectedArtist = name;
-  d3.selectAll(".node")
-    .attr("stroke", d => d.name === name ? "rgba(100, 200, 100, 0.9)" : "rgba(255, 255, 255, 0.3)")
-    .attr("stroke-width", d => d.name === name ? 2.5 : 1.5);
-}
-
-// ============================================================================
-// Artist Panel
-// ============================================================================
-
-function showPanel(artist) {
-  // Stop any currently playing audio
-  if (state.currentAudio) {
-    state.currentAudio.pause();
-    state.currentAudio = null;
-    if (state.currentTrackEl) {
-      state.currentTrackEl.classList.remove("playing");
+  async function loadSavedMap() {
+    try {
+      const data = await getJson("/api/map/get");
+      if (data.nodes && data.nodes.length) {
+        graph.replace(data.nodes, data.edges || []);
+        el.initBtn.textContent = "REGENERATE MY MAP";
+      }
+    } catch (e) {
+      console.warn("Could not load saved map:", e.message);
     }
   }
 
-  const imageUrl = artist.image_url || "";
-  const bio = artist.bio || "";
-  const tags = artist.tags || [];
-  const listeners = artist.listeners || 0;
-  const topTracks = artist.top_tracks || [];
+  // ── Graph ────────────────────────────────────────────────────────────────────
 
-  let html = `<div class="panel-body">`;
+  const graph = (() => {
+    const svg = d3.select("#graph");
+    const root = svg.append("g");
+    const gEdges = root.append("g").attr("class", "edges");
+    const gNodes = root.append("g").attr("class", "nodes");
+    const gLabels = root.append("g").attr("class", "labels");
+    const zoom = d3.zoom().scaleExtent([0.1, 8]).on("zoom", e => root.attr("transform", e.transform));
+    svg.call(zoom).on("dblclick.zoom", null);
+    svg.on("click", () => { select(null); closePanel(); });
 
-  // Hero image
-  if (imageUrl) {
-    html += `<img class="panel-hero" src="${imageUrl}" alt="${artist.name}" />`;
-  }
+    let edgeSel = gEdges.selectAll("line");
+    let nodeSel = gNodes.selectAll("circle");
+    let labelSel = gLabels.selectAll("text");
+    let radiusScale = () => 4;
 
-  // Name and listeners
-  html += `
-    <div class="panel-name">${artist.name}</div>
-    <div class="panel-meta">${listeners.toLocaleString()} listeners</div>
-  `;
+    const sim = d3.forceSimulation()
+      .force("link", d3.forceLink().id(d => d.name).distance(90).strength(e => 0.2 + 0.5 * (e.weight || 0.5)))
+      .force("charge", d3.forceManyBody().strength(state.charge * 4))
+      .force("collide", d3.forceCollide().radius(d => radius(d) + 4))
+      .force("x", d3.forceX().strength(0.04))
+      .force("y", d3.forceY().strength(0.04))
+      .on("tick", ticked);
+    sim.stop();
 
-  // Tags
-  if (tags.length > 0) {
-    html += `<div class="panel-tags">`;
-    tags.slice(0, 5).forEach(tag => {
-      html += `<div class="panel-tag">${tag}</div>`;
+    function size() {
+      const w = window.innerWidth, h = window.innerHeight;
+      svg.attr("width", w).attr("height", h);
+      sim.force("x").x(w / 2);
+      sim.force("y").y(h / 2);
+      return { w, h };
+    }
+    size();
+    let resizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { size(); sim.alpha(0.1).restart(); }, 150);
     });
-    html += `</div>`;
-  }
 
-  // Bio
-  if (bio) {
-    html += `<div class="panel-bio">${bio.substring(0, 300)}${bio.length > 300 ? "..." : ""}</div>`;
-  }
+    // Radius from listeners, sqrt-scaled across the map's known range (BUG-15).
+    function rescale() {
+      const known = state.nodes.map(d => d.listeners || 0).filter(v => v > 0);
+      const [lo, hi] = known.length ? d3.extent(known) : [0, 1];
+      const s = d3.scaleSqrt().domain([lo, Math.max(hi, lo + 1)]).range([5, 18]).clamp(true);
+      radiusScale = d => (d.listeners > 0 ? s(d.listeners) : 4);
+    }
+    function radius(d) { return radiusScale(d) * state.nodeSize; }
 
-  // Top tracks
-  if (topTracks.length > 0) {
-    html += `<div class="panel-section-label">TOP TRACKS</div>`;
-    html += `<div style="margin-bottom: 12px;">`;
-    topTracks.slice(0, 10).forEach((track, idx) => {
-      const trackName = track.name || "";
-      const albumArt = track.album_art || "";
-      const previewUrl = track.preview_url || "";
-      html += `
-        <div class="track-row" data-preview="${previewUrl}" data-track-idx="${idx}">
-          ${albumArt ? `<img class="track-art" src="${albumArt}" alt="${trackName}" />` : `<div class="track-art" style="background: rgba(255,255,255,0.1);"></div>`}
-          <div class="track-name" title="${trackName}">${trackName}</div>
-          ${previewUrl ? `<button class="track-play" data-track-idx="${idx}">▶ PLAY</button>` : `<span style="font-size: 8px; color: rgba(255,255,255,0.25);">N/A</span>`}
-        </div>
-      `;
-    });
-    html += `</div>`;
-  }
+    function ticked() {
+      edgeSel.attr("x1", e => e.source.x).attr("y1", e => e.source.y)
+             .attr("x2", e => e.target.x).attr("y2", e => e.target.y);
+      nodeSel.attr("cx", d => d.x).attr("cy", d => d.y);
+      labelSel.attr("x", d => d.x).attr("y", d => d.y + radius(d) + 11);
+    }
 
-  html += `</div>`;
+    function restyle() {
+      nodeSel
+        .attr("r", radius)
+        .attr("fill", d => genreColor(d.genre || "Unknown"))
+        .attr("stroke", d => d.name === state.selected ? "rgba(100,200,100,0.95)"
+                           : d.seed ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.25)")
+        .attr("stroke-width", d => d.name === state.selected ? 2.5 : d.seed ? 2 : 1);
+      labelSel
+        .attr("opacity", state.showLabels ? 1 : 0)
+        .attr("font-weight", d => d.seed ? 500 : 400)
+        .attr("fill", d => d.seed ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.5)");
+      sim.force("collide").radius(d => radius(d) + 4);
+      ticked();
+    }
 
-  elements.panelContent.innerHTML = html;
-  elements.artistPanel.classList.add("open");
+    function join() {
+      edgeSel = gEdges.selectAll("line")
+        .data(state.edges, e => `${nameOf(e.source)}→${nameOf(e.target)}`)
+        .join("line")
+        .attr("stroke", "rgba(255,255,255,0.14)")
+        .attr("stroke-width", e => 0.6 + 1.6 * (e.weight || 0.3));
+      nodeSel = gNodes.selectAll("circle")
+        .data(state.nodes, d => d.name)
+        .join(enter => enter.append("circle")
+          .attr("class", "node")
+          .attr("data-name", d => d.name)
+          .style("cursor", "pointer")
+          .on("click", (event, d) => { event.stopPropagation(); select(d.name); openPanel(d); })
+          .call(d3.drag()
+            .on("start", (event, d) => { if (!event.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
+            .on("drag", (event, d) => { d.fx = event.x; d.fy = event.y; })
+            .on("end", (event, d) => { if (!event.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })));
+      labelSel = gLabels.selectAll("text")
+        .data(state.nodes, d => d.name)
+        .join("text")
+        .attr("class", "label")
+        .attr("font-size", 10)
+        .attr("text-anchor", "middle")
+        .attr("pointer-events", "none")
+        .text(d => d.name);
+      rescale();
+      restyle();
+    }
 
-  // Wire up play button listeners
-  document.querySelectorAll(".track-play").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const trackIdx = parseInt(btn.dataset.trackIdx);
-      const track = topTracks[trackIdx];
-      const previewUrl = track.preview_url;
+    function nameOf(n) { return typeof n === "object" ? n.name : n; }
 
-      if (!previewUrl) return;
+    function setData(nodes, edges) {
+      state.nodes = nodes;
+      state.nodeByName = new Map(nodes.map(n => [n.name, n]));
+      state.edges = edges.filter(e => state.nodeByName.has(nameOf(e.source)) && state.nodeByName.has(nameOf(e.target)))
+                         .map(e => ({ ...e, source: nameOf(e.source), target: nameOf(e.target) }));
+      sim.nodes(state.nodes);
+      sim.force("link").links(state.edges);
+      join();
+    }
 
-      // Toggle playback
-      if (state.currentAudio && state.currentTrackEl === btn) {
-        state.currentAudio.pause();
-        state.currentAudio = null;
-        btn.classList.remove("playing");
-        state.currentTrackEl = null;
-      } else {
-        // Stop other audio
-        if (state.currentAudio) {
-          state.currentAudio.pause();
-        }
-        if (state.currentTrackEl) {
-          state.currentTrackEl.classList.remove("playing");
-        }
+    function fit(duration) {
+      if (!state.nodes.length) return;
+      const { w, h } = { w: window.innerWidth, h: window.innerHeight };
+      const xs = state.nodes.map(d => d.x), ys = state.nodes.map(d => d.y);
+      const pad = 60;
+      const x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad;
+      const y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+      const k = Math.min(w / (x1 - x0), h / (y1 - y0), 2);
+      const t = d3.zoomIdentity.translate(w / 2 - k * (x0 + x1) / 2, h / 2 - k * (y0 + y1) / 2).scale(k);
+      (duration ? svg.transition().duration(duration) : svg).call(zoom.transform, t);
+    }
 
-        // Play new audio
-        const audio = new Audio(previewUrl);
-        audio.addEventListener("ended", () => {
-          btn.classList.remove("playing");
-          state.currentAudio = null;
-          state.currentTrackEl = null;
+    /** Replace the whole map (initial load / regenerate). */
+    function replace(nodes, edges) {
+      const { w, h } = size();
+      nodes.forEach((n, i) => {   // start on a small circle so the layout unfolds evenly
+        const a = (2 * Math.PI * i) / Math.max(nodes.length, 1);
+        n.x = w / 2 + 40 * Math.cos(a); n.y = h / 2 + 40 * Math.sin(a);
+      });
+      setData(nodes, edges);
+      sim.alpha(1);
+      sim.tick(Math.ceil(Math.log(sim.alphaMin()) / Math.log(1 - sim.alphaDecay())));
+      ticked();
+      fit(0);
+      sim.alpha(0.05).restart();
+    }
+
+    /** Merge a server map into the running simulation, keeping existing positions. */
+    function merge(nodes, edges, parentName) {
+      const parent = state.nodeByName.get(parentName);
+      const merged = nodes.map(n => {
+        const existing = state.nodeByName.get(n.name);
+        if (existing) return Object.assign(existing, n, { x: existing.x, y: existing.y });
+        const a = Math.random() * 2 * Math.PI;
+        return Object.assign(n, {
+          x: (parent ? parent.x : window.innerWidth / 2) + 30 * Math.cos(a),
+          y: (parent ? parent.y : window.innerHeight / 2) + 30 * Math.sin(a),
         });
-        audio.play();
-        state.currentAudio = audio;
-        state.currentTrackEl = btn;
+      });
+      setData(merged, edges);
+      sim.alpha(0.5).restart();
+    }
+
+    function setCharge(c) {
+      sim.force("charge").strength(c * 4);
+      sim.alpha(0.3).restart();
+    }
+
+    return { replace, merge, restyle, setCharge, fit };
+  })();
+
+  function select(name) {
+    state.selected = name;
+    graph.restyle();
+  }
+
+  // ── Artist panel ─────────────────────────────────────────────────────────────
+
+  function stopAudio() {
+    if (state.audio) state.audio.pause();
+    if (state.audioBtn) {
+      state.audioBtn.classList.remove("playing");
+      state.audioBtn.textContent = "▶ PLAY";
+    }
+    state.audio = null;
+    state.audioBtn = null;
+  }
+
+  function closePanel() {
+    stopAudio();
+    state.panelRequest++;
+    el.artistPanel.classList.remove("open");
+    el.panelContent.innerHTML = "";
+  }
+
+  function renderPanel(artist, { loading = false, error = "" } = {}) {
+    const img = safeUrl(artist.image_url);
+    const tags = (artist.tags || []).slice(0, 5);
+    const tracks = (artist.top_tracks || []).slice(0, 10);
+    const listeners = artist.listeners > 0 ? `${Number(artist.listeners).toLocaleString()} listeners` : "";
+    const meta = [listeners, artist.seed ? "one of your artists" : artist.parent ? `similar to ${artist.parent}` : ""]
+      .filter(Boolean).join(" · ");
+
+    let html = img ? `<img class="panel-hero" src="${img}" alt="" />` : "";
+    html += `<div class="panel-body">`;
+    html += `<div class="panel-name">${escapeHtml(artist.name)}</div>`;
+    html += `<div class="panel-meta">${escapeHtml(meta)}</div>`;
+    html += artist.expanded
+      ? `<button class="panel-expand" id="expandBtn" disabled>EXPANDED</button>`
+      : `<button class="panel-expand" id="expandBtn">+ EXPAND: ADD SIMILAR ARTISTS</button>`;
+    html += `<div class="panel-error" id="panelError">${escapeHtml(error)}</div>`;
+    if (tags.length) {
+      html += `<div class="panel-tags">${tags.map(t => `<div class="panel-tag">${escapeHtml(t)}</div>`).join("")}</div>`;
+    }
+    if (artist.bio) html += `<div class="panel-bio">${escapeHtml(artist.bio)}</div>`;
+    if (loading) html += `<div class="panel-loading"><div class="spinner"></div></div>`;
+    if (tracks.length) {
+      html += `<div class="panel-section-label">TOP TRACKS</div><div class="panel-tracks">`;
+      tracks.forEach((t, i) => {
+        const art = safeUrl(t.album_art);
+        html += `<div class="track-row">` +
+          (art ? `<img class="track-art" src="${art}" alt="" />` : `<div class="track-art track-art-empty"></div>`) +
+          `<div class="track-name" title="${escapeHtml(t.name)}">${escapeHtml(t.name)}</div>` +
+          `<button class="track-play" data-track-idx="${i}">▶ PLAY</button></div>`;
+      });
+      html += `</div>`;
+    }
+    html += `</div>`;
+    el.panelContent.innerHTML = html;
+    el.artistPanel.classList.add("open");
+
+    $("expandBtn").addEventListener("click", e => { e.stopPropagation(); expand(artist); });
+    el.panelContent.querySelectorAll(".track-play").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.stopPropagation();
+        playTrack(btn, artist, tracks[parseInt(btn.dataset.trackIdx, 10)]);
+      });
+    });
+  }
+
+  async function openPanel(artist) {
+    stopAudio();
+    const myRequest = ++state.panelRequest;
+    renderPanel(artist, { loading: !artist.details_loaded });
+    if (artist.details_loaded) return;
+    try {
+      const details = await getJson(`/api/artist?name=${encodeURIComponent(artist.name)}`);
+      Object.assign(artist, details);
+      graph.restyle();
+      if (myRequest === state.panelRequest) renderPanel(artist);
+    } catch (e) {
+      if (myRequest === state.panelRequest) renderPanel(artist, { error: `Couldn't load details: ${e.message}` });
+    }
+  }
+
+  async function expand(artist) {
+    const btn = $("expandBtn");
+    const myRequest = state.panelRequest;
+    if (btn) { btn.disabled = true; btn.textContent = "EXPANDING…"; }
+    try {
+      const data = await getJson("/api/map/expand", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ artist: artist.name }),
+      });
+      graph.merge(data.nodes || [], data.edges || [], artist.name);
+      artist.expanded = true;
+      if (myRequest === state.panelRequest) {
+        renderPanel(artist);
+        const added = (data.added_nodes || []).length;
+        $("panelError").textContent = added ? "" : "No new similar artists found.";
+      }
+    } catch (e) {
+      if (myRequest === state.panelRequest) renderPanel(artist, { error: `Expand failed: ${e.message}` });
+    }
+  }
+
+  async function playTrack(btn, artist, track) {
+    if (state.audioBtn === btn) { stopAudio(); return; }
+    stopAudio();
+    state.audioBtn = btn;
+    btn.textContent = "…";
+    const params = new URLSearchParams();
+    if (track.deezer_id) params.set("deezer_id", track.deezer_id);
+    params.set("artist", track.artist || artist.name);
+    params.set("title", track.name || "");
+    try {
+      const { preview_url: url } = await getJson(`/api/preview?${params}`);
+      if (state.audioBtn !== btn) return;          // user clicked something else meanwhile
+      if (!url) throw new Error("no preview");
+      const audio = new Audio(url);
+      audio.addEventListener("ended", stopAudio);
+      state.audio = audio;
+      await audio.play();                          // rejects for dead/blocked media (BUG-38)
+      if (state.audioBtn === btn) {
         btn.classList.add("playing");
+        btn.textContent = "❚❚ STOP";
       }
-    });
-  });
-}
-
-function closePanel() {
-  // Stop any playing audio
-  if (state.currentAudio) {
-    state.currentAudio.pause();
-    state.currentAudio = null;
-  }
-  if (state.currentTrackEl) {
-    state.currentTrackEl.classList.remove("playing");
-    state.currentTrackEl = null;
+    } catch (_) {
+      if (state.audioBtn === btn) {
+        stopAudio();
+        btn.textContent = "N/A";
+        btn.disabled = true;
+      }
+    }
   }
 
-  elements.artistPanel.classList.remove("open");
-  elements.panelContent.innerHTML = "";
-}
+  // ── Boot ─────────────────────────────────────────────────────────────────────
 
-// ============================================================================
-// Initialization
-// ============================================================================
-
-updateAuthUI();
+  updateAuthUI();
+  if (state.authenticated) loadSavedMap();
+})();

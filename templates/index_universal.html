@@ -487,6 +487,31 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    .status-line { font-family: monospace; color: rgba(255, 255, 255, 0.7); }
+    .status-ok { color: rgba(100, 200, 100, 0.85); }
+    .status-error { color: rgba(255, 110, 110, 0.9); white-space: normal !important; }
+
+    /* ── Panel: expand / errors / loading ─── */
+    .panel-expand {
+      width: 100%;
+      margin: 2px 0 10px;
+      background: none;
+      border: 1px solid rgba(100, 200, 100, 0.45);
+      color: rgba(100, 200, 100, 0.9);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      padding: 8px;
+      cursor: pointer;
+    }
+    .panel-expand:hover:not(:disabled) { background: rgba(100, 200, 100, 0.08); }
+    .panel-expand:disabled { border-color: rgba(255, 255, 255, 0.12); color: rgba(255, 255, 255, 0.3); cursor: default; }
+    .panel-error { font-size: 9px; color: rgba(255, 110, 110, 0.9); margin-bottom: 10px; }
+    .panel-error:empty { display: none; }
+    .panel-loading { display: flex; justify-content: center; padding: 16px 0; }
+    .track-art-empty { background: rgba(255, 255, 255, 0.1); }
+    .track-play:disabled { opacity: 0.35; cursor: default; }
   </style>
 </head>
 <body>
