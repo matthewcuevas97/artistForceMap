@@ -11,17 +11,25 @@ from backend.cache import get_cached_artist, set_cached_artist
 from backend.user_data import load_user_db, update_user_db
 
 
+class EnrichmentUnavailable(Exception):
+    """Last.fm failed transiently; the result must not be cached."""
+
+
 def enrich_artist_with_lastfm(artist_name: str) -> Dict[str, Any]:
     """
     Fetch enriched data from Last.fm for a single artist.
     Returns {name, listeners, tags, image_url, bio}.
+    Raises EnrichmentUnavailable if the tag lookup failed (rate limit, network),
+    so a temporary outage is never cached as "this artist has no tags" (BUG-23).
     """
+    # Get top tags first: they drive genre, seed diversity and edges.
+    tags = get_artist_top_tags(artist_name, limit=10)
+    if tags is None:
+        raise EnrichmentUnavailable(artist_name)
+
     # Get basic info
     info = get_artist_info(artist_name)
     listeners = info.get("listeners", 0) if info else 0
-
-    # Get top tags
-    tags = get_artist_top_tags(artist_name, limit=10)
 
     # Get image and bio
     image_url, bio = get_artist_image_and_bio(artist_name)
@@ -29,7 +37,7 @@ def enrich_artist_with_lastfm(artist_name: str) -> Dict[str, Any]:
     return {
         "name": artist_name,
         "listeners": listeners,
-        "tags": tags or [],
+        "tags": tags,
         "image_url": image_url,
         "bio": bio,
     }

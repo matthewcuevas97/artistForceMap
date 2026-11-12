@@ -8,24 +8,41 @@ load_dotenv()
 API_KEY = os.getenv("LASTFM_API_KEY")
 BASE_URL = "https://ws.audioscrobbler.com/2.0/"
 
+# Last.fm error 6 = "artist/user not found": a genuine empty answer, safe to cache.
+# Anything else (rate limit 29, service errors, network failures) is transient.
+LASTFM_NOT_FOUND = 6
+
+
+class _Transient(Exception):
+    pass
+
+
+def _artist_call(method, artist_name, **extra):
+    """
+    GET an artist.* method. Returns the JSON dict, {} for "artist not found",
+    or raises _Transient for network/rate-limit/service errors.
+    """
+    params = {"method": method, "artist": artist_name, "api_key": API_KEY, "format": "json", **extra}
+    try:
+        data = requests.get(BASE_URL, params=params, timeout=10).json()
+    except Exception as exc:
+        raise _Transient(str(exc))
+    if "error" in data:
+        if data.get("error") == LASTFM_NOT_FOUND:
+            return {}
+        raise _Transient(data.get("message", "Last.fm error"))
+    return data
+
 
 def get_similar_artists(artist_name, limit=50, threshold=0.1):
-    params = {
-        "method": "artist.getSimilar",
-        "artist": artist_name,
-        "limit": limit,
-        "api_key": API_KEY,
-        "format": "json",
-    }
+    """
+    [{name, match}] above `threshold`; [] if Last.fm has none.
+    None on a transient failure, so callers can avoid caching it.
+    """
     try:
-        response = requests.get(BASE_URL, params=params, timeout=10)
-        data = response.json()
-    except Exception:
-        return []
-
-    if "error" in data:
-        return []
-
+        data = _artist_call("artist.getSimilar", artist_name, limit=limit)
+    except _Transient:
+        return None
     artists = data.get("similarartists", {}).get("artist", [])
     return [
         {"name": a["name"], "match": float(a["match"])}
@@ -34,36 +51,22 @@ def get_similar_artists(artist_name, limit=50, threshold=0.1):
 
 
 def get_artist_top_tags(artist_name, limit=100):
-    """Returns a list of tag name strings."""
-    params = {
-        "method": "artist.getTopTags",
-        "artist": artist_name,
-        "limit": limit,
-        "api_key": API_KEY,
-        "format": "json",
-    }
+    """Lower-cased tag names; [] if none. None on a transient failure (don't cache it)."""
     try:
-        response = requests.get(BASE_URL, params=params, timeout=10)
-        data = response.json()
-        if "error" in data:
-            return []
-        tags = data.get("toptags", {}).get("tag", [])
-        return [t["name"].lower() for t in tags]
-    except Exception:
-        return []
+        data = _artist_call("artist.getTopTags", artist_name, limit=limit)
+    except _Transient:
+        return None
+    tags = data.get("toptags", {}).get("tag", [])
+    return [t["name"].lower() for t in tags]
 
 
 def get_artist_info(artist_name):
-    params = {
-        "method": "artist.getInfo",
-        "artist": artist_name,
-        "api_key": API_KEY,
-        "format": "json",
-    }
-    response = requests.get(BASE_URL, params=params)
-    data = response.json()
-
-    if "error" in data:
+    """{name, listeners}, or None if not found or on any failure."""
+    try:
+        data = _artist_call("artist.getInfo", artist_name)
+    except _Transient:
+        return None
+    if not data:
         return None
 
     artist = data.get("artist", {})
@@ -75,17 +78,12 @@ def get_artist_info(artist_name):
 
 
 def get_artist_image_and_bio(artist_name):
-    """Returns (image_url, bio) — either may be None."""
-    params = {
-        "method": "artist.getInfo",
-        "artist": artist_name,
-        "api_key": API_KEY,
-        "format": "json",
-    }
-    response = requests.get(BASE_URL, params=params, timeout=10)
-    data = response.json()
-
-    if "error" in data:
+    """Returns (image_url, bio) — either may be None (also on any failure)."""
+    try:
+        data = _artist_call("artist.getInfo", artist_name)
+    except _Transient:
+        return None, None
+    if not data:
         return None, None
 
     artist = data.get("artist", {})

@@ -5,11 +5,12 @@ Global caching layer for API requests.
 - NO sensitive data stored: auth tokens, passwords, refresh tokens
 """
 
-import json
 import os
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any, Dict, Optional, List
+
+from backend.storage import file_lock, read_json, safe_id, write_json_atomic
 
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
@@ -28,20 +29,13 @@ DEEZER_CACHE_TTL = 90 * 24 * 60 * 60  # 90 days in seconds
 
 def _load_artist_cache() -> Dict[str, Any]:
     """Load the global artist cache from disk."""
-    if not os.path.exists(ARTIST_CACHE_FILE):
-        return {}
-    try:
-        with open(ARTIST_CACHE_FILE, "r") as f:
-            return json.load(f)
-    except Exception:
-        return {}
+    return read_json(ARTIST_CACHE_FILE, {})
 
 
 def _save_artist_cache(cache: Dict[str, Any]) -> None:
     """Save the global artist cache to disk."""
     try:
-        with open(ARTIST_CACHE_FILE, "w") as f:
-            json.dump(cache, f, indent=2)
+        write_json_atomic(ARTIST_CACHE_FILE, cache)
     except Exception as e:
         print(f"Failed to save artist cache: {e}")
 
@@ -56,22 +50,23 @@ def get_cached_artist(artist_name: str) -> Optional[Dict[str, Any]]:
     Returns:
         Artist dict with info, or None if not cached or expired
     """
-    cache = _load_artist_cache()
-    entry = cache.get(artist_name)
+    with file_lock(ARTIST_CACHE_FILE):
+        cache = _load_artist_cache()
+        entry = cache.get(artist_name)
 
-    if not entry:
-        return None
+        if not entry:
+            return None
 
-    # Check expiry
-    created_at = entry.get("_created_at", 0)
-    if time.time() - created_at > ARTIST_CACHE_TTL:
-        # Expired, remove it
-        del cache[artist_name]
-        _save_artist_cache(cache)
-        return None
+        # Check expiry
+        created_at = entry.get("_created_at", 0)
+        if time.time() - created_at > ARTIST_CACHE_TTL:
+            # Expired, remove it
+            del cache[artist_name]
+            _save_artist_cache(cache)
+            return None
 
-    # Return data (without metadata)
-    return {k: v for k, v in entry.items() if not k.startswith("_")}
+        # Return data (without metadata)
+        return {k: v for k, v in entry.items() if not k.startswith("_")}
 
 
 def set_cached_artist(artist_name: str, data: Dict[str, Any]) -> None:
@@ -82,13 +77,14 @@ def set_cached_artist(artist_name: str, data: Dict[str, Any]) -> None:
         artist_name: Normalized artist name (lowercase)
         data: Artist info dict (no sensitive data)
     """
-    cache = _load_artist_cache()
-    cache[artist_name] = {
-        **data,
-        "_created_at": time.time(),
-        "_updated_at": datetime.now().isoformat()
-    }
-    _save_artist_cache(cache)
+    with file_lock(ARTIST_CACHE_FILE):
+        cache = _load_artist_cache()
+        cache[artist_name] = {
+            **data,
+            "_created_at": time.time(),
+            "_updated_at": datetime.now().isoformat()
+        }
+        _save_artist_cache(cache)
 
 
 def get_or_set_cached_artist(
@@ -159,22 +155,15 @@ def get_cache_stats() -> Dict[str, Any]:
 
 def _load_similar_artists_cache() -> Dict[str, Any]:
     """Load the similar artists cache from disk."""
-    if not os.path.exists(SIMILAR_ARTISTS_CACHE_FILE):
-        return {}
-    try:
-        with open(SIMILAR_ARTISTS_CACHE_FILE, "r") as f:
-            return json.load(f)
-    except Exception:
-        return {}
+    return read_json(SIMILAR_ARTISTS_CACHE_FILE, {})
 
 
 def _save_similar_artists_cache(cache: Dict[str, Any]) -> None:
     """Save the similar artists cache to disk."""
     try:
-        with open(SIMILAR_ARTISTS_CACHE_FILE, "w") as f:
-            json.dump(cache, f, indent=2)
+        write_json_atomic(SIMILAR_ARTISTS_CACHE_FILE, cache)
     except Exception as e:
-        print(f"Failed to save similar artists cache: {e}")
+        print(f"Failed to save similar_artists cache: {e}")
 
 
 def get_cached_similar_artists(artist_name: str) -> Optional[List[Dict[str, Any]]]:
@@ -187,22 +176,23 @@ def get_cached_similar_artists(artist_name: str) -> Optional[List[Dict[str, Any]
     Returns:
         List of similar artist dicts, or None if not cached or expired
     """
-    cache = _load_similar_artists_cache()
-    entry = cache.get(artist_name)
+    with file_lock(SIMILAR_ARTISTS_CACHE_FILE):
+        cache = _load_similar_artists_cache()
+        entry = cache.get(artist_name)
 
-    if not entry:
-        return None
+        if not entry:
+            return None
 
-    # Check expiry
-    created_at = entry.get("_created_at", 0)
-    if time.time() - created_at > SIMILAR_ARTISTS_CACHE_TTL:
-        # Expired, remove it
-        del cache[artist_name]
-        _save_similar_artists_cache(cache)
-        return None
+        # Check expiry
+        created_at = entry.get("_created_at", 0)
+        if time.time() - created_at > SIMILAR_ARTISTS_CACHE_TTL:
+            # Expired, remove it
+            del cache[artist_name]
+            _save_similar_artists_cache(cache)
+            return None
 
-    # Return data (without metadata)
-    return entry.get("similar_artists", [])
+        # Return data (without metadata)
+        return entry.get("similar_artists", [])
 
 
 def set_cached_similar_artists(artist_name: str, similar_artists: List[Dict[str, Any]]) -> None:
@@ -213,13 +203,14 @@ def set_cached_similar_artists(artist_name: str, similar_artists: List[Dict[str,
         artist_name: Artist name
         similar_artists: List of similar artist dicts
     """
-    cache = _load_similar_artists_cache()
-    cache[artist_name] = {
-        "similar_artists": similar_artists,
-        "_created_at": time.time(),
-        "_updated_at": datetime.now().isoformat()
-    }
-    _save_similar_artists_cache(cache)
+    with file_lock(SIMILAR_ARTISTS_CACHE_FILE):
+        cache = _load_similar_artists_cache()
+        cache[artist_name] = {
+            "similar_artists": similar_artists,
+            "_created_at": time.time(),
+            "_updated_at": datetime.now().isoformat()
+        }
+        _save_similar_artists_cache(cache)
 
 
 # ============================================================================
@@ -228,22 +219,15 @@ def set_cached_similar_artists(artist_name: str, similar_artists: List[Dict[str,
 
 def _load_deezer_cache() -> Dict[str, Any]:
     """Load the Deezer cache from disk."""
-    if not os.path.exists(DEEZER_CACHE_FILE):
-        return {}
-    try:
-        with open(DEEZER_CACHE_FILE, "r") as f:
-            return json.load(f)
-    except Exception:
-        return {}
+    return read_json(DEEZER_CACHE_FILE, {})
 
 
 def _save_deezer_cache(cache: Dict[str, Any]) -> None:
     """Save the Deezer cache to disk."""
     try:
-        with open(DEEZER_CACHE_FILE, "w") as f:
-            json.dump(cache, f, indent=2)
+        write_json_atomic(DEEZER_CACHE_FILE, cache)
     except Exception as e:
-        print(f"Failed to save Deezer cache: {e}")
+        print(f"Failed to save deezer cache: {e}")
 
 
 def get_cached_deezer_info(artist_name: str) -> Optional[Dict[str, Any]]:
@@ -256,22 +240,23 @@ def get_cached_deezer_info(artist_name: str) -> Optional[Dict[str, Any]]:
     Returns:
         Deezer info dict, or None if not cached or expired
     """
-    cache = _load_deezer_cache()
-    entry = cache.get(artist_name)
+    with file_lock(DEEZER_CACHE_FILE):
+        cache = _load_deezer_cache()
+        entry = cache.get(artist_name)
 
-    if not entry:
-        return None
+        if not entry:
+            return None
 
-    # Check expiry
-    created_at = entry.get("_created_at", 0)
-    if time.time() - created_at > DEEZER_CACHE_TTL:
-        # Expired, remove it
-        del cache[artist_name]
-        _save_deezer_cache(cache)
-        return None
+        # Check expiry
+        created_at = entry.get("_created_at", 0)
+        if time.time() - created_at > DEEZER_CACHE_TTL:
+            # Expired, remove it
+            del cache[artist_name]
+            _save_deezer_cache(cache)
+            return None
 
-    # Return data (without metadata)
-    return {k: v for k, v in entry.items() if not k.startswith("_")}
+        # Return data (without metadata)
+        return {k: v for k, v in entry.items() if not k.startswith("_")}
 
 
 def set_cached_deezer_info(artist_name: str, data: Dict[str, Any]) -> None:
@@ -282,13 +267,14 @@ def set_cached_deezer_info(artist_name: str, data: Dict[str, Any]) -> None:
         artist_name: Artist name
         data: Deezer info dict (image_url, top_tracks, fans, etc)
     """
-    cache = _load_deezer_cache()
-    cache[artist_name] = {
-        **data,
-        "_created_at": time.time(),
-        "_updated_at": datetime.now().isoformat()
-    }
-    _save_deezer_cache(cache)
+    with file_lock(DEEZER_CACHE_FILE):
+        cache = _load_deezer_cache()
+        cache[artist_name] = {
+            **data,
+            "_created_at": time.time(),
+            "_updated_at": datetime.now().isoformat()
+        }
+        _save_deezer_cache(cache)
 
 
 # ============================================================================
@@ -297,18 +283,14 @@ def set_cached_deezer_info(artist_name: str, data: Dict[str, Any]) -> None:
 
 def get_user_cache_path(user_id: str) -> str:
     """Get path to user's cache file."""
-    return os.path.join(CACHE_DIR, f"{user_id}_cache.json")
+    return os.path.join(CACHE_DIR, f"{safe_id(user_id)}_cache.json")
 
 
 def load_user_cache(user_id: str) -> Dict[str, Any]:
     """Load user's cache data."""
-    path = get_user_cache_path(user_id)
-    if os.path.exists(path):
-        try:
-            with open(path, "r") as f:
-                return json.load(f)
-        except Exception:
-            pass
+    loaded = read_json(get_user_cache_path(user_id), None)
+    if isinstance(loaded, dict):
+        return loaded
 
     return {
         "user_id": user_id,
@@ -325,10 +307,8 @@ def load_user_cache(user_id: str) -> Dict[str, Any]:
 def save_user_cache(user_id: str, data: Dict[str, Any]) -> None:
     """Save user's cache data."""
     data["_last_updated"] = datetime.now().isoformat()
-    path = get_user_cache_path(user_id)
     try:
-        with open(path, "w") as f:
-            json.dump(data, f, indent=2)
+        write_json_atomic(get_user_cache_path(user_id), data)
     except Exception as e:
         print(f"Failed to save user cache: {e}")
 
@@ -403,6 +383,11 @@ def update_user_top_artists(
     Returns:
         Updated user cache
     """
+    with file_lock(get_user_cache_path(user_id)):
+        return _update_user_top_artists_locked(user_id, spotify_artists, lastfm_artists)
+
+
+def _update_user_top_artists_locked(user_id, spotify_artists, lastfm_artists):
     cache = load_user_cache(user_id)
 
     if spotify_artists:

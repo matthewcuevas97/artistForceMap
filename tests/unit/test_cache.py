@@ -92,9 +92,8 @@ def test_corrupt_cache_file_reads_as_empty():
     assert cache.get_cached_artist("truncated") is None
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-11: cache writes truncate the file in place "
-                   "(open(..., 'w')); a crash/concurrent reader mid-write loses the whole cache")
 def test_failed_write_does_not_destroy_existing_cache(monkeypatch):
+    """BUG-11 regression: writes go to a temp file and os.replace() it, so a failed write keeps the old cache."""
     cache.set_cached_artist("keep me", {"name": "Keep"})
 
     real_dump = json.dump
@@ -103,8 +102,8 @@ def test_failed_write_does_not_destroy_existing_cache(monkeypatch):
         fp.write('{"partial":')
         raise OSError("disk full / process killed")
 
-    monkeypatch.setattr(cache.json, "dump", exploding_dump)
+    monkeypatch.setattr(json, "dump", exploding_dump)
     cache.set_cached_artist("new", {"name": "New"})  # error is swallowed by _save_artist_cache
-    monkeypatch.setattr(cache.json, "dump", real_dump)
+    monkeypatch.setattr(json, "dump", real_dump)
 
     assert cache.get_cached_artist("keep me") == {"name": "Keep"}

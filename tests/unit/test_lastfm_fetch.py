@@ -61,9 +61,8 @@ def test_image_and_bio_strip_html_and_pick_largest(http):
     assert bio == "Great band."
 
 
-@pytest.mark.xfail(strict=True, raises=(AssertionError, requests.ConnectionError), reason="BUG-32: get_artist_info has no timeout and no exception "
-                   "handling, unlike its sibling functions")
 def test_artist_info_network_error_is_handled(http):
+    """BUG-32 regression: get_artist_info had no timeout or exception handling."""
     http.add("GET", LASTFM_URL, body=requests.ConnectionError("down"))
     assert fetch.get_artist_info("X") is None
 
@@ -91,3 +90,24 @@ def test_artist_bio_from_api_is_trimmed_cleanly(http):
     http.add("GET", LASTFM_URL, json={"artist": {"image": [], "bio": {"summary": summary}}})
     _, bio = fetch.get_artist_image_and_bio("X")
     assert bio.endswith("Paris.") and len(bio) <= fetch.BIO_LIMIT
+
+
+# ── Transient failures return None (never cache them), not-found returns [] ──
+
+@pytest.mark.parametrize("fn", ["get_artist_top_tags", "get_similar_artists"])
+def test_transient_errors_return_none(http, fn):
+    http.add("GET", LASTFM_URL, json={"error": 29, "message": "Rate limit exceeded"})
+    http.add("GET", LASTFM_URL, body=requests.ConnectionError("down"))
+    assert getattr(fetch, fn)("X") is None
+    assert getattr(fetch, fn)("X") is None
+
+
+@pytest.mark.parametrize("fn", ["get_artist_top_tags", "get_similar_artists"])
+def test_unknown_artist_returns_empty_list(http, fn):
+    http.add("GET", LASTFM_URL, json={"error": 6, "message": "The artist you supplied could not be found"})
+    assert getattr(fetch, fn)("Nobody") == []
+
+
+def test_image_and_bio_network_error_is_handled(http):
+    http.add("GET", LASTFM_URL, body=requests.ConnectionError("down"))
+    assert fetch.get_artist_image_and_bio("X") == (None, None)

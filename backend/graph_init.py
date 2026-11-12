@@ -117,8 +117,10 @@ def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict, idx: int = 0
         if idx > 0 and total > 0:
             print(f"[{idx}/{total}] Gathering {artist_name} -{frame}*-{frame}* LOADING")
         similar = get_similar_artists(artist_name, limit=20, threshold=0.05)
-        # Cache it for 90 days
-        set_cached_similar_artists(artist_name, similar)
+        # Cache it for 90 days, but never cache a transient failure (None)
+        if similar is not None:
+            set_cached_similar_artists(artist_name, similar)
+        similar = similar or []
     else:
         # Found in cache
         if idx > 0 and total > 0:
@@ -174,28 +176,45 @@ def fetch_seed_artist_metadata(artist_name: str, lastfm_data: Dict, idx: int = 0
     return metadata
 
 
+# Extrapolated RBO is 1.0 for identical lists of any length. The old truncated
+# score topped out at 1 - p^10 = 0.65 for full 10-tag lists with a 0.21 cutoff;
+# 0.21 / 0.65 ≈ 0.32 keeps the same bar for 10-tag artists while letting short
+# identical lists (e.g. ['pop', 'dance']) connect (BUG-35).
+RBO_EDGE_THRESHOLD = 0.32
+
+
 def rbo_similarity(list1: List[str], list2: List[str], p: float = 0.9) -> float:
     """
-    Rank-Biased Overlap similarity between two ranked lists.
+    Extrapolated Rank-Biased Overlap (Webber, Moffat & Zobel 2010, eq. 32) between
+    two ranked lists, possibly of different lengths. 1.0 for identical lists, 0.0 for
+    disjoint ones, and 0.0 if either list is empty (no evidence of similarity, BUG-18).
     """
-    if not list1 and not list2:
-        return 1.0
     if not list1 or not list2:
         return 0.0
-
-    set1, set2 = set(), set()
-    score = 0.0
-    max_d = max(len(list1), len(list2))
-
-    for d in range(1, max_d + 1):
-        if d <= len(list1):
-            set1.add(list1[d - 1])
-        if d <= len(list2):
-            set2.add(list2[d - 1])
-        agreement = len(set1 & set2) / d
-        score += (1 - p) * (p ** (d - 1)) * agreement
-
-    return score
+    S, L = (list1, list2) if len(list1) <= len(list2) else (list2, list1)
+    s, l = len(S), len(L)
+    seen_s, seen_l = set(), set()
+    overlap = 0       # X_d: |S[:d] ∩ L[:d]|, with S frozen once exhausted
+    x_s = 0           # X_s: overlap at depth s
+    total = 0.0
+    for d in range(1, l + 1):
+        l_item = L[d - 1]
+        if d <= s:
+            s_item = S[d - 1]
+            if s_item == l_item:
+                overlap += 1
+            else:
+                overlap += (s_item in seen_l) + (l_item in seen_s)
+            seen_s.add(s_item)
+            seen_l.add(l_item)
+            if d == s:
+                x_s = overlap
+        else:
+            overlap += l_item in seen_s
+            seen_l.add(l_item)
+            total += x_s * (d - s) / (s * d) * p ** d
+        total += overlap / d * p ** d
+    return (1 - p) / p * total + ((overlap - x_s) / l + x_s / s) * p ** l
 
 
 def build_seed_graph(
@@ -257,7 +276,7 @@ def build_seed_graph(
 
             # RBO similarity of tags
             rbo_score = rbo_similarity(tags1, tags2, p=0.9)
-            if rbo_score >= 0.21:  # RBO_BASE_THRESHOLD
+            if rbo_score >= RBO_EDGE_THRESHOLD:
                 edges.append({
                     "source": artist1,
                     "target": artist2,

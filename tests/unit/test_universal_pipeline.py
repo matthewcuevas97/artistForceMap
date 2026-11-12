@@ -26,9 +26,28 @@ def test_derive_genre(tags, genre):
     assert _derive_genre(tags) == genre
 
 
-def test_rbo_identical_lists_is_max_for_depth():
-    tags = [f"t{i}" for i in range(10)]
-    assert rbo_similarity(tags, tags) == pytest.approx(1 - 0.9 ** 10)
+@pytest.mark.parametrize("n", [1, 2, 5, 10])
+def test_rbo_identical_lists_is_one_at_any_length(n):
+    tags = [f"t{i}" for i in range(n)]
+    assert rbo_similarity(tags, tags) == pytest.approx(1.0)
+
+
+def test_rbo_matches_hand_computed_extrapolation():
+    # First 5 of 10 agree, rest disjoint: (1-p)/p * Σ X_d/d p^d + X_10/10 p^10 = 0.7442
+    a = list("abcdefghij")
+    b = list("abcde") + list("vwxyz")
+    assert rbo_similarity(a, b) == pytest.approx(0.744196, abs=1e-6)
+
+
+def test_rbo_is_top_weighted():
+    base = list("abcdefghij")
+    agree_top = list("abc") + list("uvwxyzq")
+    agree_bottom = list("uvwxyzq") + list("hij")
+    assert rbo_similarity(base, agree_top) > rbo_similarity(base, agree_bottom)
+
+
+def test_rbo_both_empty_is_zero():
+    assert rbo_similarity([], []) == 0.0
 
 
 def test_rbo_disjoint_lists_is_zero():
@@ -44,9 +63,8 @@ def test_rbo_is_symmetric():
     assert rbo_similarity(a, b) == pytest.approx(rbo_similarity(b, a))
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-18: rbo_similarity([], []) returns 1.0, so two "
-                   "tag-less seed artists get a spurious 'tag_similarity' edge")
 def test_two_tagless_artists_are_not_connected():
+    """BUG-18 regression: rbo([], []) was 1.0, linking two tag-less artists."""
     graph = build_seed_graph("u", ["A", "B"], {"A": {"name": "A", "tags": []}, "B": {"name": "B", "tags": []}})
     assert graph["edges"] == []
 
@@ -54,9 +72,8 @@ def test_two_tagless_artists_are_not_connected():
 TAGS5 = ["pop", "dance", "electropop", "synthpop", "hyperpop"]
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-35: RBO is truncated (no extrapolation), so identical "
-                   "short tag lists score < 0.21 — e.g. two artists tagged ['pop','dance'] = 0.19")
 def test_identical_short_tag_lists_are_connected():
+    """BUG-35 regression: truncated RBO scored identical 2-tag lists 0.19 (< 0.21)."""
     meta = {n: {"name": n, "tags": ["pop", "dance"]} for n in "AB"}
     assert build_seed_graph("u", ["A", "B"], meta)["edges"]
 
@@ -134,9 +151,8 @@ def test_enrichment_fetches_and_caches(http):
     assert len(http.calls) == n_calls, "second run should be served from cache"
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-23: a Last.fm error/rate-limit on getTopTags is "
-                   "turned into tags=[] and cached for 90 days, permanently degrading that artist")
 def test_enrichment_does_not_cache_failed_tag_lookup(http):
+    """BUG-23 regression: a rate-limited tag lookup was cached as tags=[] for 90 days."""
     _mock_lastfm(http, error_on=("artist.getTopTags",))
     user_data.set_user_top_artists("u", spotify_artists=[{"name": "A", "score": 1.0}])
     tag_enrichment.enrich_top_25_artists("u")
@@ -190,12 +206,38 @@ def test_load_user_db_falls_back_to_single_source():
     assert user_data.load_user_db("u")["top_artists"] == [{"name": "X", "score": 1}]
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError, reason="BUG-22: user ids are interpolated into file paths "
-                   "unsanitized (data/users/{user_id}_map.json)")
-def test_user_id_cannot_escape_data_dir(isolated_storage):
+@pytest.mark.parametrize("uid", ["../../escape", "/etc/passwd", "..", "a/b", "名前", "x" * 200])
+def test_user_id_cannot_escape_data_dir(isolated_storage, uid):
+    """BUG-22 regression: user ids went into file paths unsanitised."""
     import os
-    path = os.path.realpath(user_data.get_user_map_path("../../escape"))
-    assert path.startswith(os.path.realpath(str(isolated_storage["users"])))
+    for path in (user_data.get_user_map_path(uid), user_data.get_user_db_path(uid), cache.get_user_cache_path(uid)):
+        real = os.path.realpath(path)
+        assert os.path.dirname(real) in {os.path.realpath(str(isolated_storage["users"])),
+                                         os.path.realpath(str(isolated_storage["cache"]))}
+
+
+def test_normal_user_ids_keep_readable_file_names():
+    assert user_data.get_user_map_path("yfs6fgzckr3o9tikcj54rsd0f").endswith("yfs6fgzckr3o9tikcj54rsd0f_map.json")
+    assert user_data.get_user_map_path("bob_the-dj.1").endswith("bob_the-dj.1_map.json")
+
+
+def test_user_map_roundtrip_for_unsafe_id():
+    user_data.save_user_map("../evil", {"nodes": [{"name": "A"}], "edges": []})
+    assert user_data.load_user_map("../evil")["nodes"] == [{"name": "A"}]
+
+
+def test_concurrent_map_updates_are_not_lost():
+    import threading
+    user_data.save_user_map("u", {"nodes": [], "edges": []})
+
+    def add(i):
+        user_data.update_user_map("u", lambda m: m["nodes"].append({"name": f"N{i}"}))
+    threads = [threading.Thread(target=add, args=(i,)) for i in range(20)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert len(user_data.load_user_map("u")["nodes"]) == 20
 
 
 # ── Ingestion ─────────────────────────────────────────────────────────────────

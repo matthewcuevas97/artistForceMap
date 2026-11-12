@@ -5,9 +5,9 @@ User data persistence layer with caching.
 - NO sensitive data: auth tokens, passwords, refresh tokens
 """
 
-import json
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
+from .storage import file_lock, read_json, safe_id, write_json_atomic
 from .cache import (
     load_user_cache,
     save_user_cache,
@@ -21,12 +21,12 @@ os.makedirs(USER_DATA_DIR, exist_ok=True)
 
 def get_user_db_path(user_id: str) -> str:
     """Get the path to a user's database file (legacy, for backwards compat)."""
-    return os.path.join(USER_DATA_DIR, f"{user_id}_db.json")
+    return os.path.join(USER_DATA_DIR, f"{safe_id(user_id)}_db.json")
 
 
 def get_user_map_path(user_id: str) -> str:
     """Get the path to a user's map file."""
-    return os.path.join(USER_DATA_DIR, f"{user_id}_map.json")
+    return os.path.join(USER_DATA_DIR, f"{safe_id(user_id)}_map.json")
 
 
 # ============================================================================
@@ -52,15 +52,8 @@ def load_user_db(user_id: str) -> Dict[str, Any]:
             top_artists = cache["top_artists_lastfm"]
 
     # Try to load enriched data from legacy format
-    all_artists = {}
-    try:
-        legacy_path = get_user_db_path(user_id)
-        if os.path.exists(legacy_path):
-            with open(legacy_path, "r") as f:
-                legacy_data = json.load(f)
-                all_artists = legacy_data.get("all_artists", {})
-    except Exception:
-        pass
+    legacy_data = read_json(get_user_db_path(user_id), {})
+    all_artists = legacy_data.get("all_artists", {}) if isinstance(legacy_data, dict) else {}
 
     return {
         "user_id": user_id,
@@ -97,23 +90,19 @@ def save_user_db(user_id: str, data: Dict[str, Any]) -> None:
     if "all_artists" in data:
         legacy_path = get_user_db_path(user_id)
         try:
-            legacy = {}
-            if os.path.exists(legacy_path):
-                with open(legacy_path) as f:
-                    legacy = json.load(f)
-            legacy["all_artists"] = data["all_artists"]
-            with open(legacy_path, "w") as f:
-                json.dump(legacy, f, indent=2)
+            with file_lock(legacy_path):
+                legacy = read_json(legacy_path, {})
+                legacy["all_artists"] = data["all_artists"]
+                write_json_atomic(legacy_path, legacy)
         except Exception:
             pass
 
 
 def load_user_map(user_id: str) -> Dict[str, Any]:
     """Load user's graph map (nodes and edges for frontend)."""
-    path = get_user_map_path(user_id)
-    if os.path.exists(path):
-        with open(path, "r") as f:
-            return json.load(f)
+    loaded = read_json(get_user_map_path(user_id), None)
+    if isinstance(loaded, dict):
+        return loaded
     return {
         "user_id": user_id,
         "nodes": [],  # Seed artists with full metadata
@@ -124,13 +113,26 @@ def load_user_map(user_id: str) -> Dict[str, Any]:
 def save_user_map(user_id: str, data: Dict[str, Any]) -> None:
     """Save user's graph map."""
     path = get_user_map_path(user_id)
-    with open(path, "w") as f:
-        json.dump(data, f, indent=2)
+    with file_lock(path):
+        write_json_atomic(path, data)
 
     # Also update cache to point to this map
     cache = load_user_cache(user_id)
     cache["map_id"] = user_id  # or derive actual map ID if different
     save_user_cache(user_id, cache)
+
+
+def update_user_map(user_id: str, fn: Callable[[Dict[str, Any]], Any]) -> Any:
+    """
+    Load the user's map, let `fn` mutate it in place, and save it, all under the
+    map's file lock so concurrent expands can't drop each other's nodes.
+    Returns whatever `fn` returns.
+    """
+    with file_lock(get_user_map_path(user_id)):
+        user_map = load_user_map(user_id)
+        result = fn(user_map)
+        save_user_map(user_id, user_map)
+        return result
 
 
 def get_or_create_user(user_id: str, auth_data: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
