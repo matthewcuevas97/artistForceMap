@@ -335,7 +335,6 @@ def merge_top_artists(
     """
     # Build maps for quick lookup
     spotify_map = {artist["name"].lower(): artist for artist in spotify_artists}
-    lastfm_map = {artist["name"].lower(): artist for artist in lastfm_artists}
 
     merged = {}
 

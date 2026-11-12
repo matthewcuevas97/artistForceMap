@@ -12,7 +12,6 @@ from .cache import (
     load_user_cache,
     save_user_cache,
     update_user_top_artists,
-    merge_top_artists
 )
 
 USER_DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "users")

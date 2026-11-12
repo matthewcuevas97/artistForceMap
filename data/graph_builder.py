@@ -2,7 +2,6 @@ import json
 import math
 import os
 import re
-from collections import defaultdict
 
 
 def _norm(s):

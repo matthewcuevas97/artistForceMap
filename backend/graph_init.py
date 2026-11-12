@@ -4,15 +4,14 @@ Uses cache for similar artists and artist metadata.
 """
 
 import time
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any
 
-from lastfm.fetch import get_similar_artists, get_top_tracks
+from lastfm.fetch import get_similar_artists
 from backend.cache import (
-    get_cached_artist, set_cached_artist,
     get_cached_similar_artists, set_cached_similar_artists,
     get_cached_deezer_info, set_cached_deezer_info
 )
-from backend.user_data import load_user_db, load_user_map, save_user_map, update_user_db
+from backend.user_data import load_user_db, save_user_map, update_user_db
 from backend.progress import report
 
 
@@ -448,7 +447,7 @@ def initialize_user_graph(user_id: str) -> Dict[str, Any]:
     if not seed_artists:
         raise ValueError(f"No seed artists found for user {user_id}")
 
-    report(f"Gathering related artists")
+    report("Gathering related artists")
 
     # Fetch metadata for each seed artist
     all_artists_metadata = {}

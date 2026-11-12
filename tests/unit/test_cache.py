@@ -3,7 +3,6 @@
 import json
 import time
 
-import pytest
 
 import backend.cache as cache
 

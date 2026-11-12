@@ -72,7 +72,7 @@ def run_full_pipeline(auth_data: Dict[str, Any]) -> Dict[str, Any]:
         graph_result = initialize_user_graph(user_id)
         report(f"✓ Graph initialized with {len(graph_result['graph']['nodes'])} nodes")
         report(f"✓ Edges: {len(graph_result['graph']['edges'])}")
-        report(f"✓ Saved to user_map.json\n")
+        report("✓ Saved to user_map.json\n")
     except Exception as e:
         report(f"✗ Graph init failed: {str(e)}\n")
         raise

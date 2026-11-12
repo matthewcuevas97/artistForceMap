@@ -3,7 +3,7 @@ Seed artist selection: greedy algorithm to select 5 diverse seed artists.
 Uses Maximal Marginal Relevance: maximize rank while minimizing tag overlap.
 """
 
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 from backend.user_data import load_user_db, update_user_db
 from backend.progress import report
 

@@ -1,5 +1,3 @@
-import spotipy
-
 def get_top_artists(sp):
     """
     Fetch the current user's top artists from Spotify.

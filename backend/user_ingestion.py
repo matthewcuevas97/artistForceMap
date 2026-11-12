@@ -2,7 +2,6 @@
 User ingestion: fetching user's top artists from Spotify/Last.fm.
 """
 
-import time
 from typing import Dict, List, Any
 
 import spotipy
@@ -57,7 +56,7 @@ def ingest_user(auth_data: Dict[str, Any]) -> Dict[str, Any]:
     user_id = auth_data.get("id", "unknown")
 
     # Create/get user record
-    user_db = get_or_create_user(user_id, auth_data)
+    get_or_create_user(user_id, auth_data)
 
     # Fetch top artists based on provider
     provider = auth_data.get("provider", "unknown")

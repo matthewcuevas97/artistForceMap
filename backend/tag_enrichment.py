@@ -3,13 +3,16 @@ Tag enrichment: fetch Last.fm artist info and tags for all top 25 artists.
 Uses global artist cache (90 days) to avoid redundant API calls.
 """
 
+import logging
 import time
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 from lastfm.fetch import get_artist_info, get_artist_top_tags, get_artist_image_and_bio
 from backend.cache import get_cached_artist, set_cached_artist
 from backend.user_data import load_user_db, update_user_db
 from backend.progress import report
+
+logger = logging.getLogger(__name__)
 
 
 class EnrichmentUnavailable(Exception):
@@ -90,6 +93,8 @@ def enrich_top_25_artists(user_id: str) -> Dict[str, Any]:
             frame = frames[frame_idx % len(frames)]
             frame_idx += 1
             report(f"[{i}/{len(top_artists)}] Gathering {artist_name} -{frame}*-{frame}* ERROR")
+            # Make the cause visible in server logs (the user stream only shows ERROR).
+            logger.warning("Enrichment failed for %r: %s: %s", artist_name, e.__class__.__name__, e)
             # Still add minimal data
             all_artists[artist_name] = {
                 "name": artist_name,

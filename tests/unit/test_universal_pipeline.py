@@ -159,6 +159,15 @@ def test_enrichment_does_not_cache_failed_tag_lookup(http):
     assert cache.get_cached_artist("A") is None
 
 
+def test_enrichment_failure_is_logged(http, caplog):
+    _mock_lastfm(http, error_on=("artist.getTopTags",))
+    user_data.set_user_top_artists("u", spotify_artists=[{"name": "A", "score": 1.0}])
+    with caplog.at_level("WARNING", logger="backend.tag_enrichment"):
+        res = tag_enrichment.enrich_top_25_artists("u")
+    assert res["all_artists"]["A"]["tags"] == []  # still on the map, with minimal data
+    assert "Enrichment failed for 'A'" in caplog.text
+
+
 # ── Graph init / Deezer ───────────────────────────────────────────────────────
 
 def _expired_preview(minutes_ago=60):
