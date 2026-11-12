@@ -40,14 +40,35 @@ def test_initial_render(coachella):
     assert coachella.page_errors == []
 
 
+LONGTASK_OBSERVER = ("window.__lt=[];new PerformanceObserver(l=>l.getEntries().forEach(e=>window.__lt.push(e.duration)))"
+                     ".observe({entryTypes:['longtask']});")
+# PERF-01: 3000 synchronous pre-ticks used to block ~800 ms on load and on every slider step.
+MAIN_THREAD_BUDGET_MS = 300
+
+
 def test_initial_render_blocks_main_thread_under_budget(coachella):
-    """Perf guard-rail: the 3000 synchronous pre-ticks currently cost ~0.8 s on an M-series Mac."""
-    coachella.page.add_init_script(
-        "window.__lt=[];new PerformanceObserver(l=>l.getEntries().forEach(e=>window.__lt.push(e.duration)))"
-        ".observe({entryTypes:['longtask']});")
+    coachella.page.add_init_script(LONGTASK_OBSERVER)
     _open(coachella)
     worst = max(coachella.page.evaluate("() => window.__lt") or [0])
-    assert worst < 2500, f"main thread blocked for {worst:.0f} ms"
+    assert worst < MAIN_THREAD_BUDGET_MS, f"main thread blocked for {worst:.0f} ms"
+
+
+def test_threshold_slider_is_cheap_and_keeps_layout(coachella):
+    """PERF-01: a threshold step swaps edges in place: no long task, nodes keep their positions."""
+    coachella.page.add_init_script(LONGTASK_OBSERVER)
+    _open(coachella)
+    p = coachella.page
+    p.evaluate("() => { window.__lt = []; }")
+    before = p.evaluate("() => Object.fromEntries(Array.from(document.querySelectorAll('#graph circle')).map(c => [c.__data__.name, [c.__data__.x, c.__data__.y]]))")
+    for v in ("5", "0", "3"):
+        p.locator("#thresholdSlider").fill(v)
+        p.wait_for_timeout(150)
+    worst = max(p.evaluate("() => window.__lt") or [0])
+    assert worst < MAIN_THREAD_BUDGET_MS, f"slider step blocked for {worst:.0f} ms"
+    after = p.evaluate("() => Object.fromEntries(Array.from(document.querySelectorAll('#graph circle')).map(c => [c.__data__.name, [c.__data__.x, c.__data__.y]]))")
+    moved = sorted(((a[0] - before[n][0]) ** 2 + (a[1] - before[n][1]) ** 2) ** 0.5 for n, a in after.items())
+    assert moved[len(moved) // 2] < 60, "median node jumped: layout was rebuilt instead of nudged"
+    assert p.locator("#graph circle").count() == TOTAL_NODES
 
 
 def test_graph_load_failure_shows_error_overlay(coachella):
@@ -241,8 +262,10 @@ def test_threshold_slider_filters_edges(coachella):
     levels = _graph_json(p)["edges_by_level"]
     for idx, key in enumerate(["0.30", "0.32", "0.34", "0.36", "0.38", "0.40"]):
         p.locator("#thresholdSlider").fill(str(idx))
-        assert p.locator("#thresholdValue").inner_text() == key
-        assert p.locator("#graph line").count() == len(levels[key])
+        assert p.locator("#thresholdValue").inner_text() == key  # label updates immediately
+        # the edge swap itself is debounced
+        p.wait_for_function(f"() => document.querySelectorAll('#graph line').length === {len(levels[key])}",
+                            timeout=2000)
 
 
 def test_threshold_change_keeps_selection_consistent(coachella):
@@ -256,6 +279,25 @@ def test_threshold_change_keeps_selection_consistent(coachella):
     coachella.wait_for_graph(TOTAL_NODES)
     opacities = set(p.evaluate("() => Array.from(document.querySelectorAll('#graph circle')).map(c => c.getAttribute('opacity'))"))
     assert opacities <= {None, "1"}, f"stale subgraph dimming after rebuild: {opacities}"
+
+
+def test_threshold_change_keeps_open_artist_highlighted(coachella):
+    """With edges swapped in place, the pinned artist stays selected and its neighbourhood is recomputed."""
+    _open(coachella)
+    p = coachella.page
+    coachella.click_node("The Strokes")
+    p.locator("#artistPanel.open").wait_for()
+    p.evaluate("() => { const s = document.getElementById('thresholdSlider'); s.value = '4';"
+               " s.dispatchEvent(new Event('input')); }")
+    p.wait_for_timeout(400)
+    assert p.locator("#artistPanel.open").count() == 1
+    edges = _graph_json(p)["edges_by_level"]["0.38"]
+    expected = {"The Strokes"} | {e["target"] for e in edges if e["source"] == "The Strokes"} \
+                               | {e["source"] for e in edges if e["target"] == "The Strokes"}
+    lit = set(p.evaluate("() => Array.from(document.querySelectorAll('#graph circle'))"
+                         ".filter(c => c.getAttribute('opacity') === '1').map(c => c.__data__.name)"))
+    assert lit == expected
+    assert coachella.node("The Strokes").get_attribute("stroke") == "#FFD700"
 
 
 def test_node_size_slider_scales_radius(coachella):
@@ -360,18 +402,18 @@ def test_spotify_connect_navigates_to_login(coachella):
 
 # ── Layout / viewport ─────────────────────────────────────────────────────────
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="BUG-09: W/H are captured once at import; the SVG and forces ignore window resize")
 def test_svg_tracks_window_resize(coachella):
+    """BUG-09 regression: W/H were captured once at import."""
     _open(coachella)
     coachella.page.set_viewport_size({"width": 900, "height": 700})
     coachella.page.wait_for_timeout(500)
-    assert coachella.page.locator("#graph").get_attribute("width") == "900"
+    g = coachella.page.locator("#graph")
+    assert (g.get_attribute("width"), g.get_attribute("height")) == ("900", "700")
+    assert coachella.page.locator("#graph > rect").get_attribute("width") == "900"
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="UX-01: no zoom-to-fit on load — part of the graph starts outside the viewport")
 def test_whole_graph_fits_viewport_on_load(coachella):
+    """UX-01 regression: part of the graph used to start outside the viewport."""
     _open(coachella)
     vp = coachella.page.viewport_size
     outside = coachella.page.evaluate("([w,h]) => Array.from(document.querySelectorAll('#graph circle')).filter(c => {"
@@ -380,11 +422,11 @@ def test_whole_graph_fits_viewport_on_load(coachella):
     assert outside == 0, f"{outside} nodes start off-screen"
 
 
-def test_most_labels_hidden_for_anonymous_users(coachella):
-    """Documents UX-02: linear listener normalisation leaves >50% of nodes with score < 0.1 → label opacity 0."""
+def test_most_labels_visible_for_anonymous_users(coachella):
+    """UX-02 regression: linear listener scaling used to hide 58% of labels (score < 0.1)."""
     _open(coachella)
     hidden = coachella.page.evaluate("() => Array.from(document.querySelectorAll('#graph text')).filter(t => t.getAttribute('opacity') === '0').length")
-    assert hidden / TOTAL_NODES > 0.5
+    assert hidden / TOTAL_NODES < 0.15
 
 
 # ── Mobile ────────────────────────────────────────────────────────────────────
@@ -401,10 +443,8 @@ def _tappable_node(c):
         .sort((a, b) => b.r - a.r)[0]?.el.__data__.name""")
 
 
-@pytest.mark.xfail(strict=True, raises=AssertionError,
-                   reason="UX-01 (mobile): only ~30/142 nodes start on-screen at 390x844 and the "
-                          "controls panel opens expanded over the top half of the screen")
 def test_mobile_initial_view_is_usable(coachella_mobile):
+    """UX-01 regression: only ~30/142 nodes started on-screen at 390x844, under expanded controls."""
     c = coachella_mobile
     c.goto()
     c.wait_for_graph(TOTAL_NODES)

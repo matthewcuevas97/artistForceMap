@@ -53,8 +53,10 @@ export let thresholdDebounce = null;
 export let controlsCollapsedBottom = 0;
 
 // ── Viewport ──────────────────────────────────────────────────────────────────
-export const W = window.innerWidth;
-export const H = window.innerHeight;
+// Live bindings: importers see updates made by setViewport() on window resize.
+export let W = window.innerWidth;
+export let H = window.innerHeight;
+export function setViewport(w, h) { W = w; H = h; }
 
 export const isMobile = window.innerWidth < 768 || ('ontouchstart' in window);
 

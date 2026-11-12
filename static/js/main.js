@@ -4,7 +4,7 @@
 
 import * as S from './state.js';
 import {
-  buildGraph, nodeEl, simulation,
+  buildGraph, updateEdges, resizeViewport, nodeEl, simulation,
   enterSubgraphHighlight, exitSubgraphHighlight,
   clearHover, zoomToSubgraph,
 } from './simulation.js';
@@ -144,8 +144,16 @@ function onPanelClose() {
 
 function onThresholdChange() {
   S.setRawEdges(S.edgesByLevel[S.edgeThreshold.toFixed(2)] || []);
-  buildGraph(onNodeClick, onBgClick);
+  updateEdges();
 }
+
+// ── Window resize ─────────────────────────────────────────────────────────────
+
+let _resizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(_resizeTimer);
+  _resizeTimer = setTimeout(() => resizeViewport(window.innerWidth, window.innerHeight), 150);
+});
 
 // ── Graph loading ─────────────────────────────────────────────────────────────
 
